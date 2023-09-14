@@ -1,0 +1,2047 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SANBI WPS technical and user documentation.">
+      
+      
+        <meta name="author" content="Kartoza">
+      
+      
+      
+        <link rel="prev" href="../quickstart/">
+      
+      
+        <link rel="next" href="../manual/">
+      
+      <link rel="icon" href="../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
+    
+    
+      
+        <title>SAWPS User Guide - SAWPS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.558e4712.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="custom">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sawps-user-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SAWPS" class="md-header__button md-logo" aria-label="SAWPS" data-md-component="logo">
+      
+  <img src="../../img/SANBI-logo.jpg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SAWPS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              SAWPS User Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+            </label>
+          
+        
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kartoza/sawps/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    SANBI WPS
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        Home
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link md-tabs__link--active">
+        User
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../administrator/" class="md-tabs__link">
+        Administrators
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../developer/" class="md-tabs__link">
+        Developer
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../devops/" class="md-tabs__link">
+        DevOps
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        About
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SAWPS" class="md-nav__button md-logo" aria-label="SAWPS" data-md-component="logo">
+      
+  <img src="../../img/SANBI-logo.jpg" alt="logo">
+
+    </a>
+    SAWPS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kartoza/sawps/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    SANBI WPS
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" >
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../..">Home</a>
+          
+            <label for="__nav_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Home" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          Home
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/code-of-conduct/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+        
+          
+            
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../">User</a>
+          
+            <label for="__nav_2">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="User" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          User
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        Quickstart
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_2_3" type="checkbox" id="__nav_2_3" checked>
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index md-nav__link--active">
+          <a href="./">Guide</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Guide" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_3">
+          <span class="md-nav__icon md-icon"></span>
+          Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_4" type="checkbox" id="__nav_2_4" >
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../manual/">Manual</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Manual" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_4">
+          <span class="md-nav__icon md-icon"></span>
+          Manual
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../administrator/">Administrators</a>
+          
+            <label for="__nav_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Administrators" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Administrators
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../administrator/guide/">Guide</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Guide" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../administrator/manual/">Manual</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Manual" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          Manual
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../developer/">Developer</a>
+          
+            <label for="__nav_4">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Developer" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Developer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../developer/guide/">Guide</a>
+          
+            <label for="__nav_4_2">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Guide" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/architecture/" class="md-nav__link">
+        Architecture
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/prerequisites/" class="md-nav__link">
+        Prerequisites
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/design/" class="md-nav__link">
+        Design
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/ide-setup/" class="md-nav__link">
+        IDE Setup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/cloning/" class="md-nav__link">
+        Cloning
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/building/" class="md-nav__link">
+        Building
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/workflows/" class="md-nav__link">
+        Workflows
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/templates/pull-request-template/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/guide/templates/commit-message-convention/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../developer/manual/">Manual</a>
+          
+            <label for="__nav_4_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Manual" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          Manual
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/activity/" class="md-nav__link">
+        Activity
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/core/" class="md-nav__link">
+        Core
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/fixtures/" class="md-nav__link">
+        Fixtures
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/frontend/" class="md-nav__link">
+        Frontend
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/notification/" class="md-nav__link">
+        Notification
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/occurrence/" class="md-nav__link">
+        Occurrence
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/population_data/" class="md-nav__link">
+        Population Data
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/property/" class="md-nav__link">
+        Property
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/regulator_permit/" class="md-nav__link">
+        Regulatory Permit
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/sawps/" class="md-nav__link">
+        SAWPS
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/species/" class="md-nav__link">
+        Species
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/manual/stakeholder/" class="md-nav__link">
+        Stakeholder
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_4_4" type="checkbox" id="__nav_4_4" >
+      
+      
+        
+          
+            
+          
+        
+          
+            
+          
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../developer/api/">API</a>
+          
+            <label for="__nav_4_4">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="API" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_4">
+          <span class="md-nav__icon md-icon"></span>
+          API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/api/manual/" class="md-nav__link">
+        Reference
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/api/guide/" class="md-nav__link">
+        Guide
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/documentation/" class="md-nav__link">
+        Documentation Writing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+        
+          
+            
+          
+        
+          
+            
+          
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../devops/">DevOps</a>
+          
+            <label for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="DevOps" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          DevOps
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/guide/" class="md-nav__link">
+        Guide
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/manual/" class="md-nav__link">
+        Manual
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../about/">About</a>
+          
+            <label for="__nav_6">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="About" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          About
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/funders/" class="md-nav__link">
+        Funders
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#switching-between-light-and-dark-mode-on-the-map" class="md-nav__link">
+    Switching between light and dark mode on the map
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-new-property-by-selecting-parcels" class="md-nav__link">
+    Creating a new property by selecting parcels
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-online-form" class="md-nav__link">
+    The online form
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#printing-your-map" class="md-nav__link">
+    Printing your map
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enabling-and-disabling-the-basemap" class="md-nav__link">
+    Enabling and disabling the basemap
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-filters-panel" class="md-nav__link">
+    The Filters Panel
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uploading-data" class="md-nav__link">
+    Uploading data
+  </a>
+  
+    <nav class="md-nav" aria-label="Uploading data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-upload-csv-data" class="md-nav__link">
+    How to upload CSV data
+  </a>
+  
+    <nav class="md-nav" aria-label="How to upload CSV data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1" class="md-nav__link">
+    Step 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2" class="md-nav__link">
+    Step 2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3" class="md-nav__link">
+    Step 3
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4" class="md-nav__link">
+    Step 4
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#two-factor-authentication-settings" class="md-nav__link">
+    Two factor authentication settings
+  </a>
+  
+    <nav class="md-nav" aria-label="Two factor authentication settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-new-device" class="md-nav__link">
+    Adding new device
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deleting-a-device" class="md-nav__link">
+    Deleting a device
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#forgot-password" class="md-nav__link">
+    Forgot password
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notifications" class="md-nav__link">
+    Notifications
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#organisation-page" class="md-nav__link">
+    Organisation page
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-organisation-feature" class="md-nav__link">
+    Request organisation feature
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reminders-page" class="md-nav__link">
+    Reminders page
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+
+<h1 id="sawps-user-guide">SAWPS User Guide<a class="headerlink" href="#sawps-user-guide" title="Permanent link">&para;</a></h1>
+<h2 id="switching-between-light-and-dark-mode-on-the-map">Switching between light and dark mode on the map<a class="headerlink" href="#switching-between-light-and-dark-mode-on-the-map" title="Permanent link">&para;</a></h2>
+<p>To switch to dark mode, simply go to your map and click on the little sun icon which is located next to the layers panel.</p>
+<p><img alt="Dark Mode 1" src="img/dark-mode-1.png" /></p>
+<p>This will switch your map from light mode to dark mode.
+<img alt="Dark Mode 2" src="img/dark-mode-2.png" /></p>
+<p>To change your map from dark mode to light mode, simply click on the crescent moon icon located next to the layers panel.
+<img alt="Dark Mode 3" src="img/dark-mode-3.png" /></p>
+<h2 id="creating-a-new-property-by-selecting-parcels">Creating a new property by selecting parcels<a class="headerlink" href="#creating-a-new-property-by-selecting-parcels" title="Permanent link">&para;</a></h2>
+<p>There are various methods of creating a new property on the site. One of them uses a selection tool to allow you, as the user, to select the parcels you want to be a part of the property you are creating.
+To create a property using this method, go to ‘Maps’ and select ‘ Data Upload’.</p>
+<p><img alt="Selecting Parcels 1" src="img/selecting-parcels-1.png" /></p>
+<p>Fill in the ‘Property Information’ form and then click on ‘Save Property Information’. Next, choose the ‘Select’ option and zoom in on the map to where your property is located.</p>
+<p><img alt="Selecting Parcels 2" src="img/selecting-parcels-2.png" /></p>
+<p>Once you have located your property, select all of the relevant parcels. Once you are happy with your selection, click on the ‘Save Boundary’ button. If you want to deselect what you have selected, click ‘Cancel’ to clear everything and then ‘Select’ to start again or just click on the parcel again to deselect them individually.</p>
+<p><img alt="Selecting Parcels 3" src="img/selecting-parcels-3.png" /></p>
+<h2 id="the-online-form">The online form<a class="headerlink" href="#the-online-form" title="Permanent link">&para;</a></h2>
+<p>You will now be directed to Step 3. Select ‘Update Property Boundary’ to go back to Step 2. Select ‘Online Form’ to fill in all of the species and activity detail about the property.</p>
+<p><img alt="Online Form 1" src="img/online-form-1.png" /></p>
+<p>The online form allows you to give Species Detail as well as Activity Detail about each property.</p>
+<p><img alt="Online Form 2" src="img/online-form-2.png" /></p>
+<p><img alt="Online Form 3" src="img/online-form-3.png" /></p>
+<p>Once you have filled in both sections of the form, you can review them and then submit the form or save the form as a draft and submit it at a later stage.</p>
+<p><img alt="Online Form 4" src="img/online-form-4.png" /></p>
+<h2 id="printing-your-map">Printing your map<a class="headerlink" href="#printing-your-map" title="Permanent link">&para;</a></h2>
+<p>The print option on the map allows you to take a screenshot of whatever is present on your map canvas. To save this screenshot, click on the print icon which is located next to the layers panel.</p>
+<p><img alt="Print 1" src="img/print-1.png" /></p>
+<p>Select your desired page size, orientation, image format and DPI and then click on the ‘Generate’ button.</p>
+<p><img alt="Print 2" src="img/print-2.png" /></p>
+<p>Once you have selected your image settings, save the image to your local machine.</p>
+<p><img alt="Print 3" src="img/print-3.png" /></p>
+<h2 id="enabling-and-disabling-the-basemap">Enabling and disabling the basemap<a class="headerlink" href="#enabling-and-disabling-the-basemap" title="Permanent link">&para;</a></h2>
+<p>Once you are in the map, you have the option of enabling and disabling ‘NGI Aerial Imagery’. This basemap allows you to visualise the map using aerial imagery. By disabling this, the map will no longer have a basemap.</p>
+<p><img alt="Alt text" src="img/basemap-1.png" /></p>
+<p><img alt="Alt text" src="img/basemap-2.png" /></p>
+<h2 id="the-filters-panel">The Filters Panel<a class="headerlink" href="#the-filters-panel" title="Permanent link">&para;</a></h2>
+<p>To apply filters to the data being displayed on your map, open the ‘Filters’ panel. This panel is interchangeable with the layers panel.</p>
+<p><img alt="Alt text" src="img/filters-1.png" /></p>
+<p>Here you will be able to filter by species, year and month. There are also spatial filters available in this panel. Here you can filter by population category, protected areas, activity, critical biodiversity areas and ecosystem type.</p>
+<p><img alt="Alt text" src="img/filters-2.png" /></p>
+<p>To use these filters simply check the boxes to enable them and uncheck the boxes to disable them.</p>
+<p><img alt="Alt text" src="img/filters-3.png" /></p>
+<p>The year filter works slightly differently from the rest. Simply drag the dots on the black line to choose which year(s) you want to show data for.</p>
+<p><img alt="Alt text" src="img/filters-4.png" /></p>
+<h2 id="uploading-data">Uploading data<a class="headerlink" href="#uploading-data" title="Permanent link">&para;</a></h2>
+<p>The data upload function allows users to fill in an online form or upload a CSV file to the SAWPS platform to further enrich their data.</p>
+<h3 id="how-to-upload-csv-data">How to upload CSV data<a class="headerlink" href="#how-to-upload-csv-data" title="Permanent link">&para;</a></h3>
+<p>Users must first download a template from the platform, which they populate with their own data.</p>
+<h4 id="step-1">Step 1<a class="headerlink" href="#step-1" title="Permanent link">&para;</a></h4>
+<p>On the <strong>Map</strong> page</p>
+<p><img alt="step 1" src="img/upload-data-step-1.png" /></p>
+<p>To begin, click on <code>DATA UPLOAD</code> 1️⃣ then select the property name 2️⃣.</p>
+<h4 id="step-2">Step 2<a class="headerlink" href="#step-2" title="Permanent link">&para;</a></h4>
+<p>In this step, you have two choices to use the online form or to upload a CSV.</p>
+<p><img alt="step 2" src="img/upload-data-step-2.png" /></p>
+<p>To upload a CSV, click on <code>UPLOAD CSV</code> 1️⃣. A pop-up window 2️⃣ will open, you can then browse and select the CSV file on your computer 3️⃣. To cancel uploading you can click on the <code>cancel</code> button 4️⃣.</p>
+<h4 id="step-3">Step 3<a class="headerlink" href="#step-3" title="Permanent link">&para;</a></h4>
+<p>After selecting your CSV file, the system will check whether your file complies with the template.</p>
+<p><img alt="step 3 error" src="img/upload-data-step-3-error.png" /></p>
+<p>An alert message 1️⃣ is displayed in the case that the file is incorrect. You can close the pop-up by clicking on <code>Close</code> 2️⃣.</p>
+<h4 id="step-4">Step 4<a class="headerlink" href="#step-4" title="Permanent link">&para;</a></h4>
+<p>Once the system has checked the file you have selected, it will allow you to <strong>UPLOAD FILES</strong> if it's correct.</p>
+<p><img alt="step 4 1" src="img/upload-data-step-4-1.png" /></p>
+<p>You can drag and drop files to be uploaded or click on <code>Browse</code> 1️⃣ to select files from your file explorer. A chosen file will appear here 2️⃣ when it is being uploaded. You can cancel uploading by clicking on the <code>cancel</code> button 3️⃣. Once your files have finished uploading you can click on <code>Upload Files</code> 4️⃣ to finish the process.</p>
+<p><img alt="step 4 2" src="img/upload-data-step-4-2.png" /></p>
+<p>A success message 1️⃣ is displayed when the download is complete. The file you selected shows here 2️⃣. The pop-up window can be closed by clicking on <code>Close</code> 3️⃣.</p>
+<h2 id="two-factor-authentication-settings">Two factor authentication settings<a class="headerlink" href="#two-factor-authentication-settings" title="Permanent link">&para;</a></h2>
+<!-- This will be instructions for actions like updating user two factor authentication settings, generating backup tokens, add and deleting 2fa devices-->
+
+<p>The Two factor authentication page handles the user’s two factor authentication settings. The settings include:</p>
+<ul>
+<li>Backup tokens</li>
+<li>Two factor authentication devices</li>
+</ul>
+<p>Navigate to the 2FA tab 1️⃣ under the profile page. This dropdown menu 2️⃣ shows the current 2FA method that the user utilises to log on to the platform. Clicking this button 3️⃣ will open a pop-up window, requiring the user to enter a new device's details before saving. This is the table 4️⃣ that shows the current 2FA devices that the user utilises to log on to the platform. Clicking the <code>Delete Button</code> 5️⃣ will open a pop-up window confirming that the user is sure that they want to remove the device before proceeding to removing it. Under the Recovery Options header 6️⃣, there is a list of the backup tokens the user can use to log on to the platform in case they have lost their device. The <code>Generate backup tokens</code> button 7️⃣ allows a user to to refresh their backup tokens as well as create new ones when they've just registered onto the platform.</p>
+<p><img alt="Profile 2FA Tab 1" src="img/profile-2fa-1.png" /></p>
+<h3 id="adding-new-device">Adding new device<a class="headerlink" href="#adding-new-device" title="Permanent link">&para;</a></h3>
+<p>When a user clicks on <code>Add Device</code>, a pop-up window appears. The pop-up contains the Device Name label 1️⃣, which indicates the value that is required in the field below it, and the <code>Add button</code> 2️⃣, which when clicked will save the new device.</p>
+<p><img alt="Add Device 1" src="img/add-device-1.png" /></p>
+<p>Once the <code>Add button</code> has been clicked, the pop-up will change to display a QR Image Code Label 1️⃣ ,indicating the success result when the device is added, and the QR Code 2️⃣, which the user should scan with the authenticator app of their choice on their new device.</p>
+<p><img alt="Add device 2" src="img/add-device-2.png" /></p>
+<h3 id="deleting-a-device">Deleting a device<a class="headerlink" href="#deleting-a-device" title="Permanent link">&para;</a></h3>
+<p>The <code>Cancel</code> button 1️⃣ will prevent the device from being removed (This is in case the user isn't sure or clicked the icon by accident). The <code>Delete</code> button 2️⃣ will remove the device from the platform meaning the user will no longer be able to login using that device.</p>
+<p><img alt="Delete Device 1" src="img/delete-device-1.png" /></p>
+<h2 id="forgot-password">Forgot password<a class="headerlink" href="#forgot-password" title="Permanent link">&para;</a></h2>
+<p>When the user has forgotten their password, they can use this feature to reset it.
+The steps involve:</p>
+<ul>
+<li>Providing the correct email for the user account.</li>
+<li>Clicking on the reset password link provided in their email.</li>
+<li>Resetting their password on the platform.</li>
+<li>Logging in with their new password.</li>
+</ul>
+<p>When a user clicks on the <code>Forgot Password</code> link 1️⃣, they are redirected to the password reset page.</p>
+<p><img alt="Forgot Password 1" src="img/forgot-password-1.png" /></p>
+<p>On the password reset page, there is Reset Password Label 1️⃣. A user should enter their email address in the Email Field 2️⃣, and then click the <code>Reset Password</code> button 3️⃣ to send the reset password email and notify the user. If a user clicked the <code>Forgot Passwword</code> link by mistake they can click on the <code>Go back</code> link 4️⃣.</p>
+<p><img alt="Forgot Password 2" src="img/forgot-password-2.png" /></p>
+<p>After a user has clicked on the <code>Reset Password</code> button, the page updates to display a message 1️⃣ containing instructions which the user should follow in order to be able to reset their password, and a <code>Go back</code> link 2️⃣ which when clicked returns the user to the login page.</p>
+<p><img alt="Forgot Password 3" src="img/forgot-password-3.png" /></p>
+<p>A user should receive an email containing further instructions on completing the reset password process and a <code>Password Reset</code> button which when clicked will redirect the user to the platform to complete resetting their password.</p>
+<p><img alt="Forgot Password 4" src="img/forgot-password-4.png" /></p>
+<p>After a user clicks on the <code>Reset Password</code> button in the received email, they are redirected to the reset password page. The user should enter their password into the New Password field 1️⃣ following the criteria set out in the list of <em>Allowable Password characteristics</em> 2️⃣. The user should re-enter their password in the <code>New password confirmation</code> field 3️⃣, to make sure they didn’t make a mistake. Finally the user should click on the <code>Reset Password</code> button 4️⃣ to finish setting the password the user provided as the new password for logging in.</p>
+<p><img alt="Forgot Password 5" src="img/forgot-password-5.png" /></p>
+<p>If the password is reset without issues, the user will see a success message.</p>
+<p><img alt="Forgot Password 6" src="img/forgot-password-6.png" /></p>
+<h2 id="notifications">Notifications<a class="headerlink" href="#notifications" title="Permanent link">&para;</a></h2>
+<p>The notifications feature allows for the user to receive push notifications of the reminders they have set via the platform. When a notification comes in, a small bell icon 1️⃣ appears on the user profile icon. A link for notifications 2️⃣ becomes available in profile dropdown menu, this allows for the user to view the notifications from any page on the system. Clicking on the notification will lead the user to the notifications page where they can review more details about the notifications. On the profile pages a small notification badge 3️⃣ appears showing the number of notifications the user has.</p>
+<p><img alt="Notifications 1" src="img/notifications-1.png" /></p>
+<p>Under the profile section, a notifications tab 1️⃣ is available. When the tab is clicked, the notification page appears. On the notifications page, users can search for specific notifications entering keywords for the notification and the title columns into the search box 2️⃣. By clicking on the Filter box 3️⃣, a user can refine the search to only return notifications containing the providing keywords specifically by the filter selected. Clicking on any notification 4️⃣ will cause the pop-up with the notification's information to appear (example of pop-up below). When a user clicks on the <code>Delete</code> button 5️⃣, a pop-up appears asking a user to confirm the deletion (example below). The user is able to choose the number of notifications they prefer to see on a page by changing the number here 6️⃣ (The minimum is 5). In the bottom right, a user is able to see the current page they're own and, to navigate to previous and next pages using the navigation links 7️⃣.</p>
+<p><img alt="Notifications 2" src="img/notifications-2.png" /></p>
+<p>Example: <strong>Pop-up with the notification's information</strong></p>
+<p><img alt="Notifications 3" src="img/notifications-3.png" /></p>
+<p>Example: <strong>Delete notification pop-up</strong></p>
+<p>A user will see a <em>Delete Confirmation</em> title 1️⃣ explaining what the pop-up is. On the pop-up, user can decide to click on the <code>Delete</code> button 2️⃣ to delete the reminder or click on the <code>Cancel</code> button to abort deletion.</p>
+<p><img alt="Notifications 4" src="img/notifications-4.png" /></p>
+<blockquote>
+<p>Note: A user can delete their notifications and Organisation Managers can delete organisation notifications.</p>
+</blockquote>
+<h2 id="organisation-page">Organisation page<a class="headerlink" href="#organisation-page" title="Permanent link">&para;</a></h2>
+<p>Every organisation can manage their organisation members via this page. The organisation page allows for the viewing of organisation members, inviting new members to the organisation (provided the user has the necessary permissions), deleting organisation members (provided the user has the necessary permissions), and searching to see if a member exists within an organisation.</p>
+<p>When the user clicks the dropdown icon 1️⃣ next to their username and profile picture, a dropdown menu will appear. If a user clicks on the organisation under current organisation 2️⃣, the page will redirect to that Organisation's page.</p>
+<p><img alt="Organisation Page 1" src="img/organisation-page-1.png" /></p>
+<p>On the Organisation's page a user can see the organisation name 1️⃣ which indicates to the user the current organization they are viewing. To add new members, a user (with necessary permissions) can click on the <code>Add People</code> button 2️⃣ which will open a pop-up (example below) where a new member's information can be added. Underneath the Members heading 3️⃣, a user can use the search box 4️⃣ to find specific members within the organisation. Users can decided how many rows per page they would like to see by adjusting the rows per page 5️⃣ (fewer rows displayed can be useful on smaller devices). A user can see which page of members they are on or click on the navigation links 6️⃣ to change between pages. On the Invitations table 7️⃣, a user can see the members that have been invited to the organisation and if the user has a <em>status</em> role, they can see if a new user has joined the organisation or not in the status column 8️⃣.</p>
+<p><img alt="Organisation Page 2" src="img/organisation-page-2.png" /></p>
+<p>The <strong>Add People</strong> pop-up contains an <code>Email address</code> field 1️⃣ that the inviter needs to populate with the email address for the individual they wish to invite to the organization. The inviter also needs to specify if the individual they’re inviting will have a manager or member role within the organization using the <code>Invite as</code> field 2️⃣ and to set the new user's permissions using the <code>Permissions</code> field 3️⃣. To finalise adding a new member, an inviting user needs to click on the <code>Invite</code> button 4️⃣ to send the invitation to the individual being invited to the organisation.</p>
+<p><img alt="Organisation Page 3" src="img/organisation-page-3.png" /></p>
+<p>A success message will show if the email has been sent.</p>
+<p><img alt="Organisation Page 4" src="img/organisation-page-4.png" /></p>
+<p>In the Invitation Email received by the individual being invited to an organisation, they should click on the <code>Register</code> button 1️⃣ to be redirected to the website to complete their registration.</p>
+<p><img alt="Organisation Page 5" src="img/organisation-page-5.png" /></p>
+<p>Once redirected to the registration page, the user needs to fill in the form. Once the registration is complete and the user clicks on the <code>Register</code> button, they will then be able to login and see their new organisation under accessible organisations.</p>
+<p><img alt="Organisation Page 6" src="img/organisation-page-6.png" /></p>
+<ul>
+<li>If the user is a <strong>new member on platform</strong>, they will be taken through the normal registration and added to the organisation.</li>
+<li>If the user is <strong>already registered on platform</strong>, they will just be registered on to the organisation they're being invited.</li>
+</ul>
+<h2 id="request-organisation-feature">Request organisation feature<a class="headerlink" href="#request-organisation-feature" title="Permanent link">&para;</a></h2>
+<p>When a user on the platform wishes to either have an organisation, or be added to one, they can request for one to be created or to be added to an existing one. The SANBI administrator will review the request and if they approve of it, they will create the organisation for the user, or add them to an existing organisation, and then notify them via email.</p>
+<p>To request to be added to an organisation, or have one created, a user needs to click on the profile menu dropdown and then click on the <code>Request Organisation</code> button 1️⃣.</p>
+<p><img alt="Request Organisation 1" src="img/request-organisation-1.png" /></p>
+<p>When the <code>Request Organisation</code> button is clicked, a pop-up window is will appear. On the pop-up, a user can specify the name/s of the organization they wish to have created in <code>Organization Name</code> field 1️⃣ and add message providing a description of the organisation, etc. in the <code>Message to administrator</code> field 2️⃣. Once the user has filled in the relevant fields, they can then click on the <code>Send</code> button 3️⃣.</p>
+<p><img alt="Request Organisation 2" src="img/request-organisation-2.png" /></p>
+<p>A confirmation will be returned to the user to let them know their invitation has been sent.</p>
+<p><img alt="Request Organisation 3" src="img/request-organisation-3.png" /></p>
+<p>After these steps have been completed, the user will need to wait to receive feedback from the SANBI administrator.</p>
+<h2 id="reminders-page">Reminders page<a class="headerlink" href="#reminders-page" title="Permanent link">&para;</a></h2>
+<p>The Reminders feature has a multiple functions including allowing an organisation to set a reminder for everyone within the organisation, a user to set a personal reminder, a reminder to be edited (to change its state from active, draft and passed or altering other details etc.), a reminder to be deleted, and to send the reminder via email while also notifying the user via the platform.</p>
+<p>Other functionalities on the Reminders Page are the ability to search for specific reminders, to filter reminders, and pagination. Organisations can view all reminders set by users who have the permissions to create reminders for all members of that specific organisation. Users are capable of viewing personal reminders.</p>
+<p>Under the profile section, there is a reminders tab 1️⃣ which when clicked renders the reminders page. To add a reminder, a user needs to click on the <code>Add Reminder</code> button 2️⃣ to open the form (example below) to populate for the reminder they intend to create. A user can type keywords in the search box 3️⃣ to filter the reminder and the title columns. By changing the filter 4️⃣, a user is able to refine the search to only return reminders containing the keywords specifically provided by the filter selected. Clicking on any reminder 5️⃣ will cause a pop-up window (example below) for editing the reminder to appear. When a user clicks on the <code>Delete</code> button 6️⃣, the delete reminder pop-up will appear (example below). The user is able to choose the number of notifications they prefer to see on a page by changing the number here 7️⃣ (The minimum is 5). In the bottom right, a user is able to see the current page they're own and, to navigate to previous and next pages using the navigation links 8️⃣.</p>
+<p><img alt="Reminders Page 1" src="img/reminder-page-1.png" /></p>
+<p>On the <strong>Add Reminder</strong> reminder form the user can see the title 1️⃣. They should set the date and time 2️⃣ that the reminder should appear and then they should provide a description in the reminder field 3️⃣. After adding a description, the user should add the reminder type 4️⃣ and based on their user role within that specific organisation they can specify if the reminder is for all organisation members or it's a personal reminder. Finally the user should click on the <code>Add</code> button 5️⃣ to create the reminder.</p>
+<p><img alt="Reminders Page 2" src="img/reminder-page-2.png" /></p>
+<p>In the <strong>Edit Reminder</strong> pop-up window the user can change the reminder title 1️⃣ and by changing the date and time 2️⃣ the user can change when the reminder is scheduled. The user can then edit the description in the reminder field 3️⃣ and change the reminder type 4️⃣ and based on their user role within that specific organisation. The user is able to change the reminder status 5️⃣: if it is set to active the reminder is still scheduled, if it is set to draft the reminder is on pause, and if it is set to passed the reminder will be moved to the notifications section but no email will be sent. When a user is finished making changes they can click on the <code>Save</code> button 6️⃣ to save the changes made to the reminder.</p>
+<p><img alt="Reminders Page 3" src="img/reminder-page-3.png" /></p>
+<p>The <strong>Delete Reminder</strong> pop-up is opened when a user clicks on the <code>Delete</code> button and prompts the user if they are sure of the actions they wish to take. The user will see the Delete Confirmation title 1️⃣, and then they can choose to click on the <code>Delete</code> or <code>Cancel</code> buttons 2️⃣ depending on their intentions with the reminder.</p>
+<p><img alt="Notifications 4" src="img/notifications-4.png" /></p>
+<ul>
+<li>The user can delete their reminders.</li>
+<li>Organisation Managers can delete organisation reminders.</li>
+</ul>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Kartoza and Contributors
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/kartoza" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://hub.docker.com/r/kartoza/" target="_blank" rel="noopener" title="hub.docker.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1v59.4zm0-204.3h-66.1v60.7h66.1V32zm78.2 144.8H362v59.4h66.1v-59.4zm-156.3-72.1h-66.1v60.1h66.1v-60.1zm78.1 0h-66.1v60.1h66.1v-60.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1l-13.3-8.9zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm-78.1-72.1h-66.1v60.1h66.1v-60.1z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/KartozaGeo" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://kartoza.com" target="_blank" rel="noopener" title="kartoza.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"/></svg>
+    </a>
+  
+    
+    
+      
+      
+    
+    <a href="https://kartoza.com" target="_blank" rel="noopener" title="kartoza.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="m177.8 63.2 10 17.4c2.8 4.8 4.2 10.3 4.2 15.9v41.4c0 3.9 1.6 7.7 4.3 10.4 6.2 6.2 16.5 5.7 22-1.2l13.6-17c4.7-5.9 12.9-7.7 19.6-4.3l15.2 7.6c3.4 1.7 7.2 2.6 11 2.6 6.5 0 12.8-2.6 17.4-7.2l3.9-3.9c2.9-2.9 7.3-3.6 11-1.8l29.2 14.6c7.8 3.9 12.6 11.8 12.6 20.5 0 10.5-7.1 19.6-17.3 22.2l-35.4 8.8c-7.4 1.8-15.1 1.5-22.3-.9l-32-10.7c-3.3-1.1-6.7-1.7-10.2-1.7-7 0-13.8 2.3-19.4 6.5L176 212c-10.1 7.6-16 19.4-16 32v28c0 26.5 21.5 48 48 48h32c8.8 0 16 7.2 16 16v48c0 17.7 14.3 32 32 32 10.1 0 19.6-4.7 25.6-12.8l25.6-34.1c8.3-11.1 12.8-24.6 12.8-38.4v-12.1c0-3.9 2.6-7.3 6.4-8.2l5.3-1.3c11.9-3 20.3-13.7 20.3-26 0-7.1-2.8-13.9-7.8-18.9l-33.5-33.5c-3.7-3.7-3.7-9.7 0-13.4 5.7-5.7 14.1-7.7 21.8-5.1l14.1 4.7c12.3 4.1 25.7-1.5 31.5-13 3.5-7 11.2-10.8 18.9-9.2l27.4 5.5C432 112.4 351.5 48 256 48c-27.7 0-54 5.4-78.2 15.2zM512 256c0 141.4-114.6 256-256 256S0 397.4 0 256 114.6 0 256 0s256 114.6 256 256z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.tabs.link", "header.autohide", "navigation.expand", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.51d95adb.min.js"></script>
+      
+        <script src="https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js"></script>
+      
+        <script src="../../js/tablesort.js"></script>
+      
+    
+  </body>
+</html>
