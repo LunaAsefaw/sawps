@@ -27,3 +27,4 @@ docs/mkdocs.yml
 test-results/
 playwright-report/
 playwright/.cache/
+/django_project/htmlcov/

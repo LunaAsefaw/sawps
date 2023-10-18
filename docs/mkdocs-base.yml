@@ -46,21 +46,47 @@ nav:
                   - Quickstart: user/quickstart/index.md
                   - Guide:
                           - user/guide/index.md
-                          - Registering: user/guide/registering.md
+                          - Registering and Logging In: user/guide/registering.md
                           - Help And Contact: user/guide/help.md
-                          - Map: user/guide/map.md
-                          - Profile Page: user/guide/profile-page.md
+                          - Setting Up the Profile: user/guide/profile-setup.md
                           - Organisations: user/guide/organisations.md
+                          - Working with the Explore Page: user/guide/explore.md
+                          - Using the Data Upload Feature: user/guide/data-upload.md
                   - Manual :
                           - user/manual/index.md
-                          - Profile Page: user/manual/profile-page.md
-                          - Two Factor Authentication: user/manual/2fa.md
-                          - Forgot Password: user/manual/forgot-password.md
-                          - Notifications: user/manual/notifications.md
-                          - Reminders: user/manual/reminders.md
-                          - Organisation Page: user/manual/organisation.md
-                          - Request An Organisation: user/manual/request-organisation.md
-                          - Map: user/manual/map.md
+                          - Landing Page: user/manual/landing-page.md
+                          - Login and Logout:
+                                - user/manual/login-logout/index.md
+                                - Login: user/manual/login-logout/login-page.md
+                                - Forgot Password: user/manual/login-logout/forgot-password.md
+                                - Logout: user/manual/login-logout/logout.md
+                          - Register:
+                                - user/manual/register/index.md
+                                - Register: user/manual/register/register-page.md
+                                - Set up Two Factor Authentication: user/manual/register/setup-2fa.md
+                          - About Page: user/manual/about.md
+                          - Explore:
+                                - user/manual/explore/index.md
+                                - Layers: user/manual/explore/layers.md
+                                - Filters: user/manual/explore/filters.md
+                                - Map: user/manual/explore/map.md
+                                - Reports: user/manual/explore/reports.md
+                                - Charts: user/manual/explore/charts.md
+                          - Upload Data: 
+                                - user/manual/data-upload/index.md
+                                - Data Upload Panel: user/manual/data-upload/panel.md
+                                - The Online Form: user/manual/data-upload/online-form.md
+                                - Template Upload: user/manual/data-upload/template-upload.md
+                          - Help and Contact: user/manual/help-contact.md
+                          - User Profile:
+                                - user/manual/user-profile/index.md
+                                - Profile Page: user/manual/user-profile/profile-page.md
+                                - Reminders: user/manual/user-profile/reminders.md
+                                - Notifications: user/manual/user-profile/notifications.md
+                                - Two Factor Authentication: user/manual/user-profile/2fa.md
+                                - Organisation Page: user/manual/user-profile/organisation-page.md
+                                - Request An Organisation: user/manual/user-profile/request-organisation.md
+                          - User Roles: user/manual/user-roles.md
         - Administrators:
                 - administrator/index.md
                 - Guide:

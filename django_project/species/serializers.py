@@ -7,9 +7,15 @@ from species.models import OwnedSpecies, Taxon
 class TaxonSerializer(serializers.ModelSerializer):
     """Species serializer"""
 
-    class Meta():
+    class Meta:
         model = Taxon
-        fields = ["id", "scientific_name"]
+        fields = [
+            "id",
+            "scientific_name",
+            # common name is used to autofill common
+            # name in online form
+            "common_name_varbatim"
+        ]
 
 
 class FrontPageTaxonSerializer(serializers.ModelSerializer):

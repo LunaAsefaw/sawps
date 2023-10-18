@@ -133,9 +133,17 @@ class UploadSpeciesStatus(APIView):
             return Response(status=404)
 
         error_file = None
+        message = upload_species.success_notes
         if upload_species.error_file:
             error_file = '{}{}'.format(
                         MEDIA_URL, upload_species.error_file.name)
+
+        if not upload_species.success_notes and not upload_species.error_file:
+            message = "There is something wrong with the " \
+                      "data please check again."
+
+        if not upload_species.success_notes and upload_species.error_file:
+            message = "There is an error, please check the error file."
 
         if upload_species.processed:
 
@@ -144,7 +152,7 @@ class UploadSpeciesStatus(APIView):
                 data={
                     'status': upload_species.progress,
                     'error_file': error_file,
-                    'message': upload_species.success_notes
+                    'message': message
                 }
             )
 
@@ -153,6 +161,7 @@ class UploadSpeciesStatus(APIView):
                 status=200,
                 data={
                     'status': upload_species.canceled,
-                    'error_file': error_file
+                    'error_file': error_file,
+                    'message': message
                 }
             )

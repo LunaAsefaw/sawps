@@ -33,6 +33,7 @@ class PropertySerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     owner_email = serializers.SerializerMethodField()
     property_type = serializers.SerializerMethodField()
+    open = serializers.SerializerMethodField()
     province = serializers.SerializerMethodField()
     organisation = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
@@ -49,6 +50,9 @@ class PropertySerializer(serializers.ModelSerializer):
     def get_property_type(self, obj: Property):
         return obj.property_type.name
 
+    def get_open(self, obj: Property):
+        return obj.open.name if obj.open else ''
+
     def get_province(self, obj: Property):
         return obj.province.name
 
@@ -59,13 +63,13 @@ class PropertySerializer(serializers.ModelSerializer):
         return obj.property_size_ha
 
 
-
     class Meta:
         model = Property
         fields = [
             'id', 'name', 'owner', 'owner_email',
             'property_type', 'property_type_id',
             'province', 'province_id',
+            'open', 'open_id',
             'size', 'organisation', 'organisation_id',
         ]
 
@@ -137,6 +141,7 @@ class PropertyDetailSerializer(PropertySerializer):
         fields = [
             'id', 'name', 'owner', 'owner_email',
             'property_type', 'property_type_id',
+            'open', 'open_id',
             'province', 'province_id',
             'size', 'organisation', 'organisation_id',
             'parcels', 'bbox', 'centroid'

@@ -111,6 +111,23 @@ class ContextLayerTilingTask(models.Model):
 class Layer(models.Model):
     """A model representing an individual layer within a context."""
 
+    layer_title = models.CharField(
+        max_length=512,
+        default='',
+        blank=True,
+        help_text='Title of the layer.'
+    )
+
+    display_order = models.IntegerField(
+        default=0,
+        help_text='Order in which the layer should be displayed.'
+    )
+
+    is_filter_layer = models.BooleanField(
+        default=False,
+        help_text='Indicates if this layer is used as a spatial filter.'
+    )
+
     name = models.CharField(
         max_length=512,
         help_text='The unique name that identifies this layer. E.g., '
@@ -132,6 +149,9 @@ class Layer(models.Model):
         on_delete=models.CASCADE,
         help_text='The context layer to which this individual layer belongs.'
     )
+
+    class Meta:
+        ordering = ['display_order']
 
     def __str__(self) -> str:
         return self.name

@@ -1,5 +1,6 @@
 
 {% extends "base.html" %}
+{% load custom_tags %}
 {% load static %}
 
 {% block head_title %}Organisation Members{% endblock %}
@@ -11,7 +12,8 @@
         <div class="row">
           <h3 class="page-title sawps-text-menu mb-3" style="color: var(--green)">{{ current_organisation }}</h3>
           <div class="col-auto ml-auto">
-            {% if perms.stakeholder.can_invite_people_to_organisation %}
+            {% is_organisation_manager user.id current_organisation_id as is_current_manager %}
+            {% if is_current_manager %}
               <button class="sawps-font-button green-button mt-0" type="button" data-toggle="modal" data-target="#myModal" style="font-weight: bold; min-height: fit-content;">
                 <i class="fas fa-plus"></i> Add People
               </button>
@@ -176,7 +178,7 @@
               <tr>
                 <th>User</th>
                 <th>Role</th>
-                {% if role == 'Admin' or role == 'Super User' or user.is_superuser %}
+                {% if user.is_superuser %}
                 <th></th>
                 {% endif %}
               </tr>
@@ -184,10 +186,12 @@
             <tbody>
               {% for org_user in users %}
               {% if org_user.joined %}
+              {% is_organisation_manager org_user.id current_organisation_id as is_manager %}
               <tr>
                 <td>{{ org_user.organisation_user }}</td>
-                <td>Organisation {{ org_user.assigned_as }}</td>
-                {% if org_user.role == 'Admin' or org_user.role == 'Super User' or user.is_superuser %}
+                <td>
+                   Organisation {% if is_manager %} Manager {% else %} Member {% endif %}</td>
+                {% if user.is_superuser %}
                 <td>
                   <i class="fas fa-trash-alt trash-icon" data-object-id="{{ org_user.id }}"></i>
                 </td>
@@ -262,11 +266,7 @@
               {% for invited in invites %}
               <tr>
                 <td>{{ invited.email }}</td>
-                {% if invited.user_role == 'Base User' %}
-                <td>Organisation Member</td>
-                {% else %}
-                <td>Organisation Manager</td>
-                {% endif %}
+                <td>Organisation {{ invited.assigned_as }}</td>
                 <td class="text-center">
                   {% if invited.joined %}
                     <span class="badge badge-success">Joined</span>

@@ -45,7 +45,7 @@ django-allauth-2fa==0.11.1
 # area calculation
 area==1.1.1
 # For django image field
-Pillow==9.5.0
+Pillow==10.0.1
 
 # For reading shapefile
 fiona==1.8.21

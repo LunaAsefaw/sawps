@@ -1,6 +1,10 @@
 from typing import List
 from frontend.static_mapping import YEAR_DATA_LIMIT
-from django.db.models import F, Q, Sum
+from django.db.models import (
+    F,
+    Q,
+    Sum
+)
 from population_data.models import AnnualPopulation
 from property.models import Property
 from rest_framework import serializers
@@ -147,6 +151,111 @@ class ActivityMatrixSerializer(serializers.ModelSerializer):
         return activities_list
 
 
+class TotalCountPerPopulationEstimateSerializer(serializers.Serializer):
+    def get_total_counts_per_population_estimate(self):
+        """
+        Retrieves and calculates the total counts per
+        population estimate category.
+
+        This function filters AnnualPopulation records
+        based on the provided parameters
+        (species_name, property_ids).
+        It then iterates through the filtered records and calculates
+        the total counts per population estimate category,
+        along with the most recent year and total sums associated
+        with each category.
+
+        Returns:
+        - result (dict): A dictionary containing total counts per
+        population estimate category.
+            Each category includes count, years, total, and percentage.
+        """
+
+        # Extract filter parameters from the request context
+        species_name = self.context["request"].GET.get("species")
+        property_list = self.context['request'].GET.get('property')
+        property_ids = property_list.split(',') if property_list else []
+
+        # Initialize a dictionary to store the results
+        result = {}
+
+        start_year = self.context["request"].GET.get('start_year')
+        end_year = self.context["request"].GET.get('end_year')
+        try:
+            start_year = int(start_year)
+            end_year = int(end_year)
+            max_year = max(start_year, end_year)
+        except (ValueError, TypeError):
+            max_year = None  # if the input is not valid integers
+
+        # Query AnnualPopulation model to filter records
+        # for the most recent year
+        annual_populations = (
+            AnnualPopulation.objects.filter(
+                Q(
+                    owned_species__property__id__in=property_ids
+                ) if property_ids else Q(),
+                Q(
+                    Q(
+                        owned_species__taxon__common_name_varbatim=(
+                            species_name
+                        )
+                    ) |
+                    Q(owned_species__taxon__scientific_name=species_name)
+                ) if species_name else Q(),
+                year=max_year,
+            )
+        )
+
+        # Iterate through filtered records
+        for record in annual_populations:
+            population_estimate_category = (
+                record.population_estimate_category.name
+            )
+            year = record.year
+            total = record.total
+
+            # Calculate percentage against the total
+            percentage = (total / total) * 100 if total > 0 else 0
+
+            # Create or update the result dictionary
+            if population_estimate_category not in result:
+                result[population_estimate_category] = {
+                    "count": 1,
+                    "years": [year],
+                    "total": total,
+                    "percentage": percentage
+                }
+            elif year in result[population_estimate_category]["years"]:
+                result[population_estimate_category]["count"] += 1
+                result[population_estimate_category]["total"] += total
+            else:
+                result[population_estimate_category]["years"].append(year)
+                result[population_estimate_category]["count"] += 1
+                result[population_estimate_category]["total"] += total
+
+        # Initialize a dictionary to store the final results
+        final_result = {}
+
+        # Iterate over the result again to calculate the percentages
+        for category, data in result.items():
+            count = data["count"]
+            total = data["total"]
+
+            # Calculate percentage as count divided by total * 100
+            percentage = (count / total) * 100 if total > 0 else 0
+
+            # Create the final result entry
+            final_result[category] = {
+                "count": count,
+                "years": data["years"],
+                "total": total,
+                "percentage": percentage,
+            }
+
+        return final_result
+
+
 class TotalCountPerActivitySerializer(serializers.ModelSerializer):
     """
     Serializer class for serializing the total count per activity data.
@@ -206,15 +315,19 @@ class TotalCountPerActivitySerializer(serializers.ModelSerializer):
         owned_species = OwnedSpecies.objects.values(
             activity_type=F(
                 "annualpopulationperactivity__activity_type__name"),
+            year=F("annualpopulationperactivity__year"),
             total=Sum("annualpopulationperactivity__total"),
         ).filter(q_filters)
 
         activities_list = [
-            {item["activity_type"]: item["total"]}
+            {
+                "activity_type": item["activity_type"],
+                "year": item["year"],
+                "total": item["total"],
+            }
             for item in owned_species
             if item["activity_type"] and item["total"]
         ]
-
         return activities_list
 
 
@@ -225,35 +338,63 @@ class SpeciesPopulationDensityPerPropertySerializer(
     Serializer class for serializing species population total and density.
     """
     density = serializers.SerializerMethodField()
+    province_name = serializers.SerializerMethodField()
+    organisation_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Property
-        fields = ["density"]
+        fields = [
+            "density",
+            "province_name",
+            "organisation_name"
+        ]
+
+    def get_province_name(self, obj):
+        return obj.province.name if obj.province else None
+
+    def get_organisation_name(self, obj):
+        return obj.organisation.name if obj.organisation else None
 
     def get_density(self, obj) -> dict:
-        """ Calculate and get density of property.
-        Params: obj (Taxon): The Taxon instance.
-        """
-        owned_species = OwnedSpecies.objects.values("property__id").filter(
-            property=obj
-        ).annotate(
-            total=Sum("annualpopulation__total"),
-            property_in_ha=Sum("property__property_size_ha")
-        ).values("property__name", "total", "property_in_ha")
-        if owned_species.exists():
-            property_in_ha = owned_species[0].get("property_in_ha")
-            total = owned_species[0].get("total")
-            density = (
-                total / property_in_ha if total and property_in_ha else None
-            )
-            property_name = owned_species[0].get("property__name").capitalize()
-            data = {
-                "property_name": property_name,
-                "density": density
-            }
-            return data
-        else:
+        species_name = self.context.get("species_name")
+        if not species_name:
             return None
+
+        owned_species_data = (
+            OwnedSpecies.objects.filter(
+                property=obj,
+                taxon__scientific_name=species_name
+            )
+            .values("property__name")
+            .annotate(
+                total=Sum("annualpopulation__total"),
+                property_in_ha=Sum("property__property_size_ha"),
+                year=F("annualpopulation__year"),
+            )
+        )
+
+        # Calculate density and format data
+        result_data = []
+        for data in owned_species_data:
+            total = data.get("total")
+            property_in_ha = data.get("property_in_ha")
+            year = data.get("year")
+
+            if total and property_in_ha:
+                density = total / property_in_ha
+            else:
+                density = None
+
+            property_name = data.get("property__name").capitalize()
+
+            result_data.append({
+                "property_name": property_name,
+                "density": density,
+                "species_name": species_name,
+                "year": year,
+            })
+
+        return result_data
 
 
 class PopulationPerAgeGroupSerialiser(serializers.ModelSerializer):
@@ -276,7 +417,8 @@ class PopulationPerAgeGroupSerialiser(serializers.ModelSerializer):
             "sub_adult_male",
             "sub_adult_female",
             "juvenile_male",
-            "juvenile_female"
+            "juvenile_female",
+            "year"
         ]
 
         filters = {
@@ -293,13 +435,46 @@ class PopulationPerAgeGroupSerialiser(serializers.ModelSerializer):
             end_year = self.context['request'].GET.get("end_year")
             filters["year__range"] = (start_year, end_year)
 
-        age_groups_totals = AnnualPopulation.objects.values(
-            "owned_species__taxon__common_name_varbatim"
-        ).filter(**filters).annotate(
-            **{f"total_{field}": Sum(field) for field in sum_fields}
+        age_groups_totals = (
+            AnnualPopulation.objects
+            .values("owned_species__taxon__common_name_varbatim")
+            .filter(**filters)
+            .annotate(
+                **{
+                    f"total_{field}": (
+                        Sum(field) if field != 'year' else F('year')
+                    )
+                    for field in sum_fields
+                }
+            )
         )
 
         return age_groups_totals
+
+
+class AnnualPopulationSerializer(serializers.ModelSerializer):
+    """
+    Serializer class for serializing AnnualPopulation.
+    """
+    class Meta:
+        model = AnnualPopulation
+        fields = (
+            'year',
+            'survey_method'
+        )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['owned_species'] = instance.owned_species
+        data['owned_species__taxon'] = instance.owned_species.taxon
+        data['owned_species__property'] = instance.owned_species.property
+        data['owned_species__property__province'] = (
+            instance.owned_species.property.province
+        )
+        data['owned_species__property__property_type'] = (
+            instance.owned_species.property.property_type
+        )
+        return data
 
 
 class TotalAreaVSAvailableAreaSerializer(serializers.ModelSerializer):

@@ -1,139 +1,203 @@
-import React, { useEffect, useState } from "react";
-import { Box, Typography, Card, Grid } from "@mui/material";
-import { Bar } from "react-chartjs-2";
-import { CategoryScale } from "chart.js";
-import Chart from "chart.js/auto";
-import ChartDataLabels from "chartjs-plugin-datalabels";
-import axios from "axios";
-import Loading from "../../../components/Loading";
-import { useAppSelector } from "../../../app/hooks";
-import { RootState } from "../../../app/store";
+import React, { useEffect, useState } from 'react';
+import { Grid } from "@mui/material";
+import { Bar } from 'react-chartjs-2';
 import "./index.scss";
-import { ChartCard } from "./ChartCard";
+import Loading from '../../../components/Loading';
+import axios from 'axios';
 
-Chart.register(CategoryScale);
-Chart.register(ChartDataLabels);
+interface PropertyTypeData {
+  backgroundColor: any;
+  property_type__name: string;
+  name: string;
+  total_area: number;
+}
+
+const colors = [
+  'rgba(112, 178, 118, 1)', 
+  'rgba(250, 167, 85, 1)', 
+  'rgba(157, 133, 190, 1)', 
+  '#FF5252', 
+  '#616161',
+  'rgba(112, 178, 118, 0.5)',
+  'rgba(250, 167, 85, 0.5)',
+  'rgba(157, 133, 190, 0.5)',
+  'rgba(255, 82, 82, 0.5)',
+  'rgba(97, 97, 97, 0.5)'
+];
 
 const FETCH_SPECIES_DENSITY = '/api/total-area-per-property-type/';
 
 const PropertyTypeBarChart = (props: any) => {
-    const { selectedSpecies, propertyId, startYear, endYear, loading, setLoading } = props;
-    const [propertyTypeData, setPropertyTypeData] = useState([]);
-    const labels: string[] = [];
-    const totalArea: number[] = [];
+  const { selectedSpecies, propertyId, startYear, endYear, loading, setLoading, onEmptyDatasets } = props;
+  const [propertyTypeData, setPropertyTypeData] = useState<PropertyTypeData[]>([]);
+  const labels: string[] = [];
+  const legend_labels: string[] = [];
+  const totalArea: number[] = [];
+  const datasets: any = [];
 
-    const fetchActivityPercentageData = () => {
-        setLoading(true);
-        axios
-            .get(`${FETCH_SPECIES_DENSITY}?start_year=${startYear}&end_year=${endYear}&species=${selectedSpecies}&property=${propertyId}`)
-            .then((response) => {
-                setLoading(false);
-                if (response.data) {
-                    // Sort property types alphabetically
-                    const sortedData = response.data.sort((a: { property_type__name: string; }, b: { property_type__name: any; }) =>
-                        a.property_type__name.localeCompare(b.property_type__name)
-                    );
-                    setPropertyTypeData(sortedData);
-                }
-            })
-            .catch((error) => {
-                setLoading(false);
-                console.log(error);
-            });
-    };
+  const fetchActivityPercentageData = () => {
+    setLoading(true);
+    axios
+      .get(`${FETCH_SPECIES_DENSITY}?start_year=${startYear}&end_year=${endYear}&species=${selectedSpecies}&property=${propertyId}`)
+      .then((response) => {
+        setLoading(false);
+        if (response.data) {
+          if(response.data.length > 0){
+            onEmptyDatasets(true)
+          }else {
+            onEmptyDatasets(false)
+          }
+          const uniquePropertyTypes: Record<string, number> = {};
+          const uniqueColors: Record<string, string> = {};
+  
+          response.data.forEach((item: PropertyTypeData, index: number) => {
+            if (!uniquePropertyTypes[item.property_type__name]) {
+              uniquePropertyTypes[item.property_type__name] = 0;
+              uniqueColors[item.property_type__name] = colors[index % colors.length]; // Assign a color from the array
+            }
+            uniquePropertyTypes[item.property_type__name] += item.total_area;
+          });
+  
+          const newData: PropertyTypeData[] = Object.keys(uniquePropertyTypes).map((property_type__name) => ({
+            property_type__name,
+            name: '', 
+            total_area: uniquePropertyTypes[property_type__name],
+            backgroundColor: uniqueColors[property_type__name], // Assign the color
+          }));
+  
+          const sortedData = newData.sort((a, b) => a.property_type__name.localeCompare(b.property_type__name));
+          setPropertyTypeData(sortedData);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.log(error);
+      });
+  };
+  
 
-    useEffect(() => {
-        fetchActivityPercentageData();
-    }, [propertyId, startYear, endYear, selectedSpecies]);
+  useEffect(() => {
+    fetchActivityPercentageData();
+  }, [propertyId, startYear, endYear, selectedSpecies]);
 
-    for (const each of propertyTypeData) {
-        labels.push(each.property_type__name);
-        totalArea.push(each.total_area);
-    }
+  for (const each of propertyTypeData) {
+    labels.push(each.property_type__name); // Use 'property_type__name' as label
+    legend_labels.push(each.name);
+    totalArea.push(each.total_area);
+  }
 
-    // Assign colors based on availableColors array
-    const availableColors: string[] = [
-        "#FF5252",
-        "rgb(83 83 84)",
-        "#75B37A",
-        "#282829",
-        "#F9A95D",
-        "#000000",
-        "#70B276",
-        "#9F89BF",
-    ];
+  for (var count = 0; count < labels.length; count++) {
 
-    // Ensure we have enough colors for all property types
-    const backgroundColors = labels.map((_, index) => availableColors[index % availableColors.length]);
+    // Create an array with leading zeros based on the index
+    const dataWithLeadingZeros = Array(count).fill(0);
+    dataWithLeadingZeros.push(totalArea[count]);
 
-    const data = {
-        labels: labels,
-        datasets: [
-            {
-                label: labels.length === 1 ? labels[0] : 'Population density (individuals/Ha)',
-                backgroundColor: backgroundColors,
-                borderColor: backgroundColors,
-                borderWidth: 1,
-                data: totalArea,
-            },
-        ],
-    };
-
-    const options = {
-        plugins: {
-            datalabels: {
-                display: false,
-            },
-            legend: {
-                display: true,
-                position: 'bottom' as 'bottom',
-            },
-            title: {
-                display: true,
-                text: 'Total area per property type',
-                font: {
-                    size: 16,
-                    weight: 'bold' as 'bold',
-                },
-            },
-        },
-        scales: {
-            x: {
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: 'Property type', // X-axis label
-                    font: {
-                        size: 14,
-                    },
-                },
-            },
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    stepSize: 50,
-                    max: 200,
-                },
-                title: {
-                    display: true,
-                    text: 'Area (Ha)', // Y-axis label
-                    font: {
-                        size: 14,
-                    },
-                },
-            },
-        },
-    };
-
-    return (
-        <Grid>
-            {!loading ? (
-                <Bar data={data} options={options} height={400} width={1000} />
-            ) : (
-                <Loading containerStyle={{ minHeight: 160 }} />
-            )}
-        </Grid>
+    datasets.push(
+        {
+            label: labels[count],
+            data: dataWithLeadingZeros,
+            backgroundColor: propertyTypeData[count].backgroundColor, // Use the assigned color
+        }
     );
+}
+
+  const data = {
+    labels: labels,
+    datasets: datasets,
+  };
+
+  const options = {
+  indexAxis: 'x' as const,
+  scales: {
+    x: {
+      beginAtZero: false,
+      display: true,
+      stacked: true,
+      title: {
+        display: true,
+        text: 'Property type', // X-axis label
+        font: {
+          size: 14,
+        },
+      },
+      barPercentage: 1, // Set barPercentage to 1 to make bars fill the label space
+      categoryPercentage: 1, // Set categoryPercentage to 1 to make bars fill the label space
+    },
+    y: {
+      display: true,
+      stacked: true,
+      grid: {
+        display: false,
+      },
+      ticks: {
+        color: "black",
+      },
+      title: {
+        display: true,
+        text: 'Area (Ha)', // Y-axis label
+        font: {
+          size: 14,
+        },
+      },
+      callback: (value: string, index: number) => {
+        return labels[index];
+      },
+    },
+  },
+  plugins: {
+    responsive: true,
+    maintainAspectRatio: false,
+    tooltip: {
+      enabled: true,
+      callbacks: {
+        label: (context: { dataset: any; parsed: any; dataIndex: number; }) => {
+          const datasetLabel = context.dataset.label || '';
+          const value = context.parsed.y;
+          const property = propertyTypeData[context.dataIndex];
+          return `${datasetLabel}: ${property.name} - ${value} Ha`;
+        },
+      },
+    },
+    datalabels: {
+      display: false,
+    },
+    legend: {
+      display: false,
+      position: 'right' as 'right',
+      labels: {
+        boxWidth: 20,
+        boxHeight: 13,
+        padding: 12,
+        font: {
+          size: 10,
+          weight: "bold" as "bold"
+        }
+      },
+    },
+    title: {
+      display: true,
+      text: 'Total area per property type',
+      font: {
+        size: 16,
+        weight: 'bold' as 'bold',
+      },
+    },
+  },
+} as const;
+
+
+  return (
+    <Grid>
+      {!loading ? (
+        <Bar
+          data={data}
+          options={options}
+        />
+      ) : (
+        <Loading containerStyle={{ minHeight: 160 }} />
+      )}
+    </Grid>
+  );
 };
 
 export default PropertyTypeBarChart;

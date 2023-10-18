@@ -16,12 +16,14 @@ from frontend.serializers.metrics import (
     TotalCountPerActivitySerializer,
     PopulationPerAgeGroupSerialiser,
     TotalAreaVSAvailableAreaSerializer,
+    TotalCountPerPopulationEstimateSerializer
 )
 from frontend.utils.metrics import (
     calculate_population_categories,
     calculate_total_area_available_to_species,
     calculate_total_area_per_property_type,
     calculate_base_population_of_species,
+    calculate_species_count_per_province
 )
 from property.models import Property
 from rest_framework.permissions import IsAuthenticated
@@ -102,6 +104,21 @@ class ActivityPercentageAPIView(APIView):
         return Response(calculate_base_population_of_species(serializer.data))
 
 
+class TotalCountPerPopulationEstimateAPIView(APIView):
+    """
+    API view to retrieve total counts per population
+    estimate category for species.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs) -> Response:
+        serializer = TotalCountPerPopulationEstimateSerializer(
+            context={"request": request}
+        )
+        result = serializer.get_total_counts_per_population_estimate()
+        return Response(result)
+
+
 class TotalCountPerActivityAPIView(APIView):
     """
     API view to retrieve total counts per activity for species.
@@ -136,6 +153,35 @@ class TotalCountPerActivityAPIView(APIView):
         return Response(serializer.data)
 
 
+class SpeciesPopulationCountPerProvinceAPIView(APIView):
+    """
+    API view to retrieve species pcount per province.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self) -> QuerySet[Property]:
+        """
+        Returns a filtered queryset of property objects
+        within the specified organization.
+        """
+        organisation_id = get_current_organisation_id(self.request.user)
+        queryset = Property.objects.filter(organisation_id=organisation_id)
+        filtered_queryset = PropertyFilter(
+            self.request.GET, queryset=queryset
+        ).qs
+        return filtered_queryset.distinct('name')
+
+    def get(self, request, *args, **kwargs) -> Response:
+        """
+        Handle GET request to retrieve species count per province.
+        """
+        species_name = request.GET.get("species")
+        queryset = self.get_queryset()
+        return Response(
+            calculate_species_count_per_province(queryset, species_name)
+        )
+
+
 class SpeciesPopulationDensityPerPropertyAPIView(APIView):
     """
     API view to retrieve species population density per property.
@@ -162,8 +208,17 @@ class SpeciesPopulationDensityPerPropertyAPIView(APIView):
         Params:request (Request): The HTTP request object.
         """
         queryset = self.get_queryset()
+
+        # Extract the species_name query parameter from the URL
+        species_name = self.request.query_params.get("species", None)
+
         serializer = SpeciesPopulationDensityPerPropertySerializer(
-            queryset, many=True, context={"request": request}
+            queryset,
+            many=True,
+            context={
+                "request": request,
+                "species_name": species_name
+            }
         )
         return Response(serializer.data)
 
@@ -190,8 +245,11 @@ class PropertiesPerPopulationCategoryAPIView(APIView):
         """
         Handle GET request to retrieve population categories for properties.
         """
+        species_name = request.GET.get("species")
         queryset = self.get_queryset()
-        return Response(calculate_population_categories(queryset))
+        return Response(
+            calculate_population_categories(queryset, species_name)
+        )
 
 
 class TotalAreaAvailableToSpeciesAPIView(APIView):
@@ -216,8 +274,14 @@ class TotalAreaAvailableToSpeciesAPIView(APIView):
         Retrieve the calculated total area available to species and
         return it as a Response.
         """
+        species_name = request.GET.get("species")
         queryset = self.get_queryset()
-        return Response(calculate_total_area_available_to_species(queryset))
+        return Response(
+            calculate_total_area_available_to_species(
+                queryset,
+                species_name
+            )
+        )
 
 
 class TotalAreaPerPropertyTypeAPIView(APIView):

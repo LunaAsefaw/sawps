@@ -76,8 +76,18 @@ class TestPopulationAPIViews(TestCase):
         view = PopulationMetadataList.as_view()
         response = view(request)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('certainties', response.data)
-        self.assertEqual(len(response.data['certainties']), 1)
+        self.assertEqual(
+            list(response.data.keys()),
+            [
+                'taxons',
+                'survey_methods',
+                'intake_events',
+                'offtake_events',
+                'sampling_effort_coverages',
+                'population_statuses',
+                'population_estimate_categories'
+            ]
+        )
 
     @mock.patch(
         'frontend.api_views.population.'

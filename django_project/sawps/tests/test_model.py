@@ -6,7 +6,6 @@ from sawps.tests.model_factories import (
     Group,
 )
 from sawps.models import (
-    create_extended_group,
     save_extended_group, ExtendedGroup
 )
 from sawps.admin import GroupAdmin
@@ -18,12 +17,11 @@ class TestExtendedGroup(TestCase):
         group = GroupF.create()
         self.assertIsNotNone(group.extended)
         self.assertTrue('Group name' in str(
-            group.extended
+            group.extended.group.name
         ))
 
     def test_save_group(self):
 
-        post_save.disconnect(create_extended_group, sender=Group)
         post_save.disconnect(save_extended_group, sender=Group)
 
         group = GroupF.create()
@@ -36,7 +34,6 @@ class TestExtendedGroup(TestCase):
             ).exists()
         )
 
-        post_save.connect(create_extended_group, sender=Group)
         post_save.connect(save_extended_group, sender=Group)
 
         group.save()
@@ -44,6 +41,16 @@ class TestExtendedGroup(TestCase):
             ExtendedGroup.objects.filter(
                 group_id=group.id
             ).exists()
+        )
+
+        group.extended.description = 'test'
+        group.save()
+
+        self.assertEqual(
+            ExtendedGroup.objects.get(
+                group_id=group.id
+            ).description,
+            'test'
         )
 
 
@@ -56,12 +63,10 @@ class GroupAdminTestCase(TestCase):
 
     def test_get_no_description(self):
 
-        post_save.disconnect(create_extended_group, sender=Group)
         post_save.disconnect(save_extended_group, sender=Group)
 
         group = GroupF.create()
 
-        post_save.connect(create_extended_group, sender=Group)
         post_save.connect(save_extended_group, sender=Group)
 
         admin_instance = GroupAdmin(Group, site)

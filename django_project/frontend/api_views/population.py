@@ -4,8 +4,7 @@ from datetime import datetime
 
 from activity.models import ActivityType
 from activity.serializers import ActivityTypeSerializer
-from django.db.models import Q, IntegerField
-from django.db.models.functions import Cast
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from frontend.models.upload import DraftSpeciesUpload
 from frontend.utils.statistical_model import (
@@ -18,18 +17,14 @@ from occurrence.serializers import (
 from population_data.models import (
     AnnualPopulation,
     AnnualPopulationPerActivity,
-    OpenCloseSystem,
     SamplingEffortCoverage,
     PopulationStatus,
     PopulationEstimateCategory,
-    Certainty
 )
 from population_data.serializers import (
-    OpenCloseSystemSerializer,
     SamplingEffortCoverageSerializer,
     PopulationStatusSerializer,
     PopulationEstimateCategorySerializer,
-    CertaintySerializer
 )
 from property.models import Property
 from rest_framework.permissions import IsAuthenticated
@@ -50,7 +45,6 @@ class PopulationMetadataList(APIView):
         taxons = Taxon.objects.filter(
             taxon_rank__name__iexact="species"
         ).order_by('scientific_name')
-        open_close_systems = OpenCloseSystem.objects.all().order_by("name")
         survey_methods = SurveyMethod.objects.all().order_by("name")
         intake_events = ActivityType.objects.filter(
             recruitment=True).order_by("name")
@@ -64,16 +58,10 @@ class PopulationMetadataList(APIView):
         population_estimate_categories = (
             PopulationEstimateCategory.objects.all().order_by("name")
         )
-        certainties = Certainty.objects.annotate(
-            certainty=Cast('name', IntegerField())
-        ).all().order_by('certainty')
         return Response(
             status=200,
             data={
                 "taxons": TaxonSerializer(taxons, many=True).data,
-                "open_close_systems": (OpenCloseSystemSerializer(
-                    open_close_systems, many=True).data
-                                       ),
                 "survey_methods": (
                     SurveyMethodSerializer(survey_methods, many=True).data
                 ),
@@ -96,11 +84,6 @@ class PopulationMetadataList(APIView):
                 "population_estimate_categories": (
                     PopulationEstimateCategorySerializer(
                         population_estimate_categories, many=True
-                    ).data
-                ),
-                "certainties": (
-                    CertaintySerializer(
-                        certainties, many=True
                     ).data
                 )
             },
@@ -161,10 +144,6 @@ class UploadPopulationAPIVIew(APIView):
         survey_method = get_object_or_404(
             SurveyMethod, id=annual_population.get("survey_method_id", 0)
         )
-        # get open_close_system
-        open_close_system = get_object_or_404(
-            OpenCloseSystem, id=annual_population.get("open_close_id")
-        )
         # area_available_to_species
         area_available_to_species = annual_population.get(
             "area_available_to_species", 0
@@ -214,7 +193,6 @@ class UploadPopulationAPIVIew(APIView):
             group=annual_population.get("group", 0),
             note=annual_population.get("note", None),
             survey_method=survey_method,
-            open_close_system=open_close_system,
             sub_adult_male=annual_population.get("sub_adult_male", 0),
             sub_adult_female=annual_population.get("sub_adult_female", 0),
             sub_adult_total=(annual_population.get("sub_adult_male", 0) +

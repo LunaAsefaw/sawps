@@ -4,6 +4,7 @@ Welcome to the SAWPS user guide. In this section of the documentation, we aim to
 
 * **[Registering:](./registering.md)** This page will show you how to register on the platform.
 * **[Help and Contact Pages:](./help.md)** Here we explain how to get help with the platform, either from the documentation or through contacting the SAWPS team.
-* **[Map:](./map.md)** This section explains how use the map page of the platform and the various tabs contained within the map page.
-* **[Profile Page:](./profile-page.md)** Describes how to set up your user profile and to navigate the various tabs of the profile page.
+* **[The Explore Page:](./explore.md)** This section explains how use the Explore page of the platform and the various tabs contained within the explore page.
+* **[Profile Setup:](./profile-setup.md)** Describes how to set up your user profile and to navigate the various tabs of the profile page.
 * **[Organisations:](./organisations.md)** This documentation shows you the features of the organisation page.
+* **[Upload Data:](./data-upload.md)**: This section guides you through using the data upload feature on the site.

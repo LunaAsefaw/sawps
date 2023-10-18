@@ -125,13 +125,19 @@ class NationalPropertiesView(APIView):
         ).qs
         return filtered_queryset
 
-    def get(self, *args, **kwargs) -> Response:
+    def get(self, request, *args, **kwargs) -> Response:
         """
         Handle GET request to
         retrieve population categories for properties.
         """
+        species_name = request.GET.get("species")
         queryset = self.get_properties_per_population_category()
-        return Response(calculate_population_categories(queryset))
+        return Response(
+            calculate_population_categories(
+                queryset,
+                species_name
+            )
+        )
 
 
 class NationalActivityCountView(APIView):

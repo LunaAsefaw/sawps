@@ -305,26 +305,35 @@
 
 .charts-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(50vw, 1fr)); /* Automatically adjust to fit two charts per row */
+    grid-template-columns: repeat(auto-fill, minmax(65vw, 1fr)); /* Automatically adjust to fit two charts per row */
     gap: 16px; /* Adjust the gap between charts */
     max-width: 100%; /* Ensure the charts don't exceed the container width */
-    overflow-x: auto; /* Enable horizontal scrolling if needed */
     padding: 16px; /* Add padding to the container */
     // background-color: #fff; /* make background same color can increase visibility on downloaded pdf */
     box-shadow: none;
     border-bottom: none;
-    
+    flex-wrap: wrap; /* Allow charts to wrap to the next line if there's not enough space */
 }
 
-
-.chart-row {
-    display: flex;
-    flex-wrap: wrap; /* Allow charts to wrap to the next line if there's not enough space */
-  }
   
-  .chart-row > * {
+  .charts-container  > * {
     flex: 1;
     margin: 8px;
   }
+
+  /* Adjust column width for smaller screens */
+@media screen and (max-width: 768px) {
+    .charts-container {
+        grid-template-columns: repeat(auto-fill, minmax(80vw, 1fr));
+        margin-left: 55px;
+    }
+}
+
+/* Further adjustments for even smaller screens  */
+@media screen and (max-width: 480px) {
+    .charts-container {
+        grid-template-columns: repeat(auto-fill, minmax(90vw, 1fr));
+    }
+}
   
 

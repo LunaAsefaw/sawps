@@ -344,6 +344,7 @@ class OrganisationUsersView(
                 "pk": invite.pk,
                 "email": str(invite.email),
                 "user_role": str(invite.assigned_as),
+                "assigned_as": str(invite.assigned_as),
                 "joined": invite.joined
             }
             paginated_organisation_invites.append(object_to_save)

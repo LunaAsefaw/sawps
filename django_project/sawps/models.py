@@ -18,29 +18,17 @@ class ExtendedGroup(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return self.group.name
+        return self.description
 
 
 @receiver(post_save, sender=Group)
-def create_extended_group(sender, instance, created, **kwargs):
+def save_extended_group(sender, instance, created, **kwargs):
     """
-    When a group is created, also create a ExtendedGroup
+    Handle ExtendedGroup creation and saving for the Group
     """
-    if (
-            created and
-            not ExtendedGroup.objects.filter(group=instance).exists()
-    ):
-        ExtendedGroup.objects.create(group=instance)
+    extended_group, created = (
+        ExtendedGroup.objects.get_or_create(group=instance)
+    )
 
-
-@receiver(post_save, sender=Group)
-def save_extended_group(sender, instance, **kwargs):
-    """
-    Save the ExtendedGroup whenever a save event occurs
-    """
-    if ExtendedGroup.objects.filter(
-        group_id=instance.id
-    ).exists():
+    if not created:
         instance.extended.save()
-    else:
-        ExtendedGroup.objects.create(group=instance)

@@ -10,6 +10,10 @@ from frontend.models.statistical import (
     StatisticalModelOutput,
 )
 from frontend.models.upload import UploadSpeciesCSV
+from frontend.models.spatial import (
+    SpatialDataModel,
+    SpatialDataValueModel
+)
 
 
 class UserF(factory.django.DjangoModelFactory):
@@ -179,3 +183,36 @@ class UploadSpeciesCSVF(factory.django.DjangoModelFactory):
     class Meta:
         """Meta class Factory for UploadSpeciesCSV Model."""
         model = UploadSpeciesCSV
+
+
+class SpatialDataModelF(factory.django.DjangoModelFactory):
+    """Factor for SpatialData model"""
+
+    property = factory.SubFactory(
+        'property.factories.PropertyFactory'
+    )
+
+    context_layer = factory.SubFactory(
+        'frontend.tests.model_factories.ContextLayerF'
+    )
+
+    class Meta:
+        model = SpatialDataModel
+
+
+class SpatialDataModelValueF(factory.django.DjangoModelFactory):
+    """Factor for SpatialDataModelValue model"""
+    spatial_data = factory.SubFactory(
+        'frontend.tests.model_factories.SpatialDataModelF'
+    )
+
+    context_layer_value = factory.Sequence(
+        lambda n: f'context layer value {n}'
+    )
+
+    layer = factory.SubFactory(
+        'frontend.tests.model_factories.LayerF'
+    )
+
+    class Meta:
+        model = SpatialDataValueModel

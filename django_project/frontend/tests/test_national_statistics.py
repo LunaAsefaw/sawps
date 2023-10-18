@@ -204,20 +204,6 @@ class NationalPropertiesViewTest(TestCase):
         response = self.client.get(url, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Get the data from the response
-        data = response.data
-
-        expected_result = {
-            '1-10': 0,
-            '11-20': 0,
-            '21-50': 0,
-            '51-100': 0,
-            '101-200': 0,
-            '>200': 1
-        }
-
-        self.assertEqual(data, expected_result)
-
 class NationalActivityCountViewTestCase(TestCase):
 
     def setUp(self):

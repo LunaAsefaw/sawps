@@ -30,10 +30,12 @@ from frontend.api_views.metrics import (
     SpeciesPopuationCountPerYearAPIView,
     TotalAreaPerPropertyTypeAPIView,
     SpeciesPopulationDensityPerPropertyAPIView,
+    SpeciesPopulationCountPerProvinceAPIView,
     TotalCountPerActivityAPIView,
     TotalAreaAvailableToSpeciesAPIView,
     PopulationPerAgeGroupAPIView,
     TotalAreaVSAvailableAreaAPIView,
+    TotalCountPerPopulationEstimateAPIView
 )
 from frontend.api_views.population import (
     DraftPopulationUpload,
@@ -50,7 +52,13 @@ from frontend.api_views.property import (
     UpdatePropertyInformation,
     PropertySearch
 )
-from frontend.api_views.statistical import SpeciesNationalTrend
+from frontend.api_views.spatial_filter import (
+    SpatialFilterList
+)
+from frontend.api_views.statistical import (
+    SpeciesNationalTrend,
+    SpeciesTrend
+)
 from frontend.api_views.upload import (
     BoundaryFileList,
     BoundaryFileRemove,
@@ -59,6 +67,7 @@ from frontend.api_views.upload import (
     BoundaryFileUpload,
 )
 from frontend.views.base_view import get_user_notifications
+from .api_views.user import UserInfoAPIView
 
 from .views.about import AboutView
 from .views.contact import ContactUsView
@@ -207,6 +216,11 @@ urlpatterns = [
         name='species-national-trend'
     ),
     path(
+        'api/species/population_trend/',
+        SpeciesTrend.as_view(),
+        name='species-population-trend'
+    ),
+    path(
         'api/upload/population/draft/<uuid:draft_uuid>/',
         FetchDraftPopulationUpload.as_view(),
         name='fetch-draft-upload-species'
@@ -277,6 +291,16 @@ urlpatterns = [
         'api/species-population-total-density/',
         SpeciesPopulationDensityPerPropertyAPIView.as_view(),
         name='species_population_total_density'
+    ),
+    path(
+        'api/total-count-per-population-estimate/',
+        TotalCountPerPopulationEstimateAPIView.as_view(),
+        name='total-count-per-population-estimate'
+    ),
+    path(
+        'api/species-count-per-province/',
+        SpeciesPopulationCountPerProvinceAPIView.as_view(),
+        name='species_count_per_province'
     ),
     path(
         'api/properties-per-population-category/',
@@ -363,4 +387,14 @@ urlpatterns = [
         save_permissions,
         name='save_permissions'
     ),
+    path(
+        'api/spatial-filter-list/',
+        SpatialFilterList.as_view(),
+        name='spatial-filter-list'
+    ),
+    path(
+        'api/user-info/',
+        UserInfoAPIView.as_view(),
+        name='user-info-api'
+    )
 ]

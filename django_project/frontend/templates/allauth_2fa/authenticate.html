@@ -5,11 +5,11 @@
 
 
 {% block content %}
-<section class="login-page fs-background" style="background-color: #000000; min-height:var(--min-content-height);">
+<section class="login-page fs-background registerSignUpAccount" style="background-color: #000000; min-height:var(--min-content-height);">
     <div class="container-fluid full-height">
         <div class="row half-height">
-            <div class="col-7"></div>
-            <div class="col-5 sawps-text-primary">
+            <div class="col-12 col-md-5 col-lg-7"></div>
+            <div class="col-12 col-md-7 col-lg-5 sawps-text-primary registerSignUp">
             <div class="account-form content">
                 <div class="custom-form-container">
                 <h4 class="account-form-title">{% trans "Two-Factor Authentication" %}</h4>
@@ -19,7 +19,7 @@
                 {{ form.non_field_errors }}
                 <p><label style="color:#ffff">OTP code</label></p>
                 <p>{{ form.otp_token }}</p>
-                
+
                 <div class="login-help text-center" style="color:#ffff">
                 Use your preferred authenticator application to generate an OTP
                 </div>
@@ -42,7 +42,7 @@
       // Get references to the link and the hidden paragraph
       const lostDeviceLink = document.getElementById('lostDeviceLink');
       const contactAdmin = document.getElementById('contactAdmin');
-    
+
       // Add a click event listener to the link
       lostDeviceLink.addEventListener('click', function() {
         // Toggle the visibility of the hidden paragraph

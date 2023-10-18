@@ -9,18 +9,30 @@ ACTIVITY_COLORS_DICT = {
 
 YEAR_DATA_LIMIT = 10
 
+REGIONAL_DATA_CONSUMER = 'Regional data consumer'
+NATIONAL_DATA_CONSUMER = 'National data consumer'
+
+REGIONAL_DATA_SCIENTIST = 'Regional data scientist'
+NATIONAL_DATA_SCIENTIST = 'National data scientist'
+
+ORGANISATION_MEMBER = 'Organisation member'
+ORGANISATION_MANAGER = 'Organisation manager'
+
+SUPER_USER = 'Super user'
+
+
 DATA_CONTRIBUTORS = [
-    "Organisation member",
-    "Organisation manager",
+    ORGANISATION_MEMBER,
+    ORGANISATION_MANAGER,
 ]
 
 DATA_CONSUMERS = [
-    "National data consumer",
-    "Regional data consumer"
+    NATIONAL_DATA_CONSUMER,
+    REGIONAL_DATA_CONSUMER
 ]
 
 DATA_SCIENTISTS = [
-    "National data scientist",
-    "Regional data scientist",
-    "Super user"
+    NATIONAL_DATA_SCIENTIST,
+    REGIONAL_DATA_SCIENTIST,
+    SUPER_USER
 ]

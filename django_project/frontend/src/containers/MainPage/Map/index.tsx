@@ -6,7 +6,7 @@ import MapboxDraw, { constants as MapboxDrawConstant } from '@mapbox/mapbox-gl-d
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import {RootState} from '../../../app/store';
 import {useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { 
+import {
   setMapReady,
   toggleParcelSelectedState,
   setSelectedProperty,
@@ -44,6 +44,7 @@ import PropertyInterface from '../../../models/Property';
 import CustomDrawControl from './CustomDrawControl';
 import LoadingIndicatorControl from './LoadingIndicatorControl';
 import useThemeDetector from '../../../components/ThemeDetector';
+import {useGetUserInfoQuery} from "../../../services/api";
 
 const MAP_STYLE_URL = window.location.origin + '/api/map/styles/'
 const MAP_SOURCES = ['sanbi', 'properties', 'NGI Aerial Imagery']
@@ -104,8 +105,10 @@ export default function Map() {
   const isDarkTheme = useThemeDetector()
   const [highlightedParcel, setHighlightedParcel] = useState<FeatureIdentifier>(getEmptyFeature())
 
+  const { data: userInfoData, isLoading, isSuccess } = useGetUserInfoQuery()
+
   const onMapMouseEnter = () => {
-    if (!map.current) return;    
+    if (!map.current) return;
     // Change the cursor style as a UI indicator.
     map.current.getCanvas().style.cursor = 'pointer';
   }
@@ -146,7 +149,7 @@ export default function Map() {
         console.log(error)
         setSavingBoundaryDigitise(false)
         removeDrawMapLoadingIndicator()
-        alert('There is unexpected error! Please try again!') 
+        alert('There is unexpected error! Please try again!')
     })
   }
 
@@ -229,7 +232,7 @@ export default function Map() {
     _save_button.className = 'mapboxgl-ctrl-icon'
     _save_button.title = 'Save'
     _save_button.ariaLabel = 'Save'
-    
+
     let _cancel_button = document.createElement('span')
     _cancel_button.className = 'mapboxgl-ctrl-icon'
     _cancel_button.title = 'Cancel'
@@ -295,7 +298,7 @@ export default function Map() {
     if (!isMapReady) return;
     if (contextLayers.length === 0) return;
     if (!map.current) return;
-    
+
     let _mapObj: maplibregl.Map = map.current
     let _parcelLayer = findParcelLayer(contextLayers)
     if (typeof _parcelLayer === 'undefined') return;
@@ -321,6 +324,7 @@ export default function Map() {
   /* Called when mapTheme is changed */
   useEffect(() => {
     if (mapTheme === MapTheme.None) return;
+    if (!isSuccess) return;
     if (map.current) {
       dispatch(setMapReady(false))
       map.current.setStyle(`${MAP_STYLE_URL}?theme=${mapTheme}`)
@@ -350,19 +354,20 @@ export default function Map() {
       })
       map.current.on('styledata', () => {
         dispatch(setMapReady(true))
-        
-        var user_role = localStorage.getItem('user_role')
-        var enable_parcel_layers = true
 
-        if (user_role !== undefined)
-          if (user_role.toString().toLowerCase().includes('decision maker'))
-            enable_parcel_layers = false
-
-        if(enable_parcel_layers)
+        let enableParcelLayers = true;
+        if (userInfoData) {
+          for (let userRole of userInfoData.user_roles) {
+            if (userRole.toLowerCase().includes('decision maker')) {
+              enableParcelLayers = false
+            }
+          }
+        }
+        if(enableParcelLayers)
           addParcelInvisibleFillLayers(map.current)
       })
     }
-  }, [mapTheme]);
+  }, [mapTheme, isSuccess]);
 
   /* Callback when map is on click. */
   const mapOnClick = useCallback((e: any) => {
@@ -425,11 +430,12 @@ export default function Map() {
   /* OnClick event */
   useEffect(() => {
     if (!map.current) return;
+    if (!isSuccess) return;
     map.current.on('click', mapOnClick)
     return () => {
       map.current.off('click', mapOnClick)
     }
-  }, [contextLayers, selectionMode, uploadMode, selectedProperty])
+  }, [contextLayers, selectionMode, uploadMode, selectedProperty, isSuccess])
 
   /* render selected+unselected parcel */
   useEffect(() => {
@@ -481,6 +487,7 @@ export default function Map() {
         // parse bbox from payload
         if (_event.payload && _event.payload.length === 4) {
           let _bbox = _event.payload.map(Number)
+          if (!_mapObj) return;
           _mapObj.fitBounds([[_bbox[0], _bbox[1]], [_bbox[2], _bbox[3]]], {
               padding: 50,
               maxZoom: 16

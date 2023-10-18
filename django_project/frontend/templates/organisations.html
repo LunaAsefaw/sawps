@@ -9,7 +9,7 @@
     <div class="my-row">
       {% include "profile_config_base.html" %}
     </div>
-  
+
     <div class="container" style="margin-left: 0.5%;">
 
       <!-- add user modal -->
@@ -67,16 +67,16 @@
               <p class="text-center">Invitation already sent.</p>
             </div>
             <div class="modal-footer justify-content-between">
-              <button 
-                type="button" 
-                class="sawps-font-button red-button mt-0" 
-                style="font-weight: bold; min-width: 140px; margin-left: 70%;" 
+              <button
+                type="button"
+                class="sawps-font-button red-button mt-0"
+                style="font-weight: bold; min-width: 140px; margin-left: 70%;"
                 data-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
       </div>
-      
+
 
         <!-- Success Message Modal -->
         <div class="modal fade" id="successMessageModal" tabindex="-1" role="dialog" aria-labelledby="successMessageModalLabel" aria-hidden="true">
@@ -95,9 +95,9 @@
                 <p class="text-center">Email invitation sent successfully.</p>
               </div>
               <div class="modal-footer justify-content-center">
-                <button 
-                  type="button" 
-                  class="sawps-font-button red-button mt-0" 
+                <button
+                  type="button"
+                  class="sawps-font-button red-button mt-0"
                   data-dismiss="modal"
                   style="font-weight: bold; min-width: 140px; margin-left: 70%;"
                 >
@@ -140,8 +140,8 @@
               <td>
                 <!-- Add User Button - Trigger Modal -->
                 <button
-                  class="sawps-font-button green-button mt-0" 
-                  type="button" 
+                  class="sawps-font-button green-button mt-0"
+                  type="button"
                   data-toggle="modal"
                   data-target="#adduser"
                   data-organisation-id="{{ current_organisation_id }}"
@@ -153,11 +153,11 @@
               </td>
               <td>
                 <!-- Read More Link - Show/Hide More Text -->
-                <a 
-                  href="#" 
-                  class="read-more-link" 
-                  data-toggle="collapse" 
-                  data-target="#readMoreText{{ current_organisation_id }}" 
+                <a
+                  href="#"
+                  class="read-more-link"
+                  data-toggle="collapse"
+                  data-target="#readMoreText{{ current_organisation_id }}"
                   onclick="fetchOrganizationDetails({{ current_organisation_id }})"
                 >
                   Read more
@@ -186,11 +186,11 @@
                   <div id="toggleMessage{{ current_organisation_id }}" style="display: none; margin-left: 2%;" class="text-warning-custom mt-3">
                     Making changes here will not affect data that you have previously published and agreed to share under a different regime.
                   </div>
-    
+
                   <div class="form-group"></div>
-                  <button 
-                    class="sawps-font-button orange-button mt-0 update-button" 
-                    id="saveButton{{ current_organisation_id }}" 
+                  <button
+                    class="sawps-font-button orange-button mt-0 update-button"
+                    id="saveButton{{ current_organisation_id }}"
                     style="font-weight: bold; margin-left: 60%; min-width: 140px;"
                     onclick="savePermissions({{ current_organisation_id }})"
                   >
@@ -209,8 +209,8 @@
               <td>{{ organisation.name }}</td>
               <td>
                 <!-- Add User Button - Trigger Modal -->
-                <button 
-                  class="sawps-font-button green-button mt-0" 
+                <button
+                  class="sawps-font-button green-button mt-0"
                   type="button"
                   data-toggle="modal"
                   data-target="#adduser"
@@ -223,11 +223,11 @@
               </td>
               <td>
                 <!-- Read More Link - Show/Hide More Text -->
-                <a 
-                  href="#" 
-                  class="read-more-link" 
-                  data-toggle="collapse" 
-                  data-target="#readMoreText{{ organisation.id }}" 
+                <a
+                  href="#"
+                  class="read-more-link"
+                  data-toggle="collapse"
+                  data-target="#readMoreText{{ organisation.id }}"
                   onclick="fetchOrganizationDetails({{ organisation.id }})"
                 >
                   Read more
@@ -244,8 +244,8 @@
                         </thead>
                     </table>
                   </div>
-                  
-  
+
+
                   <div class="form-group mt-3" style="margin-left: 2%;">
                     <small id="data-privacy" class="form-text text-muted">
                         How would you like your data to be used?. See the SANBI data sharing <a href="URL_HERE">agreement</a>.
@@ -268,11 +268,11 @@
                   <div id="toggleMessage{{ organisation.id }}" style="display: none; margin-left: 2%;" class="text-warning-custom mt-3">
                     Making changes here will not affect data that you have previously published and agreed to share under a different regime.
                   </div>
-    
+
                   <div class="form-group"></div>
-                  <button 
-                    class="sawps-font-button orange-button mt-0 update-button" 
-                    id="saveButton{{ organisation.id }}" 
+                  <button
+                    class="sawps-font-button orange-button mt-0 update-button"
+                    id="saveButton{{ organisation.id }}"
                     style="font-weight: bold; margin-left: 60%; min-width: 140px;"
                     onclick="savePermissions({{ organisation.id }})">
                     Update
@@ -286,7 +286,7 @@
           </tbody>
         </table>
       </div>
-  
+
       <div class="row justify-content-end">
         <nav aria-label="Page navigation">
           <ul class="pagination justify-content-end" id="pagination">
@@ -297,10 +297,10 @@
     </div>
   </div>
 
-  
 
-    
-  
+
+
+
 <script>
 
   // Function to close the "Add User" modal
@@ -376,7 +376,7 @@
     function handleToggleMessage(organisationId) {
       const switches = switchStates[organisationId];
       const toggleMessage = document.getElementById(`toggleMessage${organisationId}`);
-      
+
       if (switches) {
         isAnySwitchToggled = true
         toggleMessage.style.display = isAnySwitchToggled ? "block" : "none";
@@ -432,7 +432,7 @@
         }
       })
 
-  
+
     function switchOrganisation(buttonElement){
       var organisationId = buttonElement.getAttribute('data-organisation-id');
       var url = `/switch-organisation/${organisationId}/?next=${encodeURIComponent(window.location.href)}`;
@@ -542,7 +542,7 @@
             'csrfmiddlewaretoken': '{{ csrf_token }}'
           },
           success: function(response) {
-            
+
 
 
             if (response.status === 'invitation already sent') {
@@ -559,7 +559,7 @@
           }
         });
       }
-    
+
   </script>
 
   <style>

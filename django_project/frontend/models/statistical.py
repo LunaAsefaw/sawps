@@ -10,6 +10,7 @@ POPULATION_PER_PROVINCE = 'population_per_province'
 PROVINCE_TREND = 'province_trend'
 PROPERTY_TREND = 'property_trend'
 POPULATION_PER_PROPERTY = 'population_per_property'
+SPECIES_PER_PROPERTY = 'species_per_property'
 
 
 class StatisticalModel(models.Model):
@@ -82,6 +83,7 @@ class StatisticalModelOutput(models.Model):
         (PROVINCE_TREND, 'Province Trend'),
         (PROPERTY_TREND, 'Property Trend'),
         (POPULATION_PER_PROPERTY, 'Population Per Property'),
+        (SPECIES_PER_PROPERTY, 'Species Per Property')
     )
 
     model = models.ForeignKey(

@@ -3,7 +3,6 @@
     width: 100%;
     display: flex;
     padding: 6px;
-    border-radius: 8px;
     margin-bottom: 10px;
     min-width: 120px;
 
@@ -11,7 +10,6 @@
         margin-left: auto;
         width: 300px;
         background-color: #fff;
-        border-radius: 6px;
         text-align: left;
 
         .MuiInputBase-formControl {
@@ -51,13 +49,11 @@
 }
 
 .downlodBtn {
-    width: 100%;
-    display: flex;
-    gap: 15px;
-    justify-content: flex-end;
-    margin-top: 20px;
-    padding: 0 20px;
-    padding-right: 0;
+	display: flex;
+	gap: 15px;
+	flex-direction: row-reverse;
+    margin-bottom: 5px;
+    margin-right: 5px;
 }
 
 .dataTable {
@@ -88,7 +84,6 @@
     width: 100%;
     display: flex;
     padding: 6px;
-    border-radius: 8px;
     margin-bottom: 10px;
     min-width: 120px;
     color: white;
@@ -103,4 +98,44 @@
 }
 .dataTable-auto .MuiDataGrid-root{
    margin-bottom: 0px;
+}
+.dataTable-auto .MuiDataGrid-columnHeaderTitleContainer {
+    text-align: left;
+}
+
+.dataContainer {
+    padding: 5px;
+}
+
+.topper-container {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 10px;
+    background-color: #EFEFEF;
+    min-width: 120px;
+    border: solid medium #97C19C;
+
+    .topper-grey {
+        background-color: #CCCCCC;
+        border-top: solid medium #97C19C;
+    }
+
+    .topper-detail {
+        width: 75%;
+        margin: auto;
+
+        .text-content {
+            width: max-content;
+        }
+
+        .MuiGrid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            img {
+                margin: auto;
+            }
+        }
+    }
 }

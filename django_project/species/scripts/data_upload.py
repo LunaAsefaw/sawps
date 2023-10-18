@@ -4,6 +4,7 @@ import re
 import copy
 import tempfile
 import pandas as pd
+from django.db import IntegrityError
 from frontend.models.upload import UploadSpeciesCSV
 from activity.models import ActivityType
 from occurrence.models import SurveyMethod
@@ -52,10 +53,11 @@ def string_to_number(string):
 class SpeciesCSVUpload(object):
     upload_session = UploadSpeciesCSV.objects.none()
     error_list = []
-    created_list = []
-    existed_list = []
+    created_list = 0
+    existed_list = 0
     headers = []
     total_rows = 0
+    row_error = []
     csv_dict_reader = None
 
     def process_started(self):
@@ -69,8 +71,6 @@ class SpeciesCSVUpload(object):
         Start processing the csv file from upload session
         """
         self.error_list = []
-        self.success_list = []
-        self.property = self.upload_session.property
         uploaded_file = self.upload_session.process_file
         if self.upload_session.process_file.path.endswith('.xlsx'):
             excel = pd.ExcelFile(self.upload_session.process_file)
@@ -119,18 +119,25 @@ class SpeciesCSVUpload(object):
             return
         self.process_ended()
 
-    def error_file(self, row, message):
+    def error_row(self, message):
+        """
+        Get error in row
+        :param message: error message for a row
+        """
+        self.row_error.append(message)
+
+    def error_file(self, row):
         """
         Write to error file
         :param row: error data
-        :param message: error message for this row
         """
-        logger.log(
-            level=logging.ERROR,
-            msg=str(message)
-        )
-        row['error_message'] = message
-        self.error_list.append(row)
+        if len(self.row_error) > 0:
+            logger.log(
+                level=logging.ERROR,
+                msg=' '.join(self.row_error)
+            )
+            row['error_message'] = ' '.join(self.row_error)
+            self.error_list.append(row)
 
     def finish(self, headers):
         """
@@ -149,9 +156,7 @@ class SpeciesCSVUpload(object):
         if self.error_list:
             error_headers = copy.deepcopy(headers)
             if 'error_message' not in error_headers:
-                error_headers.append('error_message')
-            if 'link' in error_headers:
-                error_headers.remove('link')
+                error_headers.insert(0, 'error_message')
             error_file_path = '{path}error_{name}'.format(
                 path=file_path,
                 name=file_name
@@ -201,16 +206,18 @@ class SpeciesCSVUpload(object):
 
         # Create success message
         success_message = None
-        if len(self.created_list) > 0 and len(self.existed_list) == 0:
-            success_message = "{} uploaded successfully."
+        if self.created_list > 0 and self.existed_list == 0:
+            success_message = "{} rows uploaded successfully." \
+                              "".format(self.created_list)
 
-        if len(self.existed_list) > 0 and len(self.created_list) == 0:
-            success_message = "{} already exist in the database."
+        if self.existed_list > 0 and self.created_list == 0:
+            success_message = "{} rows already exist in the database." \
+                              "".format(self.existed_list)
 
-        if len(self.existed_list) > 0 or len(self.created_list) > 0:
-            success_message = "{} already exist in the database. {} " \
-                              "uploaded successfully.".\
-                format(len(self.existed_list), len(self.created_list))
+        if self.existed_list > 0 and self.created_list > 0:
+            success_message = "{} rows already exist in the database. {} " \
+                              "row uploaded successfully." \
+                              "".format(self.existed_list, self.created_list)
 
         if success_message:
             self.upload_session.success_notes = success_message
@@ -243,7 +250,10 @@ class SpeciesCSVUpload(object):
         Read and process data from csv file
         """
         index = 1
+        self.created_list = 0
+        self.existed_list = 0
         for row in self.csv_dict_reader:
+            self.row_error = []
             if UploadSpeciesCSV.objects.get(
                     id=self.upload_session.id).canceled:
                 print('Canceled')
@@ -256,14 +266,16 @@ class SpeciesCSVUpload(object):
             self.upload_session.save()
             index += 1
             self.process_data(row=row)
-
+            self.error_file(row)
         self.finish(self.csv_dict_reader.fieldnames)
 
     def get_property(self, property_name):
-        if property_name:
+
+        property_selected = self.upload_session.property.name
+        if property_name == property_selected:
             try:
                 property = Property.objects.get(
-                        name=property_name,
+                        name=property_selected,
                 )
             except Property.DoesNotExist:
                 return
@@ -278,7 +290,7 @@ class SpeciesCSVUpload(object):
                     common_name_varbatim=common_name
                 )
             except Taxon.DoesNotExist:
-                return None
+                return
             return taxon
 
     def sampling_effort(self, row):
@@ -300,89 +312,135 @@ class SpeciesCSVUpload(object):
         return None
 
     # Save Survey method
-    def survey_method(self, row):
-        if_survey = self.row_value(row, IF_OTHER_SURVEY)
-        survey = self.row_value(row, SURVEY_METHOD)
-        if survey or if_survey:
+    def survey_method(self, survey):
+        """Get survey method."""
+        if not survey:
+            return None
+
+        else:
             survey, created = SurveyMethod.objects.get_or_create(
-                name=(survey if survey else if_survey)
+                name=survey
             )
             return survey
-        return None
 
-    def population_estimate_category(self, row):
+    def population_estimate_category(self, pop_est):
         """ Save Population estimate category.
         """
-        if_other = self.row_value(row, IF_OTHER_POPULATION)
-        pop_est = self.row_value(row, POPULATION_ESTIMATE_CATEGORY)
-        if pop_est or if_other:
-            p, pc = PopulationEstimateCategory.objects.get_or_create(name=(
-                pop_est if
-                pop_est else if_other
-            ))
+        if not pop_est:
+            return None
+        else:
+            p, pc = PopulationEstimateCategory.objects.get_or_create(
+                    name=pop_est)
             return p
-        return None
 
     def check_compulsory_fields(self, row):
         """Check if compulsory fields are empty."""
 
-        excluded = [
-            SURVEY_METHOD,
-            IF_OTHER_SURVEY,
-            POPULATION_ESTIMATE_CATEGORY,
-            IF_OTHER_POPULATION
-        ]
-
         for field in COMPULSORY_FIELDS:
-            if not self.row_value(row, field) and field not in excluded:
-                self.error_file(
-                    row=row,
+            if not self.row_value(row, field):
+                self.error_row(
                     message="The value of the compulsory field {} "
                             "is empty.".format(field)
                 )
-                return
+
+    def save_population_per_activity(
+            self, row, activity, year, owned_species, total, total_males,
+            total_females, male_juv, female_juv
+    ):
+
+        pop = None
+        try:
+            pop, in_c = AnnualPopulationPerActivity.objects.get_or_create(
+                activity_type=ActivityType.objects.get(
+                    name=activity),
+                year=int(string_to_number(year)),
+                owned_species=owned_species,
+                total=int(string_to_number(
+                    self.row_value(row, total))),
+                adult_male=int(string_to_number(
+                    self.row_value(row, total_males))),
+                adult_female=int(string_to_number(
+                    self.row_value(row, total_females))),
+                juvenile_male=int(string_to_number(
+                    self.row_value(row, male_juv))),
+                juvenile_female=int(string_to_number(
+                    self.row_value(row, female_juv))),
+            )
+        except IntegrityError:
+            self.error_row(
+                message="The total of {} and {} must not exceed {}.".format(
+                    total_males,
+                    total_females,
+                    total)
+            )
+        return pop
 
     def process_data(self, row):
         """Processing row of csv file."""
 
         # check compulsory fields
         self.check_compulsory_fields(row)
-
+        property = taxon = None
         property_name = self.row_value(row, PROPERTY)
-        if not property_name:
-            return
-        property = self.get_property(property_name)
+        if property_name:
+            property = self.get_property(property_name)
 
-        if not property:
-            self.error_file(
-                row=row,
-                message="Property name {} doesn't match the selected "
-                        "property. Please replace it with {}".format(
-                            self.row_value(row, PROPERTY),
-                            self.upload_session.property.name)
-            )
-            return
+            if not property:
+                self.error_row(
+                    message="Property name {} doesn't match the selected "
+                            "property. Please replace it with {}.".format(
+                                self.row_value(row, PROPERTY),
+                                self.upload_session.property.name)
+                )
 
         scientific_name = self.row_value(row, SCIENTIFIC_NAME)
         common_name = self.row_value(row, COMMON_NAME)
-
-        if not scientific_name or not common_name:
-            return
-
-        taxon = self.get_taxon(common_name, scientific_name)
-        if not taxon:
-            self.error_file(
-                row=row,
-                message="{} doesn't exist in the "
-                        "database. Please select species available "
-                        "in the dropdown only.".format(
-                            self.row_value(row, SCIENTIFIC_NAME)
-                        )
-            )
-            return
+        if scientific_name and common_name:
+            taxon = self.get_taxon(common_name, scientific_name)
+            if not taxon:
+                self.error_row(
+                    message="{} doesn't exist in the "
+                            "database. Please select species available "
+                            "in the dropdown only.".format(
+                                self.row_value(row, SCIENTIFIC_NAME)
+                            )
+                )
 
         area_available_to_species = self.row_value(row, AREA)
-        if not area_available_to_species:
+
+        survey = self.row_value(row, SURVEY_METHOD)
+        survey_method = self.survey_method(survey)
+        survey_other = self.row_value(row, IF_OTHER_SURVEY)
+        sur_other = None
+        if survey_method and survey_method.name == IF_OTHER_SURVEY_VAL:
+            if not survey_other:
+                self.error_row(
+                    message="The value of field {} "
+                            "is empty.".format(IF_OTHER_SURVEY)
+                )
+            sur_other = survey_other
+
+        open_close_system = self.open_close_system(row)
+        pop_est = self.row_value(row, POPULATION_ESTIMATE_CATEGORY)
+        population_estimate = self.population_estimate_category(pop_est)
+        population_other = self.row_value(row, IF_OTHER_POPULATION)
+        pop_other = None
+        if population_estimate and \
+                population_estimate.name == IF_OTHER_POPULATION_VAL:
+            if not population_other:
+                self.error_row(
+                    message="The value of field {} "
+                            "is empty.".format(IF_OTHER_POPULATION)
+                )
+                # return
+            pop_other = population_other
+
+        year = self.row_value(row, YEAR)
+        count_total = self.row_value(row, COUNT_TOTAL)
+        presence = self.row_value(row, PRESENCE)
+        pop_certainty = self.row_value(row, POPULATION_ESTIMATE_CERTAINTY)
+
+        if len(self.row_error) > 0:
             return
 
         owned_species, cr = OwnedSpecies.objects.get_or_create(
@@ -392,191 +450,169 @@ class SpeciesCSVUpload(object):
             area_available_to_species=area_available_to_species
         )
 
-        survey_method = self.survey_method(row)
-        if not survey_method:
-            self.error_file(
-                row=row,
-                message="The value of the compulsory field {} or {}"
-                        "is empty.".format(SURVEY_METHOD, IF_OTHER_SURVEY)
-            )
-            return
-
-        open_close_system = self.open_close_system(row)
-        if not open_close_system:
-            return
-
-        population_estimate = self.population_estimate_category(row)
-        if not population_estimate:
-            self.error_file(
-                row=row,
-                message="The value of the compulsory field {} or {}"
-                        "is empty.".format(POPULATION_ESTIMATE_CATEGORY,
-                                           IF_OTHER_POPULATION)
-            )
-            return
-
-        year = self.row_value(row, YEAR)
-        if not year:
-            return
-
-        count_total = self.row_value(row, COUNT_TOTAL)
-        if not count_total:
-            return
-
-        presence = self.row_value(row, PRESENCE)
-        if not presence:
-            return
-
-        pop_certainty = self.row_value(row, POPULATION_ESTIMATE_CERTAINTY)
-        if not pop_certainty:
-            return
-
         # Save AnnualPopulation
-        annual, annual_created = AnnualPopulation.objects.get_or_create(
-            year=int(string_to_number(year)),
-            owned_species=owned_species,
-            total=int(string_to_number(count_total)),
-            adult_male=int(string_to_number(
-                self.row_value(row, COUNT_ADULT_MALES))),
-            adult_female=int(string_to_number(
-                self.row_value(row, COUNT_ADULT_FEMALES))),
-            juvenile_male=int(string_to_number(
-                self.row_value(row, COUNT_JUVENILE_MALES))),
-            juvenile_female=int(string_to_number(
-                self.row_value(row, COUNT_JUVENILE_FEMALES))),
-            sub_adult_total=int(string_to_number(
-                self.row_value(row, COUNT_SUBADULT_TOTAL))),
-            sub_adult_male=int(string_to_number(
-                self.row_value(row, COUNT_SUBADULT_MALE))),
-            sub_adult_female=int(string_to_number(
-                self.row_value(row, COUNT_SUBADULT_FEMALE))),
-            juvenile_total=int(string_to_number(
-                self.row_value(row, COUNT_JUVENILE_TOTAL))),
-            group=int(string_to_number(self.row_value(row, GROUP))),
-            open_close_system=open_close_system,
-            survey_method=survey_method,
-            presence=string_to_boolean(presence),
-            upper_confidence_level=float(string_to_number(
-                self.row_value(row, UPPER))),
-            lower_confidence_level=float(string_to_number(
-                self.row_value(row, LOWER))),
-            certainty_of_bounds=int(string_to_number(
-                self.row_value(row, CERTAINTY_OF_POPULATION))),
-            sampling_effort_coverage=self.sampling_effort(row),
-            population_estimate_certainty=int(string_to_number(pop_certainty)),
-            population_estimate_category=population_estimate
-        )
+        try:
+            annual, annual_created = AnnualPopulation.objects.get_or_create(
+                year=int(string_to_number(year)),
+                owned_species=owned_species,
+                total=int(string_to_number(count_total)),
+                adult_male=int(string_to_number(
+                    self.row_value(row, COUNT_ADULT_MALES))),
+                adult_female=int(string_to_number(
+                    self.row_value(row, COUNT_ADULT_FEMALES))),
+                juvenile_male=int(string_to_number(
+                    self.row_value(row, COUNT_JUVENILE_MALES))),
+                juvenile_female=int(string_to_number(
+                    self.row_value(row, COUNT_JUVENILE_FEMALES))),
+                sub_adult_total=int(string_to_number(
+                    self.row_value(row, COUNT_SUBADULT_TOTAL))),
+                sub_adult_male=int(string_to_number(
+                    self.row_value(row, COUNT_SUBADULT_MALE))),
+                sub_adult_female=int(string_to_number(
+                    self.row_value(row, COUNT_SUBADULT_FEMALE))),
+                juvenile_total=int(string_to_number(
+                    self.row_value(row, COUNT_JUVENILE_TOTAL))),
+                group=int(string_to_number(self.row_value(row, GROUP))),
+                open_close_system=open_close_system,
+                survey_method=survey_method,
+                presence=string_to_boolean(presence),
+                upper_confidence_level=float(string_to_number(
+                    self.row_value(row, UPPER))),
+                lower_confidence_level=float(string_to_number(
+                    self.row_value(row, LOWER))),
+                certainty_of_bounds=int(string_to_number(
+                    self.row_value(row, CERTAINTY_OF_POPULATION))),
+                sampling_effort_coverage=self.sampling_effort(row),
+                population_estimate_certainty=int(
+                    string_to_number(pop_certainty)),
+                population_estimate_category=population_estimate,
+                survey_method_other=sur_other,
+                population_estimate_category_other=pop_other
+            )
+        except IntegrityError:
+            self.error_row(
+                message="The total of {} and {} must not exceed {}.".format(
+                        COUNT_ADULT_MALES,
+                        COUNT_ADULT_FEMALES,
+                        COUNT_TOTAL)
+            )
+            logger.log(
+                level=logging.ERROR,
+                msg=str(self.row_error)
+            )
+            return
 
         if annual_created:
-            self.created_list.append(annual.id)
-        elif annual:
-            self.existed_list.append(annual.id)
+            self.created_list += 1
+        else:
+            self.existed_list += 1
 
         # Save AnnualPopulationPerActivity translocation intake
         if self.row_value(row, INTRODUCTION_TOTAL):
-            take, in_c = AnnualPopulationPerActivity.objects.get_or_create(
-                activity_type=ActivityType.objects.get(
-                    name="Translocation (Intake)"),
-                year=int(string_to_number(year)),
-                owned_species=owned_species,
-                total=int(string_to_number(
-                    self.row_value(row, INTRODUCTION_TOTAL))),
-                adult_male=int(string_to_number(
-                    self.row_value(row, INTRODUCTION_TOTAL_MALES))),
-                adult_female=int(string_to_number(
-                    self.row_value(row, INTRODUCTION_TOTAL_FEMALES))),
-                juvenile_male=int(string_to_number(
-                    self.row_value(row, INTRODUCTION_MALE_JUV))),
-                juvenile_female=int(string_to_number(
-                    self.row_value(row, INTRODUCTION_FEMALE_JUV))),
-                reintroduction_source=self.row_value(
-                    row, INTRODUCTION_SOURCE),
-                founder_population=string_to_boolean(
-                    self.row_value(FOUNDER_POPULATION)),
-                intake_permit=self.row_value(row, INTRODUCTION_PERMIT_NUMBER)
+            intake = self.save_population_per_activity(
+                row, "Translocation (Intake)", year,
+                owned_species, INTRODUCTION_TOTAL,
+                INTRODUCTION_TOTAL_MALES, INTRODUCTION_TOTAL_FEMALES,
+                INTRODUCTION_MALE_JUV, INTRODUCTION_FEMALE_JUV
             )
+            intake_data = {
+                "reintroduction_source": self.row_value(row,
+                                                        INTRODUCTION_SOURCE),
+                "founder_population": string_to_boolean(
+                    self.row_value(row, FOUNDER_POPULATION)
+                ),
+                "intake_permit": self.row_value(
+                    row, INTRODUCTION_PERMIT_NUMBER
+                )
+            }
+            if intake:
+                intake = AnnualPopulationPerActivity.objects.filter(
+                    id=intake.id
+                )
+                intake.update(**intake_data)
 
         # Save AnnualPopulationPerActivity translocation offtake
         if self.row_value(row, TRANS_OFFTAKE_TOTAL):
-            off, off_c = AnnualPopulationPerActivity.objects.get_or_create(
-                activity_type=ActivityType.objects.get(
-                    name="Translocation (Offtake)"),
-                year=int(string_to_number(year)),
-                owned_species=owned_species,
-                total=int(string_to_number(
-                    self.row_value(row, TRANS_OFFTAKE_TOTAL))),
-                adult_male=int(string_to_number(
-                    self.row_value(row, TRANS_OFFTAKE_ADULTE_MALES))),
-                adult_female=int(string_to_number(
-                    self.row_value(row, TRANS_OFFTAKE_ADULTE_FEMALES))),
-                juvenile_male=int(string_to_number(
-                    self.row_value(row, TRANS_OFFTAKE_MALE_JUV))),
-                juvenile_female=int(string_to_number(
-                    self.row_value(row, TRANS_OFFTAKE_FEMALE_JUV))),
-                translocation_destination=self.row_value(
-                    row, TRANS_DESTINATION),
-                offtake_permit=self.row_value(row, TRANS_OFFTAKE_PERMIT_NUMBER)
+            off_take = self.save_population_per_activity(
+                row, "Translocation (Offtake)", year,
+                owned_species, TRANS_OFFTAKE_TOTAL,
+                TRANS_OFFTAKE_ADULTE_MALES, TRANS_OFFTAKE_ADULTE_FEMALES,
+                TRANS_OFFTAKE_MALE_JUV, TRANS_OFFTAKE_FEMALE_JUV
             )
+            off_take_data = {
+                "translocation_destination": self.row_value(
+                    row, TRANS_DESTINATION),
+                "offtake_permit": self.row_value(
+                    row, TRANS_OFFTAKE_PERMIT_NUMBER)
+            }
+            if off_take:
+                off_take = AnnualPopulationPerActivity.objects.filter(
+                    id=off_take.id
+                )
+                off_take.update(**off_take_data)
 
         # Save AnnualPopulationPerActivity Planned hunt/cull
         if self.row_value(row, PLANNED_HUNT_TOTAL):
-            h, hunt_c = AnnualPopulationPerActivity.objects.get_or_create(
-                activity_type=ActivityType.objects.get(
-                    name="Planned Hunt/Cull"),
-                year=int(string_to_number(year)),
-                owned_species=owned_species,
-                total=int(string_to_number(
-                    self.row_value(row, PLANNED_HUNT_TOTAL))),
-                adult_male=int(string_to_number(
-                    self.row_value(row, PLANNED_HUNT_OFFTAKE_ADULT_MALES))),
-                adult_female=int(string_to_number(
-                    self.row_value(row, PLANNED_HUNT_OFFTAKE_ADULT_FAMALES))),
-                juvenile_male=int(string_to_number(
-                    self.row_value(row, PLANNED_HUNT_OFFTAKE_MALE_JUV))),
-                juvenile_female=int(string_to_number(
-                    self.row_value(row, PLANNED_HUNT_OFFTAKE_FEMALE_JUV))),
-                offtake_permit=self.row_value(row, PLANNED_HUNT_PERMIT_NUMBER),
+            hunt = self.save_population_per_activity(
+                row, "Planned Hunt/Cull", year,
+                owned_species, PLANNED_HUNT_TOTAL,
+                PLANNED_HUNT_OFFTAKE_ADULT_MALES,
+                PLANNED_HUNT_OFFTAKE_ADULT_FAMALES,
+                PLANNED_HUNT_OFFTAKE_MALE_JUV,
+                PLANNED_HUNT_OFFTAKE_FEMALE_JUV
             )
+            hunt_data = {
+                "offtake_permit": self.row_value(
+                    row, PLANNED_HUNT_PERMIT_NUMBER
+                )
+
+            }
+            if hunt:
+                hunt = AnnualPopulationPerActivity.objects.filter(
+                    id=hunt.id
+                )
+                hunt.update(**hunt_data)
 
         # Save AnnualPopulationPerActivity Planned euthanasia
         if self.row_value(row, PLANNED_EUTH_TOTAL):
-            pe, pe_c = AnnualPopulationPerActivity.objects.get_or_create(
-                activity_type=ActivityType.objects.get(
-                    name="Planned Euthanasia/DCA"),
-                year=int(string_to_number(year)),
-                owned_species=owned_species,
-                total=int(string_to_number(
-                    self.row_value(row, PLANNED_EUTH_TOTAL))),
-                adult_male=int(string_to_number(
-                    self.row_value(row, PLANNED_EUTH_OFFTAKE_ADULT_MALES))),
-                adult_female=int(string_to_number(
-                    self.row_value(row, PLANNED_EUTH_OFFTAKE_ADULT_FAMALES))),
-                juvenile_male=int(string_to_number(
-                    self.row_value(row, PLANNED_EUTH_OFFTAKE_MALE_JUV))),
-                juvenile_female=int(string_to_number(
-                    self.row_value(row, PLANNED_EUTH_OFFTAKE_FEMALE_JUV))),
-                offtake_permit=self.row_value(
-                    row, PLANNED_EUTH_PERMIT_NUMBER),
+            planned = self.save_population_per_activity(
+                row, "Planned Euthanasia/DCA", year,
+                owned_species, PLANNED_EUTH_TOTAL,
+                PLANNED_EUTH_OFFTAKE_ADULT_MALES,
+                PLANNED_EUTH_OFFTAKE_ADULT_FAMALES,
+                PLANNED_EUTH_OFFTAKE_MALE_JUV,
+                PLANNED_EUTH_OFFTAKE_FEMALE_JUV
             )
+            planned_data = {
+                "offtake_permit": self.row_value(
+                    row, PLANNED_EUTH_PERMIT_NUMBER
+                )
+
+            }
+            if planned:
+                planned = AnnualPopulationPerActivity.objects.filter(
+                    id=planned.id
+                )
+                planned.update(**planned_data)
 
         # Save AnnualPopulationPerActivity Unplanned/illegal hunting
         if self.row_value(row, UNPLANNED_HUNT_TOTAL):
-            unp, unp_c = AnnualPopulationPerActivity.objects.get_or_create(
-                activity_type=ActivityType.objects.get(
-                    name="Unplanned/Illegal Hunting"),
-                year=int(string_to_number(year)),
-                owned_species=owned_species,
-                total=int(string_to_number(
-                    self.row_value(row, UNPLANNED_HUNT_TOTAL))),
-                adult_male=int(string_to_number(
-                    self.row_value(row, UNPLANNED_HUNT_OFFTAKE_ADULT_MALES))),
-                adult_female=int(string_to_number(
-                    self.row_value(row, UNPLANNED_HUNT_OFFTAKE_ADULT_FAMALES))
-                ),
-                juvenile_male=int(string_to_number(
-                    self.row_value(row, UNPLANNED_HUNT_OFFTAKE_MALE_JUV))),
-                juvenile_female=int(string_to_number(
-                    self.row_value(row, PLANNED_EUTH_OFFTAKE_FEMALE_JUV))),
-                offtake_permit=self.row_value(
-                    row, UNPLANNED_HUNT_OFFTAKE_FEMALE_JUV),
+            hunting = self.save_population_per_activity(
+                row, "Unplanned/Illegal Hunting", year,
+                owned_species, UNPLANNED_HUNT_TOTAL,
+                UNPLANNED_HUNT_OFFTAKE_ADULT_MALES,
+                UNPLANNED_HUNT_OFFTAKE_ADULT_FAMALES,
+                UNPLANNED_HUNT_OFFTAKE_MALE_JUV,
+                PLANNED_EUTH_OFFTAKE_FEMALE_JUV
             )
+            hunting_data = {
+                "offtake_permit": self.row_value(
+                    row, UNPLANNED_HUNT_OFFTAKE_FEMALE_JUV
+                )
+
+            }
+            if hunting:
+                hunting = AnnualPopulationPerActivity.objects.filter(
+                    id=hunting.id
+                )
+                hunting.update(**hunting_data)

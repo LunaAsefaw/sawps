@@ -20,7 +20,6 @@ import {postData} from "../../../utils/Requests";
 
 export interface FormMetadata {
     taxons: TaxonMetadata[];
-    open_close_systems: CommonUploadMetadata[];
     survey_methods: CommonUploadMetadata[];
     intake_events: CommonUploadMetadata[];
     offtake_events: CommonUploadMetadata[];
@@ -249,9 +248,9 @@ function FormWizard(props: FormWizardInterface) {
                     <TabPanel key={0} value={activeStep} index={0} noPadding>
                         <SpeciesDetail initialData={data} setIsDirty={setIsDirty} handleNext={(formData)=>onFormSave(0, formData)}
                             taxonMetadataList={props.metadata.taxons}
-                            surveyMethodMetadataList={props.metadata.survey_methods} openCloseMetadataList={props.metadata.open_close_systems}
+                            surveyMethodMetadataList={props.metadata.survey_methods}
                             sampling_effort_coverages={props.metadata.sampling_effort_coverages} population_statuses={props.metadata.population_statuses}
-                            population_estimate_categories={props.metadata.population_estimate_categories} certainties={props.metadata.certainties}
+                            population_estimate_categories={props.metadata.population_estimate_categories}
                             handleSaveDraft={handleSaveDraft} />
                     </TabPanel>
                     <TabPanel key={1} value={activeStep} index={1} noPadding>

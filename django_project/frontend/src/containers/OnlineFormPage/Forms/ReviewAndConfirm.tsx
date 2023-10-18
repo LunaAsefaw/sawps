@@ -76,10 +76,6 @@ function SpeciesDetailReview(props: ReviewItemInterface) {
                                 </Grid>
                             </Grid>
                             <Grid item className='InputContainer'>
-                                <TextField id='open-close-system' label='Open/Closed System' defaultValue={displayText(data.annual_population.open_close_name)}
-                                    variant='standard' disabled fullWidth />
-                            </Grid>
-                            <Grid item className='InputContainer'>
                                 <Grid container flexDirection={'row'} spacing={2}>
                                     <Grid item xs={6}>
                                         <TextField id='survey-method' label='Survey Method' defaultValue={displayText(data.annual_population.survey_method_name)}
@@ -277,7 +273,7 @@ function SpeciesDetailReview(props: ReviewItemInterface) {
                                             disabled
                                             variant="standard"
                                             fullWidth
-                                            defaultValue={data.annual_population.population_estimate_certainty_name}
+                                            defaultValue={data.annual_population.population_estimate_certainty}
                                         />
                                     </Grid>
                                     <Grid item xs={6}>

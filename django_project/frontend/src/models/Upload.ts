@@ -15,8 +15,6 @@ export interface AnnualPopulationInterface {
     juvenile_male?: number;
     juvenile_female?: number;
     group?: number;
-    open_close_id: number;
-    open_close_name?: string;
     area_available_to_species: number;
     survey_method_id: number;
     survey_method_name?: string;
@@ -77,7 +75,6 @@ export interface CommonUploadMetadata {
 }
 
 export interface AnnualPopulationValidation {
-    open_close_id?: boolean;
     area_available_to_species?: boolean;
     survey_method_id?: boolean;
     population_estimate_certainty?: boolean;
@@ -116,7 +113,6 @@ const getDefaultAnnualPopulation = ():AnnualPopulationInterface => {
         sub_adult_female: 0,
         juvenile_male: 0,
         juvenile_female: 0,
-        open_close_id: 0,
         area_available_to_species: 0,
         survey_method_id: 0,
         note: '',

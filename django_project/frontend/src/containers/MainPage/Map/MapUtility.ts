@@ -15,22 +15,22 @@ const PARCELS_ORIGINAL_ZOOM_LEVELS: any = {
 
 /**
  * Determine layer visibility based on selected context layers
- * @param source_layer 
- * @param contextLayers 
- * @returns 
+ * @param source_layer
+ * @param contextLayers
+ * @returns
  */
 export const checkLayerVisibility = (source_layer: string, contextLayers: ContextLayerInterface[]): boolean => {
     const contextLayer = contextLayers.find(element => element.layer_names && element.layer_names.includes(source_layer))
     if (contextLayer) {
       return contextLayer.isSelected
-    }  
+    }
     return true
 }
 
 /**
  * Return all layers for select parcels
- * @param layer_names 
- * @returns 
+ * @param layer_names
+ * @returns
  */
 export const getSelectParcelLayerNames = (layer_names: string[]) => {
     let _results: string[] = []
@@ -43,8 +43,8 @@ export const getSelectParcelLayerNames = (layer_names: string[]) => {
 
 /**
  * Render parcel layers for selection
- * @param map 
- * @param layer_names 
+ * @param map
+ * @param layer_names
  */
 export const renderHighlightParcelLayers = (map: maplibregl.Map, layer_names: string[]) => {
     for (let _idx = 0; _idx < layer_names.length; ++_idx) {
@@ -83,14 +83,14 @@ export const renderHighlightParcelLayers = (map: maplibregl.Map, layer_names: st
                 ]
                 }
             }, `${layer_names[_idx]}-highlighted`);
-        }    
+        }
     }
 }
 
 /**
  * Remove parcel layers when exits parcel selection mode
- * @param map 
- * @param layer_names 
+ * @param map
+ * @param layer_names
  */
 export const removeHighlightParcelLayers = (map: maplibregl.Map, layer_names: string[]) => {
     for (let _idx = 0; _idx < layer_names.length; ++_idx) {
@@ -108,8 +108,8 @@ export const removeHighlightParcelLayers = (map: maplibregl.Map, layer_names: st
 
 /**
  * Find context layer from Cadastral boundaries: erf, farm_portion, holding, and parent_farm
- * @param contextLayers 
- * @returns 
+ * @param contextLayers
+ * @returns
  */
 export const findParcelLayer = (contextLayers: ContextLayerInterface[]): ContextLayerInterface => {
     return contextLayers.find((element) => element.name.toLowerCase() === 'cadastral boundaries')
@@ -117,8 +117,8 @@ export const findParcelLayer = (contextLayers: ContextLayerInterface[]): Context
 
 /**
  * Find context layer from Biodiversity, Ecosystems, Protected Areas
- * @param contextLayers 
- * @returns 
+ * @param contextLayers
+ * @returns
  */
 export const findAreaLayers = (contextLayers: ContextLayerInterface[]): string[] => {
     const areaLayers = ['biome type', 'critical biodiversity areas', 'protected areas']
@@ -133,8 +133,8 @@ export const findAreaLayers = (contextLayers: ContextLayerInterface[]): string[]
 
 /**
  * Check if context layer is selected
- * @param contextLayers 
- * @returns 
+ * @param contextLayers
+ * @returns
  */
 export const isContextLayerSelected = (contextLayers: ContextLayerInterface[], contextLayerName: string): boolean => {
     let _layer = contextLayers.find((element) => element.name.toLowerCase() === contextLayerName)
@@ -148,8 +148,8 @@ export const isContextLayerSelected = (contextLayers: ContextLayerInterface[], c
 /**
  * Search parcel by coordinate
  * Note: LngLat is in srid 4326
- * @param lngLat 
- * @param callback 
+ * @param lngLat
+ * @param callback
  */
 export const searchParcel = (lngLat: maplibregl.LngLat, propertyId: number, callback: (parcel: ParcelInterface) => void) => {
     axios.get(SEARCH_PARCEL_URL + `?lat=${lngLat.lat}&lng=${lngLat.lng}&property_id=${propertyId}`).then((response) => {
@@ -169,10 +169,10 @@ export const searchParcel = (lngLat: maplibregl.LngLat, propertyId: number, call
 
 /**
  * Add layer to map
- * @param layerId 
- * @param mapObj 
- * @param layerObj 
- * @param beforeLayerId 
+ * @param layerId
+ * @param mapObj
+ * @param layerObj
+ * @param beforeLayerId
  * @returns true if layer does not exist
  */
 export const addLayerToMap = (layerId: string, mapObj: maplibregl.Map, layerObj: any, beforeLayerId?: string): boolean => {
@@ -186,8 +186,8 @@ export const addLayerToMap = (layerId: string, mapObj: maplibregl.Map, layerObj:
 /**
  * Search property by coordinate
  * Note: LngLat is in srid 4326
- * @param lngLat 
- * @param callback 
+ * @param lngLat
+ * @param callback
  */
 export const searchProperty = (lngLat: maplibregl.LngLat, callback: (parcel: PropertyInterface) => void) => {
     axios.get(SEARCH_PROPERTY_URL + `?lat=${lngLat.lat}&lng=${lngLat.lng}`).then((response) => {
@@ -226,7 +226,7 @@ const GROUP_NAME_MAPPING:{ [id: string] : string; } = {
 /**
  * Get value from feature based on sourceLayer
  * @param feature GeoJson Object
- * @returns 
+ * @returns
  */
 const getPropertyOfFeature = (feature: any):[string, string] => {
     let _feature_key = null
@@ -289,7 +289,7 @@ export const getMapPopupDescription = (features: Object[]):string => {
 
 /**
  * Add invisible fill layers for parcels to handle on click inside the layer
- * @param mapObj 
+ * @param mapObj
  */
 export const addParcelInvisibleFillLayers = (mapObj: maplibregl.Map) => {
     addLayerToMap('erf-invisible-fill', mapObj, {

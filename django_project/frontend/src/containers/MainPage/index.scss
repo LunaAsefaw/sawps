@@ -32,7 +32,6 @@ body {
 
 .grayBg {
     background: #f5f3f3;
-    margin-left: 5px;
     .Content{
         background-color: #fff;
         padding-left: 0px;
@@ -45,34 +44,54 @@ body {
 .customWidth {
     width: calc(100vw - 440px);
     .dataTable {
-        width: calc(100vw - 425px);
+        width: calc(100vw - 410px);
         overflow: auto;
         .MuiDataGrid-columnHeaderTitle{
             text-overflow: inherit;
             white-space: break-spaces;
             line-height: 17px;
+            text-align: left;
         }
         .MuiDataGrid-columnHeader{
-            &:nth-child(9){
-                max-width: 205px !important;
-                width: 205px !important;
+            &:nth-child(4){
+                max-width: 80px !important;
+                width: 80px !important;
+                min-width: 0px !important;
             }
-            &:nth-child(10){
+            &:nth-child(5){
                 max-width: 95px !important;
                 width: 95px !important;
             }
         }
-        .MuiDataGrid-row{
-            .MuiDataGrid-cell{
-                &:nth-child(9){
-                    max-width: 205px !important;
-                    width: 205px !important;
-                }
-                &:nth-child(10){
-                    max-width: 95px !important;
-                    width: 95px !important;
+        .MuiDataGrid-cell{
+            &:nth-child(4){
+                max-width: 80px !important;
+                width: 80px !important;
+                min-width: 0px !important;
+            }
+            &:nth-child(5){
+                max-width: 95px !important;
+                width: 95px !important;
+            }
+        }
+        .MuiDataGrid-virtualScrollerContent{
+            width: 100% !important;
+            .MuiDataGrid-virtualScrollerRenderZone{
+                width: 100% !important;
+                .MuiDataGrid-row{
+                    width: 100% !important;
                 }
             }
         }
     }
+}
+
+.LeftSideBar {
+    box-shadow: 0 0 6px -2px rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.TabHeaders {
+    box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.3);
+    z-index: 1;
 }

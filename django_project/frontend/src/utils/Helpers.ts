@@ -8,14 +8,23 @@ export function toSingular(str: string) {
     }
     return singularStr
   }
-  
+
   /**
    * Capitalize string
    */
   export function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-  
+
+  /**
+   * Get title from string
+   */
+  export function getTitle(key: string) {
+    return  key.split('_')
+      .map((part) => capitalize(part))
+      .join(' ').trim()
+  }
+
   /**
    * Get file type from layer_type and filename
    */
@@ -28,8 +37,18 @@ export function toSingular(str: string) {
       file_type = 'application/geopackage+sqlite3'
     else if (layer_type === 'SHAPEFILE')
       file_type = 'application/zip'
-  
+
     return file_type
   }
-  
-  
+
+export const delay = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+/**
+ * Checks if the current URL corresponds to the map page
+ */
+export const isMapDisplayed = () => {
+  const currentUrl = window.location.href;
+  return currentUrl.endsWith('/map') || currentUrl.endsWith('/map/')
+}

@@ -77,10 +77,10 @@ COMPULSORY_FIELDS = [
     "COUNT_TOTAL",
     "Area_available_to_population_(total enclosure area)_ha",
     "Population_estimate_category",
-    "If_other_(population_estimate_category)_please explain",
-    "Survey_method",
-    "If_other_(survey_method)_please explain",
     "Population_estimate_certainty",
 ]
 
 SHEET_TITLE = "Dataset pilot"
+IF_OTHER_POPULATION_VAL = "Other (please describe how the population " \
+                          "size estimate was determined)"
+IF_OTHER_SURVEY_VAL = "Other - please explain"

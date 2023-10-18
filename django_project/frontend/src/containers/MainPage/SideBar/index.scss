@@ -133,6 +133,10 @@
             border-color: #282829 !important;
         }
 
+        .autoComplete-Tags {
+            font-size: inherit!important;
+        }
+
         .ListItemButton {
             padding: 0;
             width: calc(50% - 20px);
@@ -216,4 +220,27 @@
 .MuiInputBase-root.MuiOutlinedInput-root ::placeholder {
     color: rgb(40, 40, 41) !important;
     opacity: 1 !important;
+}
+
+.sidepanel-loading-container {
+    display: flex;
+    color: rgb(255, 255, 255);
+    background-color: rgba(207, 206, 206, 0.38);
+    z-index: 999;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.clear-button-container {
+    position: absolute;
+    right: 0;
+    margin-right: 20px;
+    margin-top: -5px;
+    button {
+        text-transform: capitalize;
+        font-size: medium;
+    }
 }

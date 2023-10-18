@@ -1,6 +1,9 @@
 import json
 from django.test import RequestFactory, TestCase, Client
 from django.contrib.auth.models import User
+
+from frontend.static_mapping import REGIONAL_DATA_CONSUMER
+from sawps.tests.models.account_factory import GroupF
 from stakeholder.factories import userProfileFactory, userRoleTypeFactory
 from frontend.views.users import OrganisationUsersView
 from regulatory_permit.models import DataUsePermission
@@ -308,8 +311,6 @@ class OrganisationUsersViewTest(TestCase):
 
         self.assertEqual(response,0)
 
-
-
     def test_context_data(self):
 
         client = Client()
@@ -319,21 +320,16 @@ class OrganisationUsersViewTest(TestCase):
             password='testpassword'
         )
 
-
         login = client.login(
             username='testadmin',
             password='testpassword'
         )
-
         self.assertTrue(login, True)
-
         device = TOTPDevice(
             user=superuser,
             name='device_name'
         )
         device.save()
-
-
         response = client.post('/users/')
 
         # Check if the response status code is OK (200)
@@ -346,3 +342,42 @@ class OrganisationUsersViewTest(TestCase):
         self.assertEqual(context_data, None)
 
 
+class UserApiTest(TestCase):
+
+    def test_get_user_info(self):
+        client = Client()
+        user = User.objects.create_user(
+            username='testuser',
+            password='testpassword',
+            email='test@gmail.com'
+        )
+        group = GroupF.create(name=REGIONAL_DATA_CONSUMER)
+        user.groups.add(group)
+        login = client.login(
+            username='testuser',
+            password='testpassword'
+        )
+        self.assertTrue(login, True)
+        device = TOTPDevice(
+            user=user,
+            name='device_name'
+        )
+        device.save()
+
+        response = client.get('/api/user-info/')
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(REGIONAL_DATA_CONSUMER in response.data['user_roles'])
+        data_use_permission = DataUsePermission.objects.create(
+            name="test"
+        )
+        organisation = Organisation.objects.create(
+            name="test_organisation",
+            data_use_permission=data_use_permission
+        )
+        user.user_profile.current_organisation = organisation
+        user.save()
+
+        response = client.get('/api/user-info/')
+        self.assertEqual(response.data['current_organisation_id'], organisation.id)
+        self.assertEqual(response.data['current_organisation'], organisation.name)

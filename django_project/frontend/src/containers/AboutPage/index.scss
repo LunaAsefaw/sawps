@@ -3,7 +3,6 @@
     background-repeat: no-repeat;
     background-size: contain;
     position: relative;
-
 }
 
 .about-content-title{
@@ -103,6 +102,13 @@
         position: relative;
     }
 
+    .about-subsection-1-text2{
+        text-align: center;
+        width:100%;
+        font-size: 20px;
+        position: relative;
+    }
+
 
     .about-subsection-1-text{
         p{
@@ -115,6 +121,7 @@
         }
 
     }
+
 
     .about-subsection-1{
         display: flex;

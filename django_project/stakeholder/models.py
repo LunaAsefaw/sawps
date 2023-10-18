@@ -6,6 +6,9 @@ from django.dispatch import receiver
 from django.utils import timezone
 from property.models import Province
 
+MEMBER = 'Member'
+MANAGER = 'Manager'
+
 
 class UserRoleType(models.Model):
     """User role type (Base users, admins ..etc.) model."""
@@ -191,8 +194,6 @@ def save_user_profile(sender, instance, **kwargs):
 
 class OrganisationInvites(models.Model):
     """OrganisationInvites model to store all invites"""
-    MEMBER = 'Member'
-    MANAGER = 'Manager'
     ASSIGNED_CHOICES = [
         (MEMBER, 'Member'),
         (MANAGER, 'Manager'),

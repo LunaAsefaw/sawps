@@ -222,7 +222,7 @@ class TestUploadSpeciesApiView(TestCase):
 
         upload_species_data(upload_session.id)
         self.assertEqual(Taxon.objects.all().count(), 1)
-        self.assertEqual(AnnualPopulationPerActivity.objects.all().count(), 2)
+        self.assertEqual(AnnualPopulationPerActivity.objects.all().count(), 5)
         self.assertEqual(AnnualPopulation.objects.all().count(), 1)
         self.assertTrue(OwnedSpecies.objects.all().count(), 1)
         self.assertTrue(AnnualPopulationPerActivity.objects.filter(
@@ -230,6 +230,21 @@ class TestUploadSpeciesApiView(TestCase):
         ).count(), 1)
         self.assertTrue(AnnualPopulationPerActivity.objects.filter(
             activity_type__name="Planned Hunt/Cull"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulationPerActivity.objects.filter(
+            activity_type__name="Translocation (Intake)"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulationPerActivity.objects.filter(
+            activity_type__name="Planned Euthanasia/DCA"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulationPerActivity.objects.filter(
+            activity_type__name="Unplanned/Illegal Hunting"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulationPerActivity.objects.filter(
+            translocation_destination="KNP", offtake_permit="ABC100X10"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulationPerActivity.objects.filter(
+            offtake_permit="DEF100X10"
         ).count(), 1)
 
         self.assertTrue(OpenCloseSystem.objects.all().count() == 1)
@@ -391,10 +406,56 @@ class TestUploadSpeciesApiView(TestCase):
                 errors.append(row['error_message'])
             self.assertTrue("Property name Luna's Reserve doesn't match "
                             "the selected property. Please replace "
-                            "it with Luna" in errors)
+                            "it with Luna." in errors)
             self.assertTrue("Lemurs doesn't exist in the database. "
                             "Please select species available in the "
                             "dropdown only." in errors)
+            self.assertTrue("The value of field "
+                            "If_other_(population_estimate_category)_please "
+                            "explain is empty." in errors)
+            self.assertTrue("The value of field "
+                            "If_other_(survey_method)_please "
+                            "explain is empty." in errors)
+            self.assertTrue("The value of the compulsory field "
+                            "Population_estimate_category is empty." in errors)
+            self.assertTrue("The value of the compulsory field "
+                            "presence/absence is empty. The value "
+                            "of the compulsory field "
+                            "Population_estimate_category is empty." in errors)
+            self.assertTrue("The total of Count_adult_males and "
+                            "Count_adult_females must not exceed "
+                            "COUNT_TOTAL." in errors)
+            self.assertTrue("The total of "
+                            "Planned hunt/culling_Offtake_adult_males and "
+                            "Planned hunt/culling_Offtake_adult_females must "
+                            "not exceed Planned hunt/culling_TOTAL." in errors)
+
+        self.assertTrue(AnnualPopulation.objects.filter(
+            survey_method_other="Test survey"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulation.objects.filter(
+            survey_method__name="Other - please explain",
+            survey_method_other="Test survey"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulation.objects.filter(
+            population_estimate_category__name="Other (please describe how the "
+                                               "population size estimate was "
+                                               "determined)",
+            population_estimate_category_other="Decennial census"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulation.objects.filter(
+            population_estimate_category__name="Ad hoc or "
+                                               "opportunistic monitoring"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulationPerActivity.objects.filter(
+            intake_permit="12345"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulationPerActivity.objects.filter(
+            reintroduction_source="KNP"
+        ).count(), 1)
+        self.assertTrue(AnnualPopulationPerActivity.objects.filter(
+            founder_population=True
+        ).count(), 1)
 
     def test_upload_excel_missing_compulsory_field(self):
         """Test upload species with an excel file which misses
@@ -468,8 +529,10 @@ class TestUploadSpeciesApiView(TestCase):
         dataset = xl.parse(SHEET_TITLE)
         self.assertEqual(
             dataset.iloc[0]['error_message'],
-            "Property name Venetia Limpopo doesn't match the "
-            "selected property. Please replace it with {}".format(
+            "Property name Venetia Limpopo doesn't match the selected "
+            "property. Please replace it with {}. Loxodonta africana "
+            "doesn't exist in the database. Please select species "
+            "available in the dropdown only.".format(
                 upload_session.property.name
             )
         )

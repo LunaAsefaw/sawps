@@ -6,11 +6,11 @@
 
 
 {% block content %}
-<section class="login-page fs-background" style="background-color: #000000; min-height:var(--min-content-height);">
+<section class="login-page fs-background registerSignUpAccount" style="background-color: #000000; min-height:var(--min-content-height);">
     <div class="container-fluid full-height">
         <div class="row half-height">
-            <div class="col-7"></div>
-            <div class="col-5 sawps-text-primary">
+            <div class="col-12 col-md-5 col-lg-7"></div>
+            <div class="col-12 col-md-7 col-lg-5 sawps-text-primary registerSignUp">
             <div class="account-form content">
 
             {% csrf_token %}
@@ -28,6 +28,13 @@
                     <hr class="separator">
 
                     <form class="login" method="POST" action="{% url 'account_login' %}">{% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <ul class='form-errors'>
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                         {% for field in form %}
                         {% if field.name == 'remember' %}
                         <div class="form-check" style="margin-left: 35px; margin-bottom: 7px;">
@@ -37,7 +44,7 @@
                         {% else %}
                         <p>
                             <label>
-                                {{ field.label }} 
+                                {{ field.label }}
                             </label>
                             {{ field }}
                         </p>

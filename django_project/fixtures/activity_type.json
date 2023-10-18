@@ -1,50 +1,82 @@
 [
-{
-    "model": "activity.activitytype",
-    "pk": 1,
-    "fields": {
-        "name": "Other",
-        "recruitment": null
-    }
-},
-{
-    "model": "activity.activitytype",
-    "pk": 2,
-    "fields": {
-        "name": "Unplanned/Illegal Hunting",
-        "recruitment": null
-    }
-},
-{
-    "model": "activity.activitytype",
-    "pk": 3,
-    "fields": {
-        "name": "Planned Euthanasia/DCA",
-        "recruitment": null
-    }
-},
-{
-    "model": "activity.activitytype",
-    "pk": 4,
-    "fields": {
-        "name": "Planned Hunt/Cull",
-        "recruitment": null
-    }
-},
-{
-    "model": "activity.activitytype",
-    "pk": 5,
-    "fields": {
-        "name": "Translocation (Intake)",
-        "recruitment": null
-    }
-},
     {
-    "model": "activity.activitytype",
-    "pk": 6,
-    "fields": {
-        "name": "Translocation (Offtake)",
-        "recruitment": null
+        "model": "activity.activitytype",
+        "pk": 1,
+        "fields": {
+            "name": "Other",
+            "recruitment": null
+        }
+    },
+    {
+        "model": "activity.activitytype",
+        "pk": 2,
+        "fields": {
+            "name": "Unplanned/Illegal Hunting",
+            "colour": "#696969",
+            "recruitment": false
+        }
+    },
+    {
+        "model": "activity.activitytype",
+        "pk": 3,
+        "fields": {
+            "name": "Planned Euthanasia/DCA",
+            "recruitment": false,
+            "colour": "#9F89BF",
+            "export_fields": ["intake_permit"]
+        }
+    },
+    {
+        "model": "activity.activitytype",
+        "pk": 4,
+        "fields": {
+            "name": "Planned Hunt/Cull",
+            "recruitment": false,
+            "export_fields": ["intake_permit"]
+        }
+    },
+    {
+        "model": "activity.activitytype",
+        "pk": 5,
+        "fields": {
+            "name": "Translocation (Intake)",
+            "recruitment": true,
+            "colour": "#F9A95D",
+            "width": 106.5,
+            "export_fields": [
+                "intake_permit",
+                "translocation_destination",
+                "offtake_permit"
+            ]
+        }
+    },
+    {
+        "model": "activity.activitytype",
+        "pk": 6,
+        "fields": {
+            "name": "Translocation (Offtake)",
+            "recruitment": false,
+            "colour": "#F9A95D",
+            "width": 106.5,
+            "export_fields": [
+                "translocation_destination",
+                "founder_population",
+                "reintroduction_source"
+            ]
+        }
+    },
+    {
+        "model": "activity.activitytype",
+        "pk": 7,
+        "fields": {
+            "name": "Unplanned/natural deaths",
+            "recruitment": null,
+            "colour": "#75B37A",
+            "export_fields": [
+                "translocation_destination",
+                "founder_population",
+                "reintroduction_source"
+            ]
+        }
     }
-}
 ]

@@ -7,6 +7,8 @@ export default interface PropertyInterface {
     owner_email?: string,
     property_type: string,
     property_type_id?: number,
+    open: string,
+    open_id?: number,
     province: string,
     province_id?: number,
     size?: number,
@@ -27,10 +29,12 @@ export const createNewProperty = ():PropertyInterface => {
         province: '',
         size: 0,
         organisation: '',
+        open: '',
         parcels: [],
         property_type_id: 0,
         province_id: 0,
-        organisation_id: 0
+        organisation_id: 0,
+        open_id: 0,
     }
     return _result
 }
@@ -49,6 +53,11 @@ export interface PropertyTypeInterface {
 }
 
 export interface ProvinceInterface {
+    id: number,
+    name: string
+}
+
+export interface OpenCloseInterface {
     id: number,
     name: string
 }

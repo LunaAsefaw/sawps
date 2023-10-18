@@ -195,7 +195,7 @@ export default function Uploader(props: UploaderInterface) {
                     setLoading(false)
                 } else {
                     setIsError(true)
-                    setAlertMessage('Please check the error in error file.')
+                    setAlertMessage(response.data['message'])
                     setErrorFile(response.data['error_file'])
                     setTotalFile(totalFile - 1)
                     setSavingSpeciesCSV(false)
@@ -205,7 +205,7 @@ export default function Uploader(props: UploaderInterface) {
 
             } else {
                 setIsError(true)
-                setAlertMessage('There is something wrong with the data please check again')
+                setAlertMessage('There is something wrong with the data please check again.')
             }
         })
     }

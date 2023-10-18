@@ -11,10 +11,10 @@ theme:
     - content.code.annotate
     - content.tabs.link
     - header.autohide
-    - navigation.expand
+#    - navigation.expand # stop auto-expanding menus
     - navigation.indexes
     - navigation.instant
-    - navigation.sections
+#    - navigation.sections # This removes the ability to shrink sections on the nav menu but gives the bold headings
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.top

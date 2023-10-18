@@ -136,7 +136,7 @@ function MainPage() {
                   <Tabs
                     value={selectedTab}
                     onChange={(event: React.SyntheticEvent, newValue: number) => {
-                      const tabNames = ['map', 'report', 'charts', 'upload'];
+                      const tabNames = ['map', 'reports', 'charts', 'upload'];
                       const selectedTabName = tabNames[newValue];
                       setSelectedTab(newValue);
                       if (selectedTabName === 'upload') {

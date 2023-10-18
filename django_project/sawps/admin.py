@@ -2,8 +2,12 @@ from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
-from sawps.models import ExtendedGroup
+from django.db.models.signals import post_save
+
+from sawps.models import ExtendedGroup, save_extended_group
 from django_otp.plugins.otp_static.models import StaticDevice
+
+from sawps.utils import disconnected_signal
 
 
 class CustomStaticDeviceAdmin(admin.ModelAdmin):
@@ -28,6 +32,11 @@ class ExtendedGroupInline(admin.StackedInline):
 
 
 class GroupAdmin(BaseGroupAdmin):
+
+    def save_model(self, request, obj, form, change):
+        with disconnected_signal(post_save, save_extended_group, Group):
+            super().save_model(request, obj, form, change)
+
     inlines = (ExtendedGroupInline, )
     list_display = (
         'name',

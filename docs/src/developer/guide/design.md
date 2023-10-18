@@ -3,6 +3,8 @@
 
 ## Design Sheet
 
+The design sheet can be found on the [Figma Board](https://www.figma.com/file/T6JEAAXTWzA9OIfAQe3iW7/SANBI?type=design&node-id=1538-42037&mode=design).
+
 ## Wire-frame Model
 <!-- Link to wire-frame or screenshots of wire-frame -->
 

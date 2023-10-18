@@ -4,19 +4,19 @@
 {% block head_title %}Register{% endblock%}
 
 {% block content %}
-<section class="account-action fs-background" style="background-color: #000000; min-height:var(--min-content-height);">
+<section class="account-action fs-background registerSignUpAccount" style="background-color: #000000; min-height:var(--min-content-height);">
     <div class="container-fluid full-height position-absolute">
     <div class="row half-height">
-        <div class="col-7"></div>
-        <div class="col-5 sawps-text-primary">
-            <div class="account-form content" style="width: 700px">
+        <div class="col-12 col-md-5 col-lg-7"></div>
+        <div class="col-12 col-md-7 col-lg-5 sawps-text-primary registerSignUp">
+            <div class="account-form content">
                     {% csrf_token %}
                     <div class="container">
                         <div class="custom-form-container">
                             <!-- Form content -->
                             <form class="signup" id="signup_form" method="POST" action="{% url 'account_signup' %}">
                                 {% csrf_token %}
-                    
+
                                 <input type="hidden" name="recaptcha_token" id="recaptcha-token-input" value="">
                                 {% if form.non_field_errors %}
                                 <div class="alert alert-warning">
@@ -25,7 +25,7 @@
                                     {% endfor %}
                                 </div>
                                 {% endif %}
-                    
+
                                 <div class="form-row">
                                     {% for field in form %}
                                     {% if field.name == 'email' %}
@@ -65,25 +65,25 @@
                                     {% endif %}
                                     {% endfor %}
                                 </div>
-                    
+
                                 {% if redirect_field_value %}
                                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                                 {% endif %}
-                    
+
                                 <div class="password-help-text mt-0">
                                     <span>Your password should consist of a minimum of twelve characters, including at least one lowercase letter,
                                         one uppercase letter, one numeric character, and one special character. We highly recommend utilizing a
                                         password manager tool that can assist you in generating a strong password.</span>
                                 </div>
-                    
+
                                 <button id="submit-button" class="sawps-from-submit account-button" type="submit">{% trans "Register" %}</button>
                             </form>
                         </div>
                         <div class="form-space"></div>
                     </div> <!-- /container -->
-                    
-                    
-                    
+
+
+
                     </div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
     </div>
 
     <script>
-        
+
         // Get the URL of the current page
         var url = new URL(window.location.href);
 
@@ -115,7 +115,7 @@
             emailInput.value = email;
             emailInput.readOnly = true;
         }
-    
+
     </script>
 </section>
 {% endblock %}
