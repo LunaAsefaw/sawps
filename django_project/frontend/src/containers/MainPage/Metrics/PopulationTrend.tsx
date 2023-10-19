@@ -59,6 +59,7 @@ const PopulationTrend= (props: any) => {
       )
       .then((response) => {
             if (response) {
+                onEmptyDatasets(true)
                 setLoading(false)
                 let _data = response.data as NationalTrendInterface[]
                 setChartData({
@@ -112,7 +113,7 @@ const PopulationTrend= (props: any) => {
                       },
                     ],
                   });
-            }
+            }else onEmptyDatasets(false)
         }).catch((error) => {
             console.log(error)
             setLoading(false)

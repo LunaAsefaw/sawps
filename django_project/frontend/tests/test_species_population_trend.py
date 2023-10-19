@@ -20,6 +20,7 @@ from species.models import Taxon, TaxonRank
 from population_data.factories import AnnualPopulationF
 from property.factories import PropertyFactory
 from species.models import OwnedSpecies
+from occurrence.models import SurveyMethod
 
 def mocked_cache_get(self, *args, **kwargs):
     return OrderedDict({
@@ -65,6 +66,10 @@ class TestSpeciesTrend(TestCase):
             taxon=self.taxon
         )
 
+        survey_method = SurveyMethod.objects.create(
+            name='test_survey'
+        )
+
         AnnualPopulationF.create(
             year=2020,
             owned_species=self.owned_species_one,
@@ -77,6 +82,7 @@ class TestSpeciesTrend(TestCase):
             sub_adult_male=10,
             sub_adult_female=10,
             juvenile_total=10,
+            survey_method=survey_method
         )
     
     @mock.patch('django.core.cache.cache.get',

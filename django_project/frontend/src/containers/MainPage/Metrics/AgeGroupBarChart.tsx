@@ -18,12 +18,25 @@ const availableColors: AvailableColors = {
 const AgeGroupBarChart = (props: any) => {
     const { loading, ageGroupData } = props;
 
+
+    const filteredData = ageGroupData.filter((item: { total_adult_female: number; total_adult_male: number; total_juvenile_female: number; total_juvenile_male: number; total_sub_adult_female: number; total_sub_adult_male: number; }) => {
+        // Check if any of the specified numeric properties are empty or equal to 0
+        return (
+          item.total_adult_female !== 0 &&
+          item.total_adult_male !== 0 &&
+          item.total_juvenile_female !== 0 &&
+          item.total_juvenile_male !== 0 &&
+          item.total_sub_adult_female !== 0 &&
+          item.total_sub_adult_male !== 0
+        );
+      });
+
     // Extract the species name
     const species = ageGroupData.length > 0 ? ageGroupData[0].owned_species__taxon__common_name_varbatim : '';
 
 
     // Define the labels (years) dynamically from ageGroupData and sort them from highest to lowest
-    const labels = ageGroupData.map((data: any) => data.total_year).sort((a: number, b: number) => b - a);
+    const labels = filteredData.map((data: any) => data.total_year).sort((a: number, b: number) => b - a);
 
     // Define age groups and their corresponding data properties
     const ageGroups = [
@@ -41,11 +54,11 @@ const AgeGroupBarChart = (props: any) => {
     // Loop through age groups
     for (const ageGroup of ageGroups) {
         // Map the data for the current age group
-        const data = ageGroupData.map((dataItem: any) => dataItem[ageGroup.dataProperty] || 0);
+        const data = filteredData.map((dataItem: any) => dataItem[ageGroup.dataProperty] || 0);
 
         // Rearrange the data to match the sorted labels
         const sortedData = labels.map((year: any) => {
-            const index = ageGroupData.findIndex((item: { total_year: any }) => item.total_year === year);
+            const index = filteredData.findIndex((item: { total_year: any }) => item.total_year === year);
             return data[index];
         });
 
@@ -60,11 +73,14 @@ const AgeGroupBarChart = (props: any) => {
 }
 
 
-
-    const data = {
-        labels: labels,
-        datasets: datasets,
+let data = null;
+    
+if (labels.length > 0 && datasets.length > 0) {
+    data = {
+      labels: labels,
+      datasets: datasets,
     };
+} else return null;
 
 const options = {
     indexAxis: 'y' as const,

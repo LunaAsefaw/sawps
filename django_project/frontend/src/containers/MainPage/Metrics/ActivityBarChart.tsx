@@ -1,38 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import { CategoryScale } from "chart.js";
-import Chart from "chart.js/auto";
-import ChartDataLabels from "chartjs-plugin-datalabels";
-import Loading from "../../../components/Loading";
-import "./index.scss";
-import axios from "axios";
 import { Bar } from 'react-chartjs-2';
+import Loading from "../../../components/Loading";
+import axios from "axios";
+import "./index.scss";
 
-const FETCH_ACTIVITY_TOTAL_COUNT = '/api/total-count-per-activity/'
+const FETCH_ACTIVITY_TOTAL_COUNT = '/api/total-count-per-activity/';
 
-Chart.register(CategoryScale);
-Chart.register(ChartDataLabels);
-
-type AvailableColors = {
-    [key: string]: string;
-};
-
-const availableColors: AvailableColors = {
-    'Unplanned/Illegal Hunting': "#FF5252",
-    'Planned Euthanasia/DCA': "rgb(83 83 84)",
-    'Unplanned/natural deaths': "#75B37A",
-    'Planned Hunt/Cull': "#282829",
-    'Translocation (Intake)': "#FAA755",
-    'Translocation (Offtake)': "#70B276",
-    'Other': "#9D85BE",
-}
+const availableColors = [
+    'rgba(112, 178, 118, 1)', 
+    'rgba(250, 167, 85, 1)', 
+    'rgba(157, 133, 190, 1)', 
+    '#FF5252', 
+    '#616161',
+    // additional transparency colors for years
+    'rgba(112, 178, 118, 0.5)',  // 50% transparency
+    'rgba(255, 82, 82, 0.5)',  // 50% transparency
+    'rgba(97, 97, 97, 0.5)',  // 50% transparency
+    'rgba(157, 133, 190, 0.5)',  // 50% transparency
+    'rgba(250, 167, 85, 0.5)',  // 50% transparency
+];
 
 const ActivityBarChart = (props: {
     property: any;
     selectedSpecies: string | string[];
     from: number;
     to: number;
-  }) => {
+}) => {
     const [loading, setLoading] = useState(false);
     const [activityData, setActivityData] = useState([]);
     const [activityMethods, setActivityMethods] = useState([]);
@@ -40,14 +34,11 @@ const ActivityBarChart = (props: {
     const propertyId = props.property;
     var selectedSpecies = props.selectedSpecies;
     var startYear = props.from;
-    var endYear = props.to; 
+    var endYear = props.to;
     const [noData, setNoData] = useState(false);
-    const [useMainColor, setMainColor] = useState(false);
-    const [mainColor, setColor] = useState('');
-    const [speciesColors, setSpeciesColors] = useState<{ [key: string]: string }>({});
-    const activityColors = ['#FF5252', '#75B37A', '#282829', '#FAA755','#70B276','#000', '#9D85BE'];
-
-
+    const labels: any[] = [];
+    const data: any[] = [];
+    const datasets: any[] = [];
 
     useEffect(() => {
         if (
@@ -68,63 +59,38 @@ const ActivityBarChart = (props: {
                 `${FETCH_ACTIVITY_TOTAL_COUNT}?start_year=${startYear}&end_year=${endYear}&species=${selectedSpecies}&property=${propertyId}`
             );
 
+            const speciesColors: { [key: string]: string } = {};
+            const transformedData: React.SetStateAction<any[]> = [];
+
+
+            response.data.forEach((species: { activities: any; species_name: string | number; colour: any; }) => {
+                const activities = species.activities;
+                const filteredActivities = activities.filter((activity: { year: number; }) => activity.year === endYear);
+                transformedData.push(filteredActivities);
+                const color = typeof species.colour === 'string' ? species.colour : '';
+                speciesColors[species.species_name] = color;
+            });
             
-            
-            type ActivityData = {
-                [key: string]: number;
-            };
-            
-            type SpeciesActivity = {
-                total: number;
-                species_name: string;
-                activities: ActivityData[];
-            };
-            
-            type TransformedSpecies = {
-                animal: string;
-                [key: string]: number | string;
-            };
-            
-            const transformedData: TransformedSpecies[] = response.data.map((species: SpeciesActivity) => {
-                const speciesData: TransformedSpecies = {
-                    animal: species.species_name,
-                };
-            
-                species.activities.forEach((activity: ActivityData) => {
-                    const [activityName, activityValue] = Object.entries(activity)[0];
-                    speciesData[activityName] = activityValue;
-                });
-            
-                return speciesData;
+
+            transformedData.flat().forEach((activity, index) => {
+            const { activity_type, total } = activity;
+            labels.push(activity_type);
+            data.push(total);
+            datasets.push({
+                label: activity_type,
+                data: [total],
+                backgroundColor: availableColors[index % availableColors.length],
+            });
             });
 
-            if (transformedData.length === 0) {
+
+            setActivityData(datasets)
+
+            if (data.length === 0) {
                 setNoData(true);
             } else {
                 setNoData(false);
             }
-
-            // Extract and set species colors from the API response
-            const speciesColors = response.data.reduce((colors: { [x: string]: any; }, species: { species_name: string | number; colour: any; }) => {
-                colors[species.species_name] = species.colour;
-                setColor(species.colour)
-                return colors;
-            }, {});
-
-            // Set species colors in state
-            setSpeciesColors(speciesColors);
-            
-            const allActivities: string[] = [...new Set(transformedData.flatMap(species => Object.keys(species).filter(key => key !== 'animal')))];
-            
-
-            if(allActivities.length > 1){
-                setMainColor(false)
-            }else {
-                setMainColor(true)
-            }
-            setActivityMethods(allActivities);
-            setAnimals(transformedData.map(species => species.animal));
-            setActivityData(transformedData);
             
             setLoading(false);
         } catch (error) {
@@ -134,78 +100,67 @@ const ActivityBarChart = (props: {
         }
     };
 
-    const barData = {
-        labels: animals,
-        datasets: activityMethods.map((method, index) => ({
-            label: method,
-            data: activityData.map((item) => item[method]),
-            backgroundColor: animals.map((animal) => useMainColor ? mainColor:speciesColors[animal]),
-        })),
-    };
-
-    const barOptions = {
-        maintainAspectRatio: false,
-        plugins: {
-            datalabels: {
-                display: false,
-            },
-            legend: {
-                position: 'bottom' as 'bottom',
-                labels: {
-                    position: 'bottom' as 'bottom',
-                    usePointStyle: true,
-                    font: {
-                        size: 15,
-                    },
-                    generateLabels: (chart: any) => {
-                        const { datasets } = chart.data;
-                        const activityColorMap: { [key: string]: string } = {};
-                    
-                        datasets.forEach((dataset: any, index: any) => {
-                            const speciesName = dataset.label;
-                            const activityData = activityColors.length > 1 ? dataset.label : Object.keys(dataset.data)[0];
-                            
-                            // Assign colors based on the activity count
-                            if (!activityColorMap[activityData]) {
-                                activityColorMap[activityData] = activityColors[index % activityColors.length];
-                            }
-                    
-                            dataset.backgroundColor = useMainColor? mainColor:activityColorMap[activityData];
-                            dataset.borderColor = useMainColor? mainColor:activityColorMap[activityData];
-                        });
-                    
-                        return datasets.map((dataset: any, index: any) => ({
-                            text: dataset.label,
-                            fillStyle: useMainColor ? mainColor:activityColorMap[dataset.label],
-                            hidden: !chart.isDatasetVisible(index),
-                            lineCap: 'round',
-                            lineDash: [] as number[],
-                            lineDashOffset: 0,
-                            lineJoin: 'round',
-                            lineWidth: 10,
-                            strokeStyle: useMainColor ? mainColor: activityColorMap[dataset.label],
-                            pointStyle: 'rect',
-                            rotation: 0,
-                        }));
-                    },
-                    
-                },
-            },
-        },
-        scales: {
-            x: {
-                beginAtZero: true,
-            },
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    stepSize: 50,
-                    max: 200,
-                },
-            },
-        },
-    };
+    const BarData = {
+        labels: ['labels'],
+        datasets: activityData
+      };
     
+      const options = {
+      indexAxis: 'x' as const,
+      scales: {
+        x: {
+          beginAtZero: false,
+          display: false,
+          stacked: false,
+          barPercentage: 1, // Set barPercentage to 1 to make bars fill the label space
+          categoryPercentage: 1, // Set categoryPercentage to 1 to make bars fill the label space
+        },
+        y: {
+          display: true,
+          stacked: false,
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: "black",
+          },
+          title: {
+            display: true,
+            text: 'Total', // Y-axis label
+            font: {
+              size: 14,
+            },
+          },
+          callback: (value: string, index: number) => {
+            return labels[index];
+          },
+        },
+      },
+      plugins: {
+        responsive: true,
+        maintainAspectRatio: false,
+        tooltip: {
+          enabled: true,
+        },
+        datalabels: {
+          display: false,
+        },
+        legend: {
+          display: true,
+          position: 'bottom' as 'bottom',
+          labels: {
+            boxWidth: 20,
+            boxHeight: 13,
+            padding: 12,
+            font: {
+              size: 10,
+              weight: "bold" as "bold"
+            }
+          },
+        },
+        
+      },
+    } as const;
 
     return (
         <Box className="white-chart chartFullWidth leftBoxRound">
@@ -219,7 +174,7 @@ const ActivityBarChart = (props: {
                         <Box>
                             <Typography>Species activity data, as totals by method</Typography>
                             <Box className="BoxChartType">
-                                <Bar data={barData} options={barOptions} />
+                                <Bar data={BarData} options={options} />
                             </Box>
                         </Box>
                     )

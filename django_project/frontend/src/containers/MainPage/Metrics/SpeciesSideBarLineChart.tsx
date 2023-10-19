@@ -54,49 +54,52 @@ const SpeciesSideBarLineChart = (props: {
     };
 
     const speciesOptions = {
-    plugins: {
-        datalabels: {
-        display: false,
-        },
-        legend: {
-        position: 'bottom' as 'bottom',
-        labels: {
-            usePointStyle: true,
-            font: {
-            size: 15,
+        plugins: {
+          datalabels: {
+            display: false,
+          },
+          legend: {
+            position: 'bottom' as 'bottom',
+            labels: {
+              boxWidth: 20,
+              boxHeight: 13,
+              padding: 12,
+              font: {
+                size: 12,
+              },
+              usePointStyle: false,
             },
-            generateLabels: (chart: any) => {
-            const { datasets } = chart.data;
-            return datasets.map((dataset: any, index: any) => ({
-                text: dataset.label,
-                fillStyle: dataset.borderColor,
-                hidden: !chart.isDatasetVisible(index),
-                lineCap: 'round',
-                lineDash: [] as number[],
-                lineDashOffset: 0,
-                lineJoin: 'round',
-                lineWidth: 10,
-                strokeStyle: dataset.borderColor,
-                pointStyle: 'rect',
-                rotation: 0,
-            }))
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+                display: true,
+                text: 'Year',
+                font: {
+                    size: 14,
+                },
             },
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+                display: true,
+                text: 'Count',
+                font: {
+                    size: 14,
+                },
+            },
+          },
         },
+        interaction: {
+          mode: 'index' as const,
+          intersect: false,
         },
-    },
-    scales: {
-        x: {
-        beginAtZero: true,
-        },
-        y: {
-        beginAtZero: true,
-        ticks: {
-            stepSize: 65,
-            max: 260,
-        },
-        },
-    },
-    };
+      };
+      
+      
 
 
     useEffect(() => {

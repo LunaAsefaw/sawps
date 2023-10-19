@@ -118,12 +118,22 @@ const DataList = () => {
     }
 
     useEffect(() => {
+      const getData = setTimeout(() => {
+        fetchDataList()
+        setShowReports(true)
+      }, 500)
+
+      return () => clearTimeout(getData)
+    }, [startYear, endYear])
+
+    useEffect(() => {
         setColumns([])
         if (selectedSpecies) {
             fetchDataList()
             setShowReports(true);
         }
-    }, [startYear, endYear, selectedSpecies, selectedInfo, propertyId, organisationId, activityId, spatialFilterValues])
+    }, [selectedSpecies, selectedInfo, propertyId, organisationId, activityId, spatialFilterValues])
+
     const handleChange = (event: SelectChangeEvent<typeof selectedColumns>) => {
         const {
             target: { value },

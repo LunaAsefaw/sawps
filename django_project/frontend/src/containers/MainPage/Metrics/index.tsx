@@ -58,6 +58,7 @@ const Metrics = () => {
     const [hasEmptyPopulationEstimateCategoryCount, setHasEmptyPopulationEstimateCategoryCount] = useState(true);
     const [hasEmptyPopulationEstimateCategoryCountPercentage, setHasEmptyhasEmptyPopulationEstimateCategoryCountPercentage] = useState(true);
     const [hasEmptyPropertyAvailable, setHasEmptyPropertyAvailable] = useState(true);
+    const [hasEmptyAreaAvailable, setHasEmptyAreaAvailable] = useState(true);
 
     // Pass callback functions to each child component for the specific type
     const handleEmptyPopulationTrend = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
@@ -92,6 +93,9 @@ const Metrics = () => {
     };
     const handleEmptyPopulationEstimateCategoryCountPercentage = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
         setHasEmptyhasEmptyPopulationEstimateCategoryCountPercentage(isEmpty);
+    };
+    const handleHasEmptyAreaAvailable = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
+        setHasEmptyAreaAvailable(isEmpty);
     };
 
     const fetchActivityPercentageData = () => {
@@ -170,6 +174,9 @@ const Metrics = () => {
         setHasEmptyTotalCountPerActivityPercentage(true)
         setHasEmptyPopulationEstimateCategoryCount(true)
         setHasEmptyhasEmptyPopulationEstimateCategoryCountPercentage(true)
+        handleHasEmptyAreaAvailable(true)
+
+
     }, [propertyId, startYear, endYear, selectedSpecies])
     const handleDownloadPdf = async () => {
         const content = contentRef.current;
@@ -288,13 +295,18 @@ const Metrics = () => {
                            
 
                             
-                            {areaData.map((data, index) => (
+                            {hasEmptyAreaAvailable && areaData.map((data, index) => (
                                 <Grid container key={index} item xs={12} md={6}>
                                     {data?.area?.owned_species ? (
                                         <AreaAvailableLineChart
+                                            selectedSpecies={selectedSpecies}
+                                            propertyId={propertyId}
+                                            startYear={startYear}
+                                            endYear={endYear}
                                             loading={loading}
                                             areaData={data?.area?.owned_species}
                                             species_name={data?.common_name_varbatim}
+                                            onEmptyDatasets={handleHasEmptyAreaAvailable}
                                         />
                                     ) : null}
                                 </Grid>
@@ -315,7 +327,6 @@ const Metrics = () => {
                                 </Grid>
                             )}
 
-                               
                             
                             {selectedSpecies && hasEmptyProvinceCountPercentage && (
                                 <Grid item xs={12} md={6} 
