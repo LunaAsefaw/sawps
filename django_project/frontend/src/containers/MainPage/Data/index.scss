@@ -50,10 +50,10 @@
 
 .downlodBtn {
 	display: flex;
+    position: relative;
 	gap: 15px;
 	flex-direction: row-reverse;
-    margin-bottom: 5px;
-    margin-right: 5px;
+    margin: 5px;
 }
 
 .dataTable {
@@ -72,6 +72,10 @@
     .MuiDataGrid-footerContainer {
         display: none;
     }
+
+    .MuiDataGrid-cellContent {
+        text-align: left;
+    }
 }
 
 .MuiMenu-list {
@@ -88,14 +92,7 @@
     min-width: 120px;
     color: white;
 }
-.dataTable-auto{
-    overflow: auto;
-    max-height: calc(100vh - 260px);
-    min-height: calc(100vh - 260px);
-}
-.dataTable-auto .MuiDataGrid-virtualScroller{
-    max-height: 704px;
-}
+
 .dataTable-auto .MuiDataGrid-root{
    margin-bottom: 0px;
 }
@@ -105,6 +102,8 @@
 
 .dataContainer {
     padding: 5px;
+    height: 88vh;
+    overflow: auto;
 }
 
 .topper-container {

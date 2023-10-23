@@ -129,11 +129,11 @@ const SpeciesChart:FC<ISpeciesChartProps> = (props)=>{
            }
         }
     }
-    
+
     return(
         <>
             <div className="species-chart-container" data-testid="species-chart">
-                {chartData ? 
+                {chartData ?
                     <Line
                         data={chartData}
                         options={options}

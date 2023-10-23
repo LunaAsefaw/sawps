@@ -28,3 +28,6 @@ test-results/
 playwright-report/
 playwright/.cache/
 /django_project/htmlcov/
+
+django_project/frontend/e2e/.auth/
+django_project/frontend/.env

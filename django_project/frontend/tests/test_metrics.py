@@ -12,7 +12,6 @@ from species.factories import (
 )
 from species.models import TaxonRank
 from stakeholder.factories import organisationFactory, organisationUserFactory
-from stakeholder.models import UserProfile
 
 
 class BaseTestCase(TestCase):

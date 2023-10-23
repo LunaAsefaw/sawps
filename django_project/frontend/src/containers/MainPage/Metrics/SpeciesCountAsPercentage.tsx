@@ -121,8 +121,12 @@ const SpeciesCountAsPercentage = (props: any) => {
   }));
 
   const labels = calculatedPercentageValues.map((item) => {
-    const paddedProvince = item.province.padEnd(50, ' ');
-    return paddedProvince;
+    // Check if the province name is longer than 25 characters
+    if (item.province.length > 25) {
+      // Trim the name to 22 characters and add '...' at the end
+      return item.province.substring(0, 22) + '...';
+    }
+    return item.province.padEnd(50, ' ');
   });
   
   const percentages = calculatedPercentageValues.map((item) => item.percentage);
@@ -150,7 +154,7 @@ const SpeciesCountAsPercentage = (props: any) => {
     position: "relative",
     backgroundImage: `url(${backgroundImageUrl})`,
     backgroundSize: "18% 20%", // width and height of image
-    backgroundPosition: "19.6% 57%", //horizontal and vertical position respectively
+    backgroundPosition: "19.5% 57%", //horizontal and vertical position respectively
     backgroundRepeat: "no-repeat",
     whiteSpace: "pre-wrap", // Allow text to wrap
   };
@@ -207,7 +211,7 @@ const SpeciesCountAsPercentage = (props: any) => {
         align: 'start' as 'start',
         
         font: {
-          size: 16,
+          size: 20,
           weight: 'bold' as 'bold',
         },
       },

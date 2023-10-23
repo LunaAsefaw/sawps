@@ -13,3 +13,14 @@ def get_current_organisation_id(user):
             return user_profile.current_organisation.id
     except UserProfile.DoesNotExist:
         return None
+
+
+def get_abbreviation(text: str):
+    """
+    Get abbreviation from text.
+    """
+    words = text.split(' ')
+    if len(words) == 1:
+        return words[0][0:2].upper()
+    else:
+        return ''.join(map(lambda word: word[0:1].upper(), words))

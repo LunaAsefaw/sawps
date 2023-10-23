@@ -6,7 +6,6 @@ from stakeholder.models import (
 )
 from sawps.tests.models.account_factory import UserF
 from stakeholder.factories import (
-    userProfileFactory,
     userTitleFactory,
     userRoleTypeFactory
 )

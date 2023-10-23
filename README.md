@@ -1,4 +1,4 @@
-![Image Tag](https://img.shields.io/badge/Staging%20Image%20Tag:-0.0.1--5fc6e0c--sta-blue.svg)
+![Image Tag](https://img.shields.io/badge/Staging%20Image%20Tag:-0.0.1--d9222c9--sta-blue.svg)
 ![Jenkins Status](https://img.shields.io/badge/Staging%20Jenkins%20Build%20Status:-SUCCESS-green.svg)
 [![codecov](https://codecov.io/gh/kartoza/sawps/branch/main/graph/badge.svg)](https://codecov.io/gh/kartoza/sawps/)
 
@@ -57,7 +57,7 @@ Run the migrations inside the container: Press ```Cmd+Shift+P``` (macOS) or ```C
 
 ![image](https://user-images.githubusercontent.com/178003/231015768-39803d00-95dc-42c7-a08f-ab58ac09fa58.png)
 
-![django-migrate](https://github.com/timlinux/sawps/assets/178003/7ae66c26-2323-4664-9ead-b6c27dd5ad31)
+![django-migrate](/docs/src/developer/guide/img/ide-setup-django-migrate-1.png)
 
 ### 👩‍💻 Open the developer site
 
@@ -68,17 +68,14 @@ Run the project inside the container: Press ```Cmd+Shift+D``` (macOS) or ```Ctrl
 
 Review the list of forwarded ports from the container to your local host:
 
-![forwarded-ports](https://github.com/timlinux/sawps/assets/178003/23a38e37-5e27-482a-8dba-07798b0a8e40)
+![forwarded-ports](/docs/src/developer/guide/img/ide-setup-forwarded-ports-1.png)
 
 
 Open your web browser and go to localhost:8000 to view the running application.
 
 ### 👩‍🏭 Create a super user
 
-![django-superuser1](https://github.com/timlinux/sawps/assets/178003/a7cfc797-5738-4de8-bdaa-deffce905c53)
-
-
-![django-superuser2](https://github.com/timlinux/sawps/assets/178003/35f9f06e-79c3-405d-b7ce-b82a35ff28ac)
+![django-superuser1](/docs/src/developer/guide/img/ide-setup-django-superuser1.png)
 
 ### 💽 Restoring layer schema for map
 

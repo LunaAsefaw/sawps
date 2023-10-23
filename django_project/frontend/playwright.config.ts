@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// require('dotenv').config();
+require('dotenv').config();
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -34,9 +34,14 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    //{ name: 'setup', testMatch: /.*\.auth.spec\.ts/ },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'],
+      // Use prepared auth state.
+      //storageState: 'e2e/.auth/adminAuth.json',
+     },
+     //dependencies: ['setup'],
     },
     //
     // {

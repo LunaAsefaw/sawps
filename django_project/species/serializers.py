@@ -59,3 +59,19 @@ class FrontPageTaxonSerializer(serializers.ModelSerializer):
             'total_area',
             'colour'
         ]
+
+
+class TrendPageTaxonSerializer(FrontPageTaxonSerializer):
+    """Display species data on TrendPage."""
+    species_name = serializers.CharField(source='scientific_name')
+
+    class Meta:
+        model = Taxon
+        fields = [
+            'id',
+            'species_name',
+            'graph_icon',
+            'total_population',
+            'total_area',
+            'colour'
+        ]

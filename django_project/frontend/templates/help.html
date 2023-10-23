@@ -1,35 +1,20 @@
-{% extends 'base.html' %}
-{% load i18n %}
+{% extends "base.html" %}
+{% block extra_head %}
+    {% load render_bundle from webpack_loader %}
+{% endblock %}
 
-{% block head_title %}Help{% endblock%}
 
 {% block content %}
-<section class="fs-background d-flex help-background" style="background-color: #000000; min-height:var(--min-content-height);">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="help-image-container">
-                    <img src='/static/images/help/help_page_banner.png' class="img-fluid" alt="Help Banner" style="width: fit-content; margin-left: -10%; height: auto;">
-                </div>
-            </div>
-            <div class="col-md-6 d-flex align-items-center">
-                <div class="help-texts-container">
-                    <div class='help-content-title'>
-                        HELP
-                    </div>
-                    <div class='help-text-container'>
-                        <div class='help-text'>
-                            The SAWPS platform offers a broad range of features which are documented in a
-                            full user guide. For any other queries please contact the site administration using the contact form.
-                        </div>
-                    </div>
-                    <div class='help-btns-container'>
-                        <a href="https://kartoza.github.io/sawps/" target="_blank"><button class="green-button sawps-font-button-black mr-3">Go to user guide</button></a>
-                        <a href="/contact"><button class="orange-button sawps-font-button-black">Contact us</button></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+    <script>
+      window.maptiler_api_key = "{{ maptiler_api_key }}";
+    </script>
+
+    <div id="app"></div>
+    {% render_bundle 'Help' 'js' %}
+    {% render_bundle 'Home' 'css' %}
+
 {% endblock %}
+{% block footer %}
+{% endblock %}
+
+</html>

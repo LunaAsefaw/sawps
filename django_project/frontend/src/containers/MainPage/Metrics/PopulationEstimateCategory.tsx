@@ -90,12 +90,15 @@ const PopulationEstimateCategoryCount = (props: any) => {
       const categoryData = speciesData[category];
       const count = categoryData.count;
       year = categoryData.years[0];
+      
+      let paddedLabel = category
 
-      const paddedLabel = category.padEnd(50, ' '); // Pad with spaces
-          
-      labels.push(paddedLabel); // Use the padded label
+      if(category.length > 25){
+        paddedLabel = category.substring(0, 22) + '...';
+      }
 
-      // labels.push(category);
+      labels.push(paddedLabel.padEnd(50, ' ')); // Use the padded label
+
       data.push(count);
       uniqueColors.push(availableColors[labels.length - 1]);
     }
@@ -152,7 +155,7 @@ const PopulationEstimateCategoryCount = (props: any) => {
         text: chartTitle,
         align: 'start' as 'start',
         font: {
-          size: 16,
+          size: 20,
           weight: 'bold' as 'bold',
         },
       },
@@ -164,7 +167,7 @@ const PopulationEstimateCategoryCount = (props: any) => {
     position: "relative",
     backgroundImage: `url(${backgroundImageUrl})`,
     backgroundSize: "18% 20%", // width and height of image
-    backgroundPosition: "19.6% 57%", //horizontal and vertical position respectively
+    backgroundPosition: "19.5% 57%", //horizontal and vertical position respectively
     backgroundRepeat: "no-repeat",
     whiteSpace: "pre-wrap", // Allow text to wrap
   };

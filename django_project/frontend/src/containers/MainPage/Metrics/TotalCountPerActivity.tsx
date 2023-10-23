@@ -78,10 +78,13 @@ interface SpeciesDataItem {
 
           // Check if the activityType is not in the labels list
           if (!labels.includes(activityType)) {
-            // Ensure the label is exactly 23 characters long with padding
-            const paddedLabel = activityType.padEnd(50, ' '); // Pad with spaces
+            let paddedLabel = activityType
+            if (activityType.length > 25) {
+              // Trim the name to 22 characters and add '...' at the end
+              paddedLabel = activityType.substring(0, 22) + '...';
+            }
 
-            labels.push(paddedLabel); // Use the padded label
+            labels.push(paddedLabel.padEnd(50, ' ')); // Use the padded label
             data.push(total);
             uniqueColors.push(availableColors[labels.length - 1]);
           }
@@ -137,7 +140,7 @@ interface SpeciesDataItem {
           text: chartTitle,
           align: 'start' as 'start',
           font: {
-            size: 16,
+            size: 20,
             weight: 'bold' as 'bold',
           },
         },
@@ -149,7 +152,7 @@ interface SpeciesDataItem {
         position: "relative",
         backgroundImage: `url(${backgroundImageUrl})`,
         backgroundSize: "18% 20%", // width and height of image
-        backgroundPosition: "19.6% 57%", //horizontal and vertical position respectively
+        backgroundPosition: "19.5% 57%", //horizontal and vertical position respectively
         backgroundRepeat: "no-repeat",
         whiteSpace: "pre-wrap", // Allow text to wrap
     };

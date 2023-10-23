@@ -51,7 +51,8 @@ const SpeciesCountPerProvinceChart = (props: any) => {
     startYear,
     endYear,
     loading,
-    setLoading
+    setLoading,
+    onEmptyDatasets
   } = props;
   const [speciesData, setSpeciesData] = useState<SpeciesDataItem[]>([]);
 
@@ -63,9 +64,21 @@ const SpeciesCountPerProvinceChart = (props: any) => {
       )
       .then((response) => {
         if (response.data) {
+          let render_chart = false;
+          // Check if the array is not empty
+          if (response.data.length > 0) {
+            for (const item of response.data) {
+              if (item.year !== null) {
+                render_chart = true;
+                break;
+              }
+            }
+          }else onEmptyDatasets(false)
+          if(!render_chart) onEmptyDatasets(false)
+          else onEmptyDatasets(true)
           setSpeciesData(response.data);
           setLoading(false);
-        }
+        }else onEmptyDatasets(false)
       })
       .catch((error) => {
         console.log(error);
@@ -84,43 +97,47 @@ const SpeciesCountPerProvinceChart = (props: any) => {
   // sort the years from highest 
   legendLabels.sort((a: number, b: number) => b - a);
 
+    // Create datasets for each year using available colors
     const datasets = legendLabels.map((year, yearIndex) => {
       const backgroundColor = availableColors[yearIndex];
-  
+
       // Initialize variables to keep track of repeating provinces
       let repeatingProvinceCount = 0;
       let firstRepeatingProvinceIndex = -1;
-  
+
       const data = horizontalLabels.map((province, provinceIndex) => {
-          const item = speciesData.find((d) => d.year === year && d.province === province);
-  
-          if (item) {
-              // Check if this province has been seen before
-              if (horizontalLabels.slice(0, provinceIndex).includes(province)) {
-                  // Find the index where this province first appeared
-                  const firstAppearanceIndex = horizontalLabels.indexOf(province);
-  
-                  // Calculate the number of leading zeros
-                  const leadingZeros = provinceIndex - firstAppearanceIndex;
-                  return leadingZeros;
-              } else {
-                  // This province is not repeating, reset repeatingProvinceCount and firstRepeatingProvinceIndex
-                  repeatingProvinceCount = 0;
-                  firstRepeatingProvinceIndex = -1;
-                  return item.count || 0;
-              }
+        const item = speciesData.find((d) => d.year === year && d.province === province);
+
+        if (item) {
+          // Check if this province has been seen before
+          if (horizontalLabels.slice(0, provinceIndex).includes(province)) {
+            // Find the index where this province first appeared
+            const firstAppearanceIndex = horizontalLabels.indexOf(province);
+
+            // Calculate the number of leading zeros
+            const leadingZeros = provinceIndex - firstAppearanceIndex;
+            return leadingZeros;
           } else {
-              return 0;
+            // This province is not repeating, reset repeatingProvinceCount and firstRepeatingProvinceIndex
+            repeatingProvinceCount = 0;
+            firstRepeatingProvinceIndex = -1;
+            return item.count || 0;
           }
+        } else {
+          return 0;
+        }
       });
-  
+
       return {
-          label: year.toString(),
-          backgroundColor,
-          data,
+        label: year.toString(),
+        backgroundColor,
+        data,
       };
-  });
-  
+    });
+
+  // Reverse the order of datasets
+  datasets.reverse();
+
   const data = {
     labels: horizontalLabels,
     datasets: datasets

@@ -160,8 +160,6 @@ class CustomPasswordResetCompleteViewTest(TestCase):
         #     )
 
 
-
-
 class AddUserToOrganisationTestCase(TestCase):
     def setUp(self):
         self.user_email = 'test@example.com'
@@ -279,9 +277,6 @@ class AddUserToOrganisationTestCase(TestCase):
             args=[self.user_email, 'fake_org']
         )
         response = self.client.get(url)
-
-
-
 
 
 class SendRequestEmailTestCase(TestCase):

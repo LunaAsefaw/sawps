@@ -2,7 +2,6 @@ import base64
 import json
 import mock
 
-from core.settings.utils import absolute_path
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import GEOSGeometry
 from django.test import Client, TestCase
@@ -32,9 +31,7 @@ from population_data.models import OpenCloseSystem
 from stakeholder.factories import (
     organisationFactory,
     organisationUserFactory,
-    userProfileFactory,
 )
-from stakeholder.models import UserProfile
 
 
 class TestPropertyAPIViews(TestCase):

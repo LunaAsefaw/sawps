@@ -20,6 +20,32 @@ class ExtendedGroup(models.Model):
     def __str__(self):
         return self.description
 
+    class Meta:
+        permissions = [
+            ("can_view_population_trend", "Can view population trend"),
+            ("can_view_population_category", "Can view population category"),
+            ("can_view_property_type", "Can view property type"),
+            ("can_view_density_bar", "Can view density bar"),
+            ("can_view_property_available", "Can view property available"),
+            ("can_view_age_group", "Can view age group"),
+            ("can_view_area_available", "Can view area available"),
+            (
+                "can_view_province_species_count",
+                "Can view province species count"
+            ),
+            (
+                "can_view_province_species_count_as_percentage",
+                "Can view province species count as percentage",
+            ),
+            ("can_view_total_count", "Can view total count"),
+            ("can_view_count_as_percentage", "Can view count as percentage"),
+            ("can_view_population_estimate", "Can view population estimate"),
+            (
+                "can_view_population_estimate_as_percentage",
+                "Can view population estimate as percentage",
+            ),
+        ]
+
 
 @receiver(post_save, sender=Group)
 def save_extended_group(sender, instance, created, **kwargs):

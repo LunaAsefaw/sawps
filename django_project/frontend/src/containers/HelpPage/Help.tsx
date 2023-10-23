@@ -1,30 +1,39 @@
-import React, { FC } from 'react';
+import React, {FC} from 'react';
 import './index.scss';
 
-interface IHelp{}
+import {DocsCrawlerPage} from "django-docs-crawler-react";
 
-const Help:FC<IHelp> = ()=>{
-    return(
+import "django-docs-crawler-react/dist/style.css"
+
+interface IHelp {
+}
+
+const Help: FC<IHelp> = () => {
+    return (
         <>
             <div className='help-container' data-testid='help-container'>
                 <div className='help-content-container'>
                     <div className='help-image-container'>
-                        <div className='help-banner-img'></div>
+                        <img src='/static/images/help/help_page_banner.png'
+                             className="help-banner-img" alt="Help Banner"/>
                     </div>
                     <div className='help-texts-container'>
-                        <div className='help-content-title'>
-                            Help & Support
-                        </div>
-                        <div className='help-text-container'>
-                            <div className='help-text'>
-                            the WLPS platform offers a broad range of features which are documented in a full user guide. 
-                            For any other queries please contact the site administration using the contact from.
-                            </div>
-                        </div>
-                        <div className='help-btns-container'>
-                            <a href="/user_guide" className='user-guide-anchor' data-testid='user-guide-anchor'>User guide</a>
-                            <a href="/contact" className='contact-anchor' data-testid='contact-anchor'>Contact us</a>
-                        </div>
+                        <DocsCrawlerPage
+                            dataUrl={'/docs_crawler/data'}
+                            open={true}
+                            setOpen={() => {
+                            }}
+                            footer={
+                                <div className='help-btns-container'>
+                                    <a href="/contact">
+                                        <button
+                                            className="orange-button sawps-font-button-black">
+                                            Contact us
+                                        </button>
+                                    </a>
+                                </div>
+                            }
+                        />
                     </div>
                 </div>
             </div>

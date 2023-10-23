@@ -1,9 +1,10 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.db.models.signals import post_save
 
 from property.models import Province
+from property.factories import PropertyFactory
 from regulatory_permit.models import DataUsePermission
 from stakeholder.factories import (
     loginStatusFactory,
@@ -11,7 +12,6 @@ from stakeholder.factories import (
     organisationRepresentativeFactory,
     organisationUserFactory,
     userLoginFactory,
-    userProfileFactory,
     userRoleTypeFactory,
     userTitleFactory,
 )
@@ -192,12 +192,19 @@ class TestUserLogin(TestCase):
         self.assertEqual(User.objects.count(), 2)
 
 
+@override_settings(
+    CELERY_ALWAYS_EAGER=True,
+    BROKER_BACKEND='memory',
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True
+)
 class OrganizationTestCase(TestCase):
     """Organization test case."""
 
     @classmethod
     def setUpTestData(cls):
-        cls.organization = organisationFactory()
+        cls.organization = organisationFactory(
+            name='CapeNature'
+        )
 
     def test_create_organization(self):
         """Test creating organization."""
@@ -205,22 +212,42 @@ class OrganizationTestCase(TestCase):
         self.assertTrue(isinstance(self.organization, Organisation))
         self.assertTrue(self.organization.name, Organisation.objects.get(
             id=self.organization.id).name)
+        self.assertEqual(
+            self.organization.short_code,
+            'CA0001'
+        )
 
     def test_update_organization(self):
         """Test updating organization."""
         province, created = Province.objects.get_or_create(
                     name="Limpopo"
         )
+        property_1 = PropertyFactory.create(
+            organisation=self.organization,
+            province=province
+        )
+        property_2 = PropertyFactory.create(
+            organisation=self.organization,
+            province=province
+        )
         self.organization.name = 'test'
         self.organization.national = True
         self.organization.province = province
         self.organization.save()
+        self.organization.refresh_from_db()
+        property_1.refresh_from_db()
+        property_2.refresh_from_db()
         self.assertEqual(Organisation.objects.get(
             id=self.organization.id).name, 'test')
         self.assertEqual(Organisation.objects.filter(
             national=True).count(), 1)
         self.assertEqual(Organisation.objects.filter(
             province__name="Limpopo").count(), 1)
+
+        self.assertEqual(
+            self.organization.short_code,
+            'LITE0001'
+        )
 
     def test_delete_organization(self):
         """Test deleting organization."""
@@ -246,6 +273,10 @@ class OrganizationUserTestCase(TestCase):
         """Test creating organisation user."""
         self.assertEqual(OrganisationUser.objects.count(), 1)
         self.assertTrue(isinstance(self.organizationUser, OrganisationUser))
+        self.assertTrue(
+            self.organizationUser.user.groups.first().name,
+            'Data contributor'
+        )
 
     def test_update_organisation_user(self):
         """ Test updating organisation user."""
@@ -258,8 +289,26 @@ class OrganizationUserTestCase(TestCase):
 
     def test_delete_organisation_user(self):
         """Test deleting organisation user."""
+        user = self.organizationUser.user
+        organisation_user_2 = organisationUserFactory(
+            user=user
+        )
+        # delete organizationUser
+        # user would still be in group Data contributor
+        # because he still belongs to other organisation
         self.organizationUser.delete()
+        self.assertEqual(OrganisationUser.objects.count(), 1)
+        self.assertTrue(len(user.groups.all()), 1)
+        self.assertTrue(user.groups.first().name, 'Data contributpr')
+
+        # delete organisation_user_2
+        # user would be removed from group Data contributor
+        # because he no longer belongs any organisation
+        organisation_user_2.delete()
         self.assertEqual(OrganisationUser.objects.count(), 0)
+        self.assertFalse(
+            user.groups.exists()
+        )
 
 
 class OrganizationRepresentativeTestCase(TestCase):

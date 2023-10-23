@@ -112,12 +112,13 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
       // Rule 4: Save unique activity types
       // Check if the activityType is not in the labels list
       if (!labels.includes(activityType)) {
-        // Remove text before "/" to get text after "/"
-        // const modifiedLabel = activityType.split('/').pop(); // Get text after "/"
-        const paddedLabel = activityType.padEnd(50, ' '); // Pad with spaces
-          
-        labels.push(paddedLabel); // Use the padded label
-        // labels.push(activityType); // Use modified label or the original if there's no text after "/"
+        let paddedLabel = activityType
+          if (activityType.length > 25) {
+            // Trim the name to 22 characters and add '...' at the end
+            paddedLabel = activityType.substring(0, 22) + '...';
+          }
+
+        labels.push(paddedLabel.padEnd(50, ' ')); // Use the padded label
         data.push(percentage);
         uniqueColors.push(availableColors[labels.length - 1]);
      }
@@ -180,7 +181,7 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
           : `No data available for ${selectedSpecies} current filter selections`,
         align: 'start' as 'start',
         font: {
-          size: 16,
+          size: 20,
           weight: 'bold' as 'bold',
         },
       },
@@ -192,7 +193,7 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
     position: "relative",
     backgroundImage: `url(${backgroundImageUrl})`,
     backgroundSize: "18% 20%", // width and height of image
-    backgroundPosition: "19.6% 57%", //horizontal and vertical position respectively
+    backgroundPosition: "19.5% 57%", //horizontal and vertical position respectively
     backgroundRepeat: "no-repeat",
     whiteSpace: "pre-wrap", // Allow text to wrap
   };

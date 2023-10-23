@@ -17,7 +17,11 @@ from stakeholder.models import (
 admin.site.register(UserRoleType)
 admin.site.register(UserTitle)
 admin.site.register(LoginStatus)
-admin.site.register(Organisation)
+
+
+@admin.register(Organisation)
+class OrganisationAdmin(admin.ModelAdmin):
+    list_display = ("name", "short_code", "province", "national")
 
 
 class UserProfileInline(admin.StackedInline):

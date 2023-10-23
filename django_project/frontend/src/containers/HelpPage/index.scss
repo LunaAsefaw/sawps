@@ -1,7 +1,8 @@
 .help-container{
     display: flex;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .help-content-container{
@@ -60,6 +61,40 @@
     color:var(--black);
 }
 
+.DocsCrawler{
+    position: unset !important;
+    height: 100%;
+
+    .DocsCrawler-Close {
+        display: none;
+    }
+
+    .DocsCrawler-Content {
+        width: 100% !important;
+    }
+    .DocsCrawler-InnerContent {
+        padding: 1rem 0;
+    }
+    .DocsCrawler-Block {
+        right: -100% !important;
+        padding-top: 2rem !important;
+
+        &.Open{
+            right: 0 !important;
+        }
+    }
+    .DocsCrawler-Footer{
+        padding: 0 !important;
+    }
+    .help-btns-container {
+        margin-bottom: 15px;
+    }
+}
+
+.help-banner-img {
+    height: fit-content;
+}
+
 @media screen and (min-width:801px){
     .help-content-container{
         flex-direction: row;
@@ -68,12 +103,9 @@
     .help-image-container{
         width:100%;
         flex-basis:50%;
-        height:100%;
     }
 
     .help-banner-img{
-        width: 100%;
-        height:100%;
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
@@ -108,6 +140,9 @@
 
 
 @media screen and (min-width:500px) and (max-width: 800px) {
+    #app {
+        overflow-y: auto;
+    }
     .help-content-container{
         flex-direction: column;
     }
@@ -117,10 +152,11 @@
         flex-basis:75%;
         height:500px;
     }
+    .DocsCrawler-InnerContent{
+        height: 500px;
+    }
 
     .help-banner-img{
-        width: 100%;
-        height:100%;
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;

@@ -43,6 +43,16 @@ export interface Species {
   common_name_varbatim: string
 }
 
+export interface TaxonDetail {
+  id: number
+  species_name: string
+  graph_icon: any
+  total_population: number
+  total_area: number
+  colour: string
+}
+
+
 export interface Activity {
   id: number
   name: string
@@ -57,7 +67,7 @@ export interface Activity {
 // This defines a set of endpoints related to user operations.
 export const userApi = createApi({
     baseQuery: baseQuery,
-    tagTypes: ['User', 'Organisation', 'Activity', 'Property', 'Species'],
+    tagTypes: ['User', 'Organisation', 'Activity', 'Property', 'Species', 'Taxon'],
     endpoints: (build) => ({
         getUserInfo: build.query<UserInfo, void>({
             query: () => 'api/user-info/',
@@ -101,6 +111,13 @@ export const userApi = createApi({
             },
             providesTags: ['Species']
         }),
+        getTaxonDetail: build.query<TaxonDetail, string>({
+            query: (species_name: string) => `api/species/trend-page/?species=${species_name}`,
+            transformResponse: (response: TaxonDetail) => {
+                return response;
+            },
+            providesTags: ['Taxon']
+        }),
     })
 })
 
@@ -111,7 +128,8 @@ export const {
     useGetActivityQuery,
     useGetActivityAsObjQuery,
     useGetPropertyQuery,
-    useGetSpeciesQuery
+    useGetSpeciesQuery,
+    useGetTaxonDetailQuery
 } = userApi
 
 
