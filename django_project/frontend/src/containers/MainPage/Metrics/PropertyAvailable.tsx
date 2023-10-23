@@ -161,7 +161,7 @@ const PropertyAvailableBarChart: React.FC<PropertyAvailableBarChartProps> = (pro
       const areaIndex = group.years.indexOf(year);
       return areaIndex !== -1 ? group.areas[areaIndex] : 0;
     });
-  
+
     return {
       label: year.toString(),
       backgroundColor: backgroundColors[index],
@@ -170,7 +170,10 @@ const PropertyAvailableBarChart: React.FC<PropertyAvailableBarChartProps> = (pro
       data: dataForYear,
     };
   });
-  
+
+  // Reverse the order of datasets
+  datasets.reverse();
+
   const data = {
     labels: labelsB,
     datasets: datasets,

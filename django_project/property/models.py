@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 
@@ -28,9 +28,34 @@ class Province(models.Model):
         db_table = 'province'
 
 
+@receiver(pre_save, sender=Province)
+def province_pre_save(
+    sender, instance: Province, *args, **kwargs
+):
+    if instance.id:
+        old_province = Province.objects.get(id=instance.id)
+        if old_province.name != instance.name:
+            instance.skip_post_save = False
+
+
+@receiver(post_save, sender=Province)
+def province_post_save(
+    sender, instance: Province, created, *args, **kwargs
+):
+    from property.tasks import update_organisation_property_short_code
+
+    if not created and not getattr(instance, 'skip_post_save', True):
+        update_organisation_property_short_code.delay(instance.id)
+
+
 class Property(models.Model):
     """Property model."""
     name = models.CharField(max_length=300, unique=True)
+    short_code = models.CharField(
+        max_length=50,
+        null=False,
+        blank=True
+    )
     owner_email = models.EmailField(null=True, blank=True)
     property_size_ha = models.IntegerField(null=True, blank=True)
     geometry = models.MultiPolygonField(srid=4326, null=True, blank=True)
@@ -55,6 +80,47 @@ class Property(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_short_code(
+        self,
+        with_digit: bool = True
+    ):
+        from property.utils import get_property_short_code
+
+        province_name = self.province.name if self.province else ''
+        organisation_name = self.organisation.name if self.organisation else ''
+        property_name = self.name
+        return get_property_short_code(
+            province_name,
+            organisation_name,
+            property_name,
+            with_digit
+        )
+
+
+@receiver(pre_save, sender=Property)
+def property_pre_save(
+    sender, instance: Property, *args, **kwargs
+):
+    from property.utils import get_property_short_code
+
+    if instance.id:
+        old_property: Property = Property.objects.get(id=instance.id)
+        is_name_changed = old_property.name != instance.name
+        is_org_changed = old_property.organisation != instance.organisation
+        is_province_changed = old_property.province != instance.province
+        if any([is_province_changed, is_org_changed, is_name_changed]):
+            instance.short_code = get_property_short_code(
+                province_name=(
+                    instance.province.name if instance.province else ''
+                ),
+                organisation_name=instance.organisation.name,
+                property_name=instance.name,
+                with_digit=True
+            )
+            instance.skip_post_save = False
+    else:
+        instance.short_code = instance.get_short_code()
 
 
 @receiver(post_save, sender=Property)

@@ -15,7 +15,13 @@ class PropertyAdmin(admin.ModelAdmin):
     """Admin page for Property model.
 
     """
-    list_display = ('name', 'organisation', 'property_size_ha', 'province')
+    list_display = (
+        'name',
+        'short_code',
+        'organisation',
+        'property_size_ha',
+        'province'
+    )
     search_fields = ['name', 'organisation__name', 'province__name']
 
     @admin.action(

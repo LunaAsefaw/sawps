@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from regulatory_permit.models import DataUsePermission
 from django_otp.plugins.otp_totp.models import TOTPDevice
-from stakeholder.models import OrganisationUser, Organisation, UserProfile
+from stakeholder.models import OrganisationUser, Organisation
 from stakeholder.factories import (
     organisationFactory,
     userRoleTypeFactory,
@@ -14,9 +14,8 @@ from property.factories import (
 )
 from frontend.tests.model_factories import UserF
 from frontend.tests.request_factories import OrganisationAPIRequestFactory
-from django.http import JsonResponse
 from rest_framework import status
-from unittest.mock import patch
+
 
 class OrganisationsViewTest(TestCase):
     def setUp(self):

@@ -590,6 +590,3 @@ class TestUploadSpeciesApiView(TestCase):
         file_upload.upload_session = upload_session
         file_upload.start('utf-8-sig')
         self.assertTrue('error' in upload_session.error_file.path)
-
-
-

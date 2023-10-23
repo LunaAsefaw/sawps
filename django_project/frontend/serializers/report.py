@@ -29,6 +29,9 @@ class BaseReportSerializer(serializers.Serializer):
     """
 
     property_name = serializers.SerializerMethodField()
+    property_short_code = serializers.SerializerMethodField()
+    organisation_name = serializers.SerializerMethodField()
+    organisation_short_code = serializers.SerializerMethodField()
     scientific_name = serializers.SerializerMethodField()
     common_name = serializers.SerializerMethodField()
 
@@ -40,6 +43,15 @@ class BaseReportSerializer(serializers.Serializer):
 
     def get_property_name(self, obj: AnnualPopulation) -> str:
         return obj.owned_species.property.name
+
+    def get_property_short_code(self, obj: AnnualPopulation) -> str:
+        return obj.owned_species.property.short_code
+
+    def get_organisation_name(self, obj: AnnualPopulation) -> str:
+        return obj.owned_species.property.organisation.name
+
+    def get_organisation_short_code(self, obj: AnnualPopulation) -> str:
+        return obj.owned_species.property.organisation.short_code
 
 
 class SpeciesReportSerializer(
@@ -53,7 +65,9 @@ class SpeciesReportSerializer(
     class Meta:
         model = AnnualPopulation
         fields = [
-            "property_name", "scientific_name", "common_name",
+            "property_name", "property_short_code",
+            "organisation_name", "organisation_short_code",
+            "scientific_name", "common_name",
             "year", "group", "total", "adult_male", "adult_female",
             "juvenile_male", "juvenile_female", "sub_adult_male",
             "sub_adult_female",
@@ -93,6 +107,9 @@ class SamplingReportSerializer(
         model = AnnualPopulation
         fields = [
             "property_name",
+            "property_short_code",
+            "organisation_name",
+            "organisation_short_code",
             "scientific_name",
             "common_name",
             "population_status",
@@ -112,6 +129,9 @@ class PropertyReportSerializer(
     """
 
     property_name = serializers.SerializerMethodField()
+    property_short_code = serializers.SerializerMethodField()
+    organisation_name = serializers.SerializerMethodField()
+    organisation_short_code = serializers.SerializerMethodField()
     scientific_name = serializers.SerializerMethodField()
     common_name = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
@@ -123,6 +143,15 @@ class PropertyReportSerializer(
 
     def get_property_name(self, obj: OwnedSpecies) -> str:
         return obj.property.name
+
+    def get_property_short_code(self, obj: OwnedSpecies) -> str:
+        return obj.property.short_code
+
+    def get_organisation_name(self, obj: OwnedSpecies) -> str:
+        return obj.property.organisation.name
+
+    def get_organisation_short_code(self, obj: OwnedSpecies) -> str:
+        return obj.property.organisation.short_code
 
     def get_scientific_name(self, obj: OwnedSpecies) -> str:
         return obj.taxon.scientific_name
@@ -152,6 +181,9 @@ class PropertyReportSerializer(
         model = OwnedSpecies
         fields = [
             "property_name",
+            "property_short_code",
+            "organisation_name",
+            "organisation_short_code",
             "scientific_name",
             "common_name",
             "owner",
@@ -177,11 +209,15 @@ class ActivityReportSerializer(
     def __init__(self, *args, **kwargs):
         activity = kwargs.pop('activity', None)
         if not activity:
-            raise ValueError("'activity_name' argument is required!")
+            raise ValueError("'activity' argument is required!")
         super().__init__(*args, **kwargs)
 
         base_fields = [
-            "property_name", "scientific_name", "common_name",
+            "property_name",
+            "property_short_code",
+            "organisation_name",
+            "organisation_short_code",
+            "scientific_name", "common_name",
             "year", "total", "adult_male", "adult_female",
             "juvenile_male", "juvenile_female"
         ]

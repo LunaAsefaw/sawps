@@ -2,12 +2,14 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from frontend.utils.user_roles import (
-    get_user_roles as get_user_roles_func
+    get_user_roles as get_user_roles_func,
+    get_user_permissions as get_user_permissions_func
 )
 
 
 class UserInfoSerializer(serializers.Serializer):
     user_roles = serializers.SerializerMethodField()
+    user_permissions = serializers.SerializerMethodField()
     current_organisation_id = serializers.SerializerMethodField()
     current_organisation = serializers.SerializerMethodField()
 
@@ -24,10 +26,14 @@ class UserInfoSerializer(serializers.Serializer):
     def get_user_roles(self, obj: User):
         return get_user_roles_func(obj)
 
+    def get_user_permissions(self, obj: User):
+        return get_user_permissions_func(obj)
+
     class Meta:
         fields = [
             'user_roles',
+            'permissions'
             'current_organisation_id',
-            'current_organisation'
+            'current_organisation',
         ]
         model = User

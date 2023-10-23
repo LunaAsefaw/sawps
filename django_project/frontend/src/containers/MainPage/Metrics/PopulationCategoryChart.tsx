@@ -122,14 +122,15 @@ const PopulationCategoryChart = (props: any) => {
 
     labels.sort(customSort);
 
-    // Sort datasets in descending order
-    newDatasets.sort((a, b) => parseInt(b.label) - parseInt(a.label));
+    // Sort datasets in ascending order (lowest year first)
+    newDatasets.sort((b, a) => parseInt(a.label) - parseInt(b.label));
 
-
+    // Reverse the order of datasets
+    newDatasets.reverse();
 
     const data = {
         labels: labels,
-        datasets: newDatasets
+        datasets: newDatasets,
     };
 
   const options = {

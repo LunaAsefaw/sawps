@@ -1,20 +1,22 @@
 import json
+
+from django.contrib.auth.models import User, Permission
+from django.core.serializers.json import DjangoJSONEncoder
 from django.test import RequestFactory, TestCase, Client
-from django.contrib.auth.models import User
+from django_otp.plugins.otp_totp.models import TOTPDevice
+from django.contrib.contenttypes.models import ContentType
 
 from frontend.static_mapping import REGIONAL_DATA_CONSUMER
-from sawps.tests.models.account_factory import GroupF
-from stakeholder.factories import userProfileFactory, userRoleTypeFactory
 from frontend.views.users import OrganisationUsersView
 from regulatory_permit.models import DataUsePermission
+from sawps.models import ExtendedGroup
+from sawps.tests.models.account_factory import GroupF
+from stakeholder.factories import userRoleTypeFactory
 from stakeholder.models import (
     Organisation,
     OrganisationInvites,
-    OrganisationUser,
-    UserProfile
+    OrganisationUser
 )
-from django.core.serializers.json import DjangoJSONEncoder
-from django_otp.plugins.otp_totp.models import TOTPDevice
 
 
 class OrganisationUsersViewTest(TestCase):
@@ -352,6 +354,10 @@ class UserApiTest(TestCase):
             email='test@gmail.com'
         )
         group = GroupF.create(name=REGIONAL_DATA_CONSUMER)
+        content_type = ContentType.objects.get_for_model(ExtendedGroup)
+        all_permissions = Permission.objects.filter(content_type=content_type)
+        group.permissions.add(all_permissions[0])
+
         user.groups.add(group)
         login = client.login(
             username='testuser',
@@ -381,3 +387,11 @@ class UserApiTest(TestCase):
         response = client.get('/api/user-info/')
         self.assertEqual(response.data['current_organisation_id'], organisation.id)
         self.assertEqual(response.data['current_organisation'], organisation.name)
+
+        # Permission 2 should not be in the user permisions because:
+        # - It is not assigned to user's group
+        # - It is not allowed for organisation member or manager
+        self.assertEqual(
+            sorted(response.data['user_permissions']),
+            [all_permissions[0].name]
+        )

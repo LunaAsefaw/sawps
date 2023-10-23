@@ -1,15 +1,19 @@
+from typing import Union, List
+
 from celery import shared_task
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from django.core.mail import send_mail
+from django.db.models import QuerySet
+from django.template.loader import render_to_string
 from django.utils import timezone
+
 from stakeholder.models import (
     OrganisationUser,
     Reminders,
     UserProfile
 )
-from django.contrib.auth.models import User
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
-from django.contrib.sites.models import Site
-from django.conf import settings
 
 
 @shared_task
@@ -82,3 +86,15 @@ def update_user_profile(user):
         user_profile = user_profiles.first()
         user_profile.received_notif = False
         user_profile.save()
+
+
+@shared_task
+def update_property_short_code(organisation_id):
+    from property.models import Property
+    from property.utils import batch_short_code_update
+
+    prov_orgs: Union[QuerySet, List[dict]] = Property.objects.filter(
+        organisation_id=organisation_id
+    ).values('province', 'organisation').distinct()
+    for prov_org in prov_orgs:
+        batch_short_code_update(prov_org['province'], prov_org['organisation'])

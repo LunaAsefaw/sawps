@@ -1,6 +1,7 @@
 from typing import List
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
 
 from frontend.static_mapping import (
     SUPER_USER,
@@ -10,6 +11,7 @@ from frontend.static_mapping import (
 from stakeholder.models import (
     OrganisationUser, OrganisationInvites, MANAGER, UserProfile, Organisation
 )
+from sawps.models import ExtendedGroup
 
 
 def is_organisation_member(user: User) -> bool:
@@ -23,7 +25,6 @@ def is_organisation_member(user: User) -> bool:
         user=user
     ).exists():
         return False
-
     if not user.user_profile.current_organisation:
         return False
 
@@ -87,3 +88,34 @@ def get_user_roles(user: User) -> List[str]:
         roles += [ORGANISATION_MANAGER]
 
     return roles
+
+
+def get_user_permissions(user: User) -> List[str]:
+    """
+    Retrieve the permissions associated with a given user.
+
+    :param user: The user object
+    :return: A list containing the names of all
+        roles associated with the user
+    """
+    permissions = set()
+    groups = user.groups.all()
+    content_type = ContentType.objects.get_for_model(ExtendedGroup)
+    ext_group_permissions = Permission.objects.filter(
+        content_type=content_type
+    )
+    if user.is_superuser or user.is_staff:
+        ext_group_permissions_set = set(
+            ext_group_permissions.values_list('name', flat=True)
+        )
+        permissions = permissions.union(ext_group_permissions_set)
+
+    for group in groups:
+        allowed_permission = set(
+            group.permissions.filter(
+                id__in=ext_group_permissions
+            ).values_list('name', flat=True)
+        )
+        permissions = permissions.union(allowed_permission)
+
+    return sorted(list(permissions))

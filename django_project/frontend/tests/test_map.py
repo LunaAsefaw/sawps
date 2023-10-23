@@ -8,7 +8,6 @@ from django.urls import reverse
 from django.contrib.sessions.middleware import SessionMiddleware
 from core.settings.utils import absolute_path
 from frontend.utils.map import get_map_template_style
-from stakeholder.models import UserProfile
 from property.factories import PropertyFactory
 from stakeholder.factories import (
     organisationFactory,

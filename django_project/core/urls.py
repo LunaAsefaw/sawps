@@ -36,7 +36,8 @@ urlpatterns = [
     path('', include('activity.urls')),
     path('', include('stakeholder.urls')),
     path('', include('sawps.urls')),
-    path('', include('species.urls'))
+    path('', include('species.urls')),
+    path('', include('docs_crawler.urls')),
 ]
 
 if settings.DEBUG:

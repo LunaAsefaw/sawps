@@ -32,7 +32,7 @@ SPECIES_REPORT = 'Species_report'
 PROVINCE_REPORT = 'Province_report'
 
 
-def data_table_reports(queryset: QuerySet, request) -> List[Dict]:
+def data_table_reports(queryset: QuerySet, request, user_roles) -> List[Dict]:
     """
     Generate data table reports based on the user's request.
     Params:
@@ -79,6 +79,17 @@ def get_report_filter(request, report_type):
         ACTIVITY_REPORT: default_year_field
     }
 
+    species_list = request.GET.get("species")
+    if species_list:
+        species_list = species_list.split(",")
+        filters[species_fields[report_type]] = species_list
+
+    start_year = request.GET.get("start_year")
+    if start_year and report_type != PROPERTY_REPORT:
+        start_year = int(start_year)
+        end_year = int(request.GET.get("end_year"))
+        filters[year_fields[report_type]] = (start_year, end_year)
+
     default_activity_field = (
         'owned_species__annualpopulationperactivity__'
         'activity_type_id__in'
@@ -92,22 +103,16 @@ def get_report_filter(request, report_type):
         ACTIVITY_REPORT: default_activity_field,
     }
 
-    species_list = request.GET.get("species")
-    if species_list:
-        species_list = species_list.split(",")
-        filters[species_fields[report_type]] = species_list
-
-    start_year = request.GET.get("start_year")
-    if start_year:
-        start_year = int(start_year)
-        end_year = int(request.GET.get("end_year"))
-        filters[year_fields[report_type]] = (start_year, end_year)
-
     activity = request.GET.get("activity", "")
     activity = urllib.parse.unquote(activity)
-    filters[activity_fields[report_type]] = [
-        int(act) for act in activity.split(',')
-    ] if activity else []
+    if activity != 'all':
+        filters[activity_fields[report_type]] = [
+            int(act) for act in activity.split(',')
+        ] if activity else []
+    elif report_type == ACTIVITY_REPORT:
+        filters[
+            activity_fields[report_type]
+        ] = ActivityType.objects.values_list('id', flat=True)
     return filters
 
 
@@ -138,7 +143,6 @@ def property_report(queryset: QuerySet, request) -> List:
         request: The HTTP request object.
     """
     filters = get_report_filter(request, PROPERTY_REPORT)
-
     area_available_values = OwnedSpecies.objects.filter(
         property__in=queryset,
         **filters
@@ -292,11 +296,16 @@ def common_filters(request: HttpRequest, user_roles: List[str]) -> Dict:
             })
         )
 
-    activity = request.GET.get("activity")
-    if activity:
+    activity = request.GET.get("activity", "")
+    activity = urllib.parse.unquote(activity)
+    if activity == 'all':
         filters[
-            "annualpopulationperactivity__activity_type_id"
-        ] = urllib.parse.unquote(activity)
+            "annualpopulationperactivity__activity_type_id__in"
+        ] = ActivityType.objects.values_list('id', flat=True)
+    else:
+        filters['annualpopulationperactivity__activity_type_id__in'] = [
+            int(act) for act in activity.split(',')
+        ] if activity else []
 
     if REGIONAL_DATA_CONSUMER in user_roles:
         organisation_id = get_current_organisation_id(request.user)

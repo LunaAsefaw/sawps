@@ -29,6 +29,7 @@ import {
 } from '../../reducers/MapState';
 import DataList from './Data';
 import Metrics from './Metrics';
+import Trends from './Trends';
 
 
 
@@ -58,7 +59,8 @@ function MainPage() {
     'map': 0,
     'reports': 1,
     'charts': 2,
-    'upload': 3,
+    'trends': 3,
+    'upload': 4,
   };
 
   useEffect(() => {
@@ -72,10 +74,10 @@ function MainPage() {
   }, [location.search]);
 
   useEffect(() => {
-    const tabNames = ['map', 'reports', 'charts', 'upload'];
+    const tabNames = ['map', 'reports', 'charts', 'trends', 'upload'];
     const selectedTabName = tabNames[selectedTab];
     const newPath = `/${selectedTabName}`;
-    if (selectedTab !== 0 && selectedTab !== 3) {
+    if ([1, 2, 3].includes(selectedTab)) {
       // dispatch to reset map state in data or charts tab
       dispatch(resetMapState())
     }
@@ -114,7 +116,7 @@ function MainPage() {
         setRightSideBarMode(RightSideBarMode.None)
       }
     } else if (uploadMode === UploadMode.PropertySelected && rightSideBarMode !== RightSideBarMode.Upload) {
-      setSelectedTab(3)
+      setSelectedTab(4)
       setRightSideBarMode(RightSideBarMode.Upload)
     }
   }, [propertyItem, mapSelectionMode, uploadMode])
@@ -136,7 +138,7 @@ function MainPage() {
                   <Tabs
                     value={selectedTab}
                     onChange={(event: React.SyntheticEvent, newValue: number) => {
-                      const tabNames = ['map', 'reports', 'charts', 'upload'];
+                      const tabNames = ['map', 'reports', 'charts', 'trends', 'upload'];
                       const selectedTabName = tabNames[newValue];
                       setSelectedTab(newValue);
                       if (selectedTabName === 'upload') {
@@ -152,6 +154,7 @@ function MainPage() {
                     <Tab key={0} label={'MAP'} {...a11yProps(0)} />
                     <Tab key={1} label={'REPORTS'} {...a11yProps(1)} />
                     <Tab key={2} label={'CHARTS'} {...a11yProps(2)} />
+                    <Tab key={3} label={'TRENDS'} {...a11yProps(3)} />
                   </Tabs>
                 )}
                 <div style={{ flex: 1 }}></div>
@@ -159,7 +162,7 @@ function MainPage() {
 
               </Grid>
               <Grid item className="TabPanels">
-                <TabPanel key={0} value={selectedTab} index={-1} indexList={[0, 3]} noPadding>
+                <TabPanel key={0} value={selectedTab} index={-1} indexList={[0, 4]} noPadding>
                   <Map />
                 </TabPanel>
                 <TabPanel key={1} value={selectedTab} index={1} noPadding>
@@ -167,6 +170,9 @@ function MainPage() {
                 </TabPanel>
                 <TabPanel key={2} value={selectedTab} index={2} noPadding>
                   <Metrics/>
+                </TabPanel>
+                <TabPanel key={3} value={selectedTab} index={3} noPadding>
+                  <Trends/>
                 </TabPanel>
               </Grid>
             </Grid>

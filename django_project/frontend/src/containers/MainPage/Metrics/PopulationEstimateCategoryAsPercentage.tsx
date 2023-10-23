@@ -91,11 +91,14 @@ const PopulationEstimateAsPercentage = (props: any) => {
       const percentage = categoryData.percentage;
       year = categoryData.years[0];
 
-      const paddedLabel = category.padEnd(50, ' '); // Pad with spaces
-          
-      labels.push(paddedLabel); // Use the padded label
+      let paddedLabel = category;
 
-      // labels.push(category);
+      if (category.length > 25){
+        paddedLabel = category.substring(0, 22) + '...';
+      }
+          
+      labels.push(paddedLabel.padEnd(50, ' ')); // Use the padded label
+
       data.push(percentage);
       uniqueColors.push(availableColors[labels.length - 1]);
     }
@@ -150,7 +153,7 @@ const PopulationEstimateAsPercentage = (props: any) => {
         text: chartTitle,
         align: 'start' as 'start',
         font: {
-          size: 16,
+          size: 20,
           weight: 'bold' as 'bold',
         },
       },
@@ -162,7 +165,7 @@ const PopulationEstimateAsPercentage = (props: any) => {
   position: "relative",
   backgroundImage: `url(${backgroundImageUrl})`,
   backgroundSize: "18% 20%", // width and height of image
-  backgroundPosition: "19.6% 57%", //horizontal and vertical position respectively
+  backgroundPosition: "19.5% 57%", //horizontal and vertical position respectively
   backgroundRepeat: "no-repeat",
   whiteSpace: "pre-wrap", // Allow text to wrap
 };

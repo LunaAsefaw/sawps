@@ -4,7 +4,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Taxon
-from .serializers import FrontPageTaxonSerializer, TaxonSerializer
+from .serializers import (
+    FrontPageTaxonSerializer,
+    TaxonSerializer,
+    TrendPageTaxonSerializer
+)
 
 # Create your views here.
 
@@ -22,7 +26,7 @@ class TaxonListAPIView(APIView):
                 ownedspecies__property__organisation_id__in=(
                     [int(id) for id in _organisation]
                 ),
-                ownedspecies__taxon__taxon_rank__name = "Species"
+                ownedspecies__taxon__taxon_rank__name__iexact="Species"
             ).order_by("scientific_name").distinct()
         else:
             taxon = Taxon.objects.filter(
@@ -46,4 +50,23 @@ class TaxonFrontPageListAPIView(APIView):
         return Response(
             status=200,
             data=FrontPageTaxonSerializer(taxon, many=True).data
+        )
+
+
+class TaxonTrendPageAPIView(APIView):
+    """Fetch taxon detail to display on TrendPage."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        species_name = request.GET.get('species', '')
+        try:
+            taxon = Taxon.objects.get(scientific_name=species_name)
+        except Taxon.DoesNotExist:
+            return Response(
+                status=200,
+                data={}
+            )
+        return Response(
+            status=200,
+            data=TrendPageTaxonSerializer(taxon).data
         )

@@ -4,7 +4,6 @@ from django.test import (
 )
 from frontend.utils.organisation import CURRENT_ORGANISATION_ID_KEY
 from frontend.views.base_view import get_user_notifications
-from frontend.tests.model_factories import UserF
 from stakeholder.factories import (
     organisationFactory,
 )

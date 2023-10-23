@@ -3,10 +3,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.db.models.signals import post_save
-
-from sawps.models import ExtendedGroup, save_extended_group
 from django_otp.plugins.otp_static.models import StaticDevice
 
+from sawps.models import ExtendedGroup, save_extended_group
 from sawps.utils import disconnected_signal
 
 

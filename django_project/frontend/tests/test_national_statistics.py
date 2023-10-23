@@ -1,31 +1,25 @@
 import base64
 import datetime
 from django.urls import reverse
-from rest_framework.test import APITestCase, APIRequestFactory
+from rest_framework.test import APITestCase
 from rest_framework import status
 from unittest.mock import patch
 from activity.models import ActivityType
 from population_data.models import AnnualPopulationPerActivity
-from frontend.api_views.map import User
 from stakeholder.factories import organisationFactory
 from species.models import OwnedSpecies, Taxon, TaxonRank
 from frontend.serializers.national_statistics import (
-    SpeciesListSerializer,
-    NationalStatisticsSerializer
+    SpeciesListSerializer
 )
 from django.contrib.auth import get_user_model
-from django.test import Client, RequestFactory
+from django.test import Client
 from django_otp.plugins.otp_totp.models import TOTPDevice
-import json
 from django.test import TestCase
-from django.contrib.sessions.middleware import SessionMiddleware
 from property.models import Property, PropertyType, Province
 from frontend.api_views.national_statistic import (
-    NationalPropertiesView,
-    NationalActivityCountView,
     NationalSpeciesView
 )
-from rest_framework.response import Response
+
 
 class NationalSpeciesViewTest(APITestCase):
     def setUp(self):

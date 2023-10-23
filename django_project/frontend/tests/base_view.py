@@ -12,8 +12,7 @@ from stakeholder.factories import (
     organisationUserFactory
 )
 from stakeholder.models import (
-    Reminders,
-    UserProfile
+    Reminders
 )
 
 

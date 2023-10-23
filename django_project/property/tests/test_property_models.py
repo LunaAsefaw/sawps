@@ -1,7 +1,9 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from property.models import PropertyType, Province, ParcelType, Parcel, Property
 from property.factories import PropertyTypeFactory, ProvinceFactory, ParcelTypeFactory, ParcelFactory, PropertyFactory
 from django.db.utils import IntegrityError
+
+from stakeholder.factories import organisationFactory
 
 
 class ProvinceTestCase(TestCase):
@@ -71,23 +73,44 @@ class PropertyTypeTest(TestCase):
         self.assertEqual(PropertyType.objects.count(), 0)
 
 
+@override_settings(
+    CELERY_ALWAYS_EAGER=True,
+    BROKER_BACKEND='memory',
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True
+)
 class PropertyTestCase(TestCase):
     """ Property test case."""
     @classmethod
     def setUpTestData(cls):
-        cls.property = PropertyFactory()
+        cls.province = ProvinceFactory(name='Western Cape')
+        cls.organisation = organisationFactory(name='CapeNature')
+        cls.property = PropertyFactory(
+            name='Lupin',
+            province=cls.province,
+            organisation=cls.organisation
+        )
     
     def test_create_property(self):
         """Test creating property """
         self.assertTrue(isinstance(self.property, Property))
         self.assertEqual(Property.objects.count(), 1)
         self.assertEqual(self.property.name, Property.objects.get(id=self.property.id).name)
+
+        self.assertEqual(
+            self.property.short_code,
+            'WCCALU0001'
+        )
     
     def test_update_property(self):
         """Test update property."""
-        self.property.name = 'Property_1'
+        self.property.name = 'Rex Mundi'
         self.property.save()
-        self.assertEqual(Property.objects.get(id=self.property.id).name, 'Property_1')
+        self.assertEqual(Property.objects.get(id=self.property.id).name, 'Rex Mundi')
+
+        self.assertEqual(
+            self.property.short_code,
+            'WCCARM0002'
+        )
 
 
     def test_delete_property(self):
