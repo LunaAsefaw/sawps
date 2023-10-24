@@ -364,7 +364,8 @@ class TotalAreaPerPropertyTypeTestCase(BaseTestCase):
         Test total area per property type
         """
         url = self.url
-        response = self.client.get(url, **self.auth_headers)
+        data = {'species': self.owned_species[0].taxon.scientific_name}
+        response = self.client.get(url, data, **self.auth_headers)
         property_type = self.property.property_type.name
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]['total_area'], 200)
@@ -378,7 +379,7 @@ class TotalAreaPerPropertyTypeTestCase(BaseTestCase):
         Test total area per property type filtered by property.
         """
         id = self.owned_species[0].property_id
-        data = {'property':id}
+        data = {'property':id, 'species': self.owned_species[0].taxon.scientific_name}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

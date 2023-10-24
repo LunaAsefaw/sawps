@@ -306,8 +306,12 @@ class TotalAreaPerPropertyTypeAPIView(APIView):
         """
         Handle GET request to retrieve total area per property type.
         """
+        species_name = request.GET.get("species")
         queryset = self.get_queryset()
-        return Response(calculate_total_area_per_property_type(queryset))
+        return Response(
+            calculate_total_area_per_property_type(
+                queryset, species_name)
+        )
 
 
 class PopulationPerAgeGroupAPIView(APIView):

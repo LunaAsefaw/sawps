@@ -50,7 +50,11 @@ const PropertyTypeBarChart = (props: any) => {
           const uniquePropertyTypes: Record<string, number> = {};
           const uniqueColors: Record<string, string> = {};
   
-          response.data.forEach((item: PropertyTypeData, index: number) => {
+          const filtered_data = response.data.filter(
+            (item: { total_area: number; }) => item.total_area !== 0 && item.total_area !== null
+          );
+  
+          filtered_data.forEach((item: PropertyTypeData, index: number) => {
             if (!uniquePropertyTypes[item.property_type__name]) {
               uniquePropertyTypes[item.property_type__name] = 0;
               uniqueColors[item.property_type__name] = colors[index % colors.length]; // Assign a color from the array

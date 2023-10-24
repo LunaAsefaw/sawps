@@ -14,10 +14,10 @@ const Footer:FC<IFooter>=()=>{
                 src='/static/images/footer/sanbi-footer-logo.png'/>
             </div>
             <div className='footer-nav' data-testid='footer-navigation'>
-                <a href='/' target='_blank'>HOME</a>
-                <a href='/map' target='_blank'>EXPLORE</a>
+                <a href='/' target='_self'>HOME</a>
+                <a href='/map' target='_self'>EXPLORE</a>
                 <a href='https://kartoza.github.io/sawps/' target='_blank'>DOCUMENTATION</a>
-                <a href='/contact' target='_blank'>CONTACT</a>
+                <a href='/contact' target='_self'>CONTACT</a>
           </div>
           <div className='vendors-logos-container' data-testid='vendors-logos-container'>
             <img className='ids-logo' src='/static/images/footer/ids-logo.png' data-testid='ids-logo'/>

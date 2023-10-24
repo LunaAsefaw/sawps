@@ -77,6 +77,7 @@ from .views.map import (
     MapView,
     redirect_to_reports,
     redirect_to_charts,
+    redirect_to_trends,
     redirect_to_upload,
     redirect_to_explore
 )
@@ -245,6 +246,11 @@ urlpatterns = [
         'charts/',
         redirect_to_charts,
         name='charts'
+    ),
+    path(
+        'trends/',
+        redirect_to_trends,
+        name='trends'
     ),
     path(
         'upload/',

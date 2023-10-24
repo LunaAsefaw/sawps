@@ -30,10 +30,15 @@ class RedirectViewTests(TestCase):
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertEqual(response['location'], f"{reverse('map')}?tab=2")
 
+    def test_redirect_to_trends(self):
+        response = self.client.get(reverse('trends'))
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertEqual(response['location'], f"{reverse('map')}?tab=3")
+
     def test_redirect_to_upload(self):
         response = self.client.get(reverse('upload'))
         self.assertIsInstance(response, HttpResponseRedirect)
-        self.assertEqual(response['location'], f"{reverse('map')}?tab=3")
+        self.assertEqual(response['location'], f"{reverse('map')}?tab=4")
 
     def test_redirect_to_explore(self):
         response = self.client.get(reverse('explore'))

@@ -16,8 +16,14 @@ def redirect_to_charts(request):
     return HttpResponseRedirect(redirect_url)
 
 
-def redirect_to_upload(request):
+def redirect_to_trends(request):
     tab_number = 3
+    redirect_url = f"{reverse('map')}?tab={tab_number}"
+    return HttpResponseRedirect(redirect_url)
+
+
+def redirect_to_upload(request):
+    tab_number = 4
     redirect_url = f"{reverse('map')}?tab={tab_number}"
     return HttpResponseRedirect(redirect_url)
 

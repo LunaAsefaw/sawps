@@ -315,19 +315,24 @@
 {% endblock %}
 {% block footer %}
 <div class='footer' data-testid='footer'>
-    <div class='sanbi-footer-logo-container'>
-        <img class='footer-logo' data-testid='sanbi-footer-logo'
-        src='/static/images/footer/sanbi-footer-logo.png'/>
-    </div>
+  <div class='sanbi-footer-logo-container'>
+    <a href="https://biodiversityadvisor.sanbi.org/" target="_blank">
+      <img class='footer-logo' data-testid='sanbi-footer-logo' src='/static/images/footer/sanbi-footer-logo.png' />
+    </a>
+  </div>
     <div class='footer-nav' data-testid='footer-navigation'>
-        <a href='/' target='_blank'>HOME</a>
-        <a href='/map' target='_blank'>EXPLORE</a>
+        <a href='/' target='_self'>HOME</a>
+        <a href='/map' target='_self'>EXPLORE</a>
         <a href='https://kartoza.github.io/sawps/' target='_blank'>DOCUMENTATION</a>
-        <a href='/contact' target='_blank'>CONTACT</a>
+        <a href='/contact' target='_self'>CONTACT</a>
   </div>
   <div class='vendors-logos-container' data-testid='vendors-logos-container' style="margin-right: 1%;">
-    <img class='ids-logo' src='/static/images/footer/ids-logo.png' data-testid='ids-logo'/>
-    <img class='kartoza-white-logo' src='/static/images/footer/kartoza-white-logo.png' data-testid='kartoza-logo'/>
+    <a href="https://ids-cc.co.za/" target="_blank">
+      <img class='ids-logo' src='/static/images/footer/ids-logo.png' data-testid='ids-logo' />
+    </a>
+    <a href="https://kartoza.com/" target="_blank">
+      <img class='kartoza-white-logo' src='/static/images/footer/kartoza-white-logo.png' data-testid='kartoza-logo'/>
+    </a>
   </div>
 </div>
 {% endblock %}

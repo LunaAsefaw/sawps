@@ -6,6 +6,14 @@ body {
 .fs-background {
   height: calc(100% - 214px);
 }
+.fsBackground{
+  height: calc(100% - 214px);
+}
+@media screen and (max-width:770px ) {
+  .fsBackground{
+    height: calc(100% - -100px);
+  }
+}
 
 .full-height {
   height: 100%
@@ -1208,4 +1216,15 @@ hr.default-separator {
 
 
 
+}
+
+.instruction {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
 }
