@@ -1,3 +1,8 @@
+import logging
+import os
+from zipfile import ZipFile
+
+import pandas as pd
 import urllib.parse
 from typing import Dict, List
 
@@ -24,6 +29,10 @@ from population_data.models import (
 )
 from property.models import Province, Property
 from species.models import OwnedSpecies
+
+from django.conf import settings
+
+logger = logging.getLogger('sawps')
 
 ACTIVITY_REPORT = 'Activity_report'
 PROPERTY_REPORT = 'Property_report'
@@ -338,12 +347,12 @@ def national_level_species_report(
     """
     filters = common_filters(request, user_roles)
 
-    report_data = OwnedSpecies.objects.\
-        filter(**filters, taxon__in=queryset).\
+    report_data = OwnedSpecies.objects. \
+        filter(**filters, taxon__in=queryset). \
         values(
             'taxon__common_name_varbatim',
             'taxon__scientific_name'
-        ).\
+        ). \
         annotate(
             property_area=Sum("property__property_size_ha"),
             total_area_available=Sum("area_available_to_species"),
@@ -462,3 +471,143 @@ def national_level_province_report(
     )
 
     return serializer.data
+
+
+def write_report_to_rows(queryset, request):
+    """
+    Write report rows.
+    """
+    reports_list = request.GET.get("reports", None)
+    path = os.path.join(settings.MEDIA_ROOT, "download_data")
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+    if reports_list:
+        reports_list = reports_list.split(",")
+
+        report_functions = {
+            ACTIVITY_REPORT: activity_report_rows,
+            PROPERTY_REPORT: property_report,
+            SAMPLING_REPORT: sampling_report,
+            SPECIES_REPORT: species_report,
+            # PROVINCE_REPORT: province_reports
+        }
+
+        if request.GET.get('file') == 'xlsx':
+            filename = 'data_report' + '.' + request.GET.get('file')
+            path_file = os.path.join(path, filename)
+            if os.path.exists(path_file):
+                os.remove(path_file)
+
+            with pd.ExcelWriter(path_file, engine='openpyxl', mode='w') \
+                    as writer:
+                for report_name in reports_list:
+                    logger.log(
+                        level=logging.ERROR,
+                        msg=str(report_name)
+                    )
+                    if report_name in report_functions:
+                        rows = report_functions[report_name](queryset, request)
+                        dataframe = pd.DataFrame(rows)
+                        dataframe.to_excel(
+                            writer,
+                            sheet_name=report_name,
+                            index=False
+                        )
+                return settings.MEDIA_URL + 'download_data/' \
+                    + os.path.basename(path_file)
+
+        csv_reports = []
+        for report_name in reports_list:
+            if report_name in report_functions:
+                rows = report_functions[report_name](queryset, request)
+                dataframe = pd.DataFrame(rows)
+                filename = "data_report_" + report_name
+                filename = filename + '.' + request.GET.get('file')
+                path_file = os.path.join(path, filename)
+
+                if os.path.exists(path_file):
+                    os.remove(path_file)
+                dataframe.to_csv(path_file)
+                csv_reports.append(path_file)
+        if len(csv_reports) < 1:
+            return
+        elif len(csv_reports) == 1:
+            return settings.MEDIA_URL + 'download_data/' \
+                   + os.path.basename(csv_reports[0])
+        path_zip = os.path.join(path, 'data_report.zip')
+        if os.path.exists(path_zip):
+            os.remove(path_zip)
+        with ZipFile(path_zip, 'w') as zip:
+            for file in csv_reports:
+                zip.write(file, os.path.basename(file))
+        return settings.MEDIA_URL + 'download_data/' \
+            + os.path.basename(path_zip)
+
+
+def activity_report_rows(queryset: QuerySet, request) -> Dict[str, List[Dict]]:
+    """
+    Generate property reports for csv and Excel file
+    based on the user's request.
+    Params:
+        queryset (QuerySet): Properties queryset to generate reports from.
+        request: The HTTP request object.
+    """
+    filters = get_report_filter(request, ACTIVITY_REPORT)
+    activity_field = (
+        'owned_species__annualpopulationperactivity__'
+        'activity_type_id__in'
+    )
+    activity_type_ids = filters[activity_field]
+    del filters[activity_field]
+    valid_activities = ActivityType.objects.filter(id__in=activity_type_ids)
+    activity_data = AnnualPopulationPerActivity.objects.filter(
+        owned_species__property__in=queryset,
+        **filters
+    )
+    years = activity_data.order_by().values_list('year', flat=True).distinct()
+    properties = activity_data.order_by(
+    ).values_list('owned_species__property__name', flat=True).distinct()
+    rows = []
+
+    for year in list(years):
+        activity_report_one_row = {}
+        for property in list(properties):
+            for activity in valid_activities:
+                activity_data = AnnualPopulationPerActivity.objects.filter(
+                    owned_species__property__name=property,
+                    activity_type=activity,
+                    year=year,
+                    **filters
+                )
+                serializer = ActivityReportSerializer(
+                    activity_data,
+                    many=True,
+                    activity=activity
+                )
+                total_field = activity.name + "_total"
+                adult_male_field = activity.name + "_adult_male"
+                adult_female_field = activity.name + "_adult_female"
+                juvenile_male_field = activity.name + "_juvenile_male"
+                juvenile_female_field = activity.name + "_juvenile_female"
+                for activity_data in serializer.data:
+                    activity_report_one_row['property_name'] = \
+                        activity_data['property_name']
+                    activity_report_one_row['scientific_name'] = \
+                        activity_data['scientific_name']
+                    activity_report_one_row['common_name'] = \
+                        activity_data['common_name']
+                    activity_report_one_row['year'] = year
+                    activity_report_one_row[total_field] = \
+                        activity_data['total']
+                    activity_report_one_row[adult_male_field] = \
+                        activity_data['adult_male']
+                    activity_report_one_row[juvenile_male_field] = \
+                        activity_data['adult_female']
+                    activity_report_one_row[adult_female_field] = \
+                        activity_data['juvenile_male']
+                    activity_report_one_row[juvenile_female_field] = \
+                        activity_data['juvenile_female']
+        rows.append(activity_report_one_row)
+
+    return rows

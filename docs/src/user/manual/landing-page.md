@@ -3,6 +3,7 @@
 Welcome to the SAWPS `Landing Page`. The landing page is the entry point to your data exploration journey. The `Landing Page` provides a user-friendly interface to view agrigated species population data trends for South africa and acess features like log in, register a new account, or learn more about our platform. 
 
 ### Landing Page Header and Navigation Bar
+
 ![Landing Page](./img/landing-page-1.png)
 
 In the navigation bar at the top of the page, you'll find several options:
@@ -27,7 +28,7 @@ In the middle of the landing page, you'll find three prominent buttons:
 
 8. **Register**: The `REGISTER` button navigates to the [registration form](register-page.md) where new users can register on the platform. Becoming a registered user opens up a world of data contribution and exploration.
 
-## National Population Trends
+### National Population Trends
 
 On the `Landing Page`, useres can view interactive charts that display national population trends. The charts provide valuable insights into demographic changes and trends over time.
 
@@ -49,14 +50,13 @@ The footer of the `Landing Page`, contains usefull site map links and links to t
 
 7. **CONTACT**: The `CONTACT` link navigates to the [contact page](contact.md) where a user can use the contact form to ask any questions, or wish to provide feedback to the SAWPS support team.
 
-
 # Landing Page Once logged In
 
 Once the user has logged in to the SAWPS platfrom the landing page updates. In the header there are new navigation links to features of the site that users with credentials have acess to, their user profile, and the Quick links provide acess to site fetuers that users will need frequently. 
 
 ![Landing Page After Login](./img/landing-page-3.png)
 
-## Navigation Bar
+### Navigation Bar
 
 The navigation bar at the top of the `Landing Page` offers convenient access to key sections and actions within the SAWPS platform. It includes the following elements:
 
@@ -74,7 +74,7 @@ The navigation bar at the top of the `Landing Page` offers convenient access to 
 
 7. **Logout:** The `LOGOUT` button allows you to securely log out of your account when you're done using our platform.
 
-## Main Content
+### Main Content
 
 In the central part of the `Landing Page`, you'll find three prominent buttons that guide you to key areas of our platform:
 
@@ -84,7 +84,8 @@ In the central part of the `Landing Page`, you'll find three prominent buttons t
 
 10. **Upload Data:** Select `UPLOAD DATA` to initiate the process of adding new datasets to your account, making them accessible for further analysis.
 
-### National Population Trends
+#### National Population Trends
+
 ![National Population Trends](./img/landing-page-2.png)
 
 1. **Image**: Image of the species.
@@ -92,7 +93,8 @@ In the central part of the `Landing Page`, you'll find three prominent buttons t
 2. **Scientific Name**: Scientific name of the species.
 
 3. **Chart**: Chart showing the data of the species over the year.
-## Footer
+
+#### Footer
 
 The footer section, located at the bottom of the `Landing Page`, offers links to additional resources and pages:
 

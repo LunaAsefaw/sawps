@@ -4,7 +4,7 @@
 
 Navigate to the `HELP` button on the home page. This will prompt you to either `GO TO USER GUIDE` where you can find relevant information and commonly asked questions or `CONTACT US` button in which you can log a query to the SAWPS team.
 
-![Help 1](./img/help-1.png)
+![Help 1](./img/help-1.png) <!-- Image to be updated when site is finished -->
 
 ## How do I make contact with the SAWPS team?
 
@@ -26,11 +26,11 @@ Once you have clicked this button an email containing reset instructions will be
 
 ![Password Reset 3](img/password-reset-3.png)
 
-Once in your emails you can click the `PASSWORD RESET` button and will be redirected to the SAWS portal.
+Once in your email inbox, open the email and you can click the `PASSWORD RESET` button to be redirected to the SAWPS platform.
 
 ![Password Reset 4](img/password-reset-4.png)
 
-You will now be able to set a new password to access your account.
+After you are redirected to the platform, you will now be able to set a new password to access your account. Once you have entered your new password, click on the `Reset Password` button.
 
 ![Password Reset 5](img/password-reset-5.png)
 

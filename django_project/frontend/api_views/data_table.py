@@ -14,7 +14,8 @@ from frontend.utils.data_table import (
     data_table_reports,
     national_level_user_table,
     national_level_province_report,
-    PROVINCE_REPORT
+    PROVINCE_REPORT,
+    write_report_to_rows
 )
 from frontend.utils.organisation import get_current_organisation_id
 from frontend.utils.user_roles import get_user_roles
@@ -118,6 +119,11 @@ class DataTableAPIView(APIView):
                         reports.append({
                             PROVINCE_REPORT: province_reports
                         })
+            if request.GET.get("file"):
+                return Response({
+                    "file": write_report_to_rows(queryset, request)
+                })
+
             return Response(reports)
         else:
             return Response(

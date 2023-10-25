@@ -1,5 +1,8 @@
 import base64
+import csv
+import os
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -500,3 +503,72 @@ class DataScientistTestCase(TestCase):
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
+
+
+class DownloadDataTestCase(OwnedSpeciesTestMixins, TestCase):
+    """Test Case for download data"""
+
+    def test_download_all_reports_by_all_activity_type(self) -> None:
+        """Test download data table filter by activity name"""
+        url = self.url
+        self.owned_species[0].annualpopulationperactivity_set.all().delete()
+        self.owned_species[1].annualpopulationperactivity_set.all().delete()
+
+        data = {
+            "file": "csv",
+            "species": "SpeciesA",
+            "activity": 'all',
+            "reports": "Activity_report,Property_report,Sampling_report,Species_report"
+        }
+        response = self.client.get(url, data, **self.auth_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test if file output is zip
+        self.assertEqual(response.data['file'], "/media/download_data/data_report.zip")
+
+        # check if all csv files eexist in the folder
+        path = os.path.join(settings.MEDIA_ROOT, "download_data")
+        self.assertTrue(os.path.exists(os.path.join(path, "data_report.zip")))
+        self.assertTrue(os.path.exists(os.path.join(path, "data_report_Species_report.csv")))
+        self.assertTrue(os.path.exists(os.path.join(path, "data_report_Activity_report.csv")))
+        self.assertTrue(os.path.exists(os.path.join(path, "data_report_Property_report.csv")))
+        self.assertTrue(os.path.exists(os.path.join(path, "data_report_Sampling_report.csv")))
+
+        # check fields in Activity report
+        activity_path = "/home/web/media/download_data/data_report_Activity_report.csv"
+        with open(activity_path, encoding='utf-8-sig') as csv_file:
+            file = csv.DictReader(csv_file)
+            headers = file.fieldnames
+            self.assertTrue(any("_total" in header for header in headers))
+            self.assertTrue(any("_adult_male" in header for header in headers))
+            self.assertTrue(any("_adult_female" in header for header in headers))
+            self.assertTrue(any("_juvenile_male" in header for header in headers))
+            self.assertTrue(any("_juvenile_female" in header for header in headers))
+            self.assertTrue("property_name" in headers)
+            self.assertTrue("scientific_name" in headers)
+            self.assertTrue("common_name" in headers)
+            self.assertTrue("year" in headers)
+
+    def test_download_xlsx_data_all_reports_by_all_activity_type(self) -> None:
+        """Test download data table filter by activity name"""
+        url = self.url
+
+        data = {
+            "file": "xlsx",
+            "species": "SpeciesA",
+            "activity": 'all',
+            "reports": "Activity_report,Property_report,Sampling_report,Species_report"
+        }
+        response = self.client.get(url, data, **self.auth_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Test if file output is xlsx
+        self.assertEqual(response.data['file'], "/media/download_data/data_report.xlsx")
+
+        # check if xlsx files exists in the folder
+        path = os.path.join(settings.MEDIA_ROOT, "download_data")
+        self.assertTrue(os.path.exists(os.path.join(path, "data_report.xlsx")))
+
+
+
+

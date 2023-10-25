@@ -5,6 +5,7 @@ const baseQuery = fetchBaseQuery({
 })
 
 export interface UserInfo {
+    user_permissions: string[],
     user_roles: string[],
     current_organisation_id: number,
     current_organisation: string

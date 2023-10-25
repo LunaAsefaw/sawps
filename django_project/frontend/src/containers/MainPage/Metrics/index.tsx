@@ -18,6 +18,9 @@ import ActivityCountAsPercentage from "./ActivityCountAsPercentage";
 import PopulationEstimateCategoryCount from "./PopulationEstimateCategory";
 import PopulationEstimateAsPercentage from "./PopulationEstimateCategoryAsPercentage";
 import PopulationTrend from "./PopulationTrend";
+import {
+    useGetUserInfoQuery,
+} from "../../../services/api";
 
 
 const FETCH_POPULATION_AGE_GROUP = '/api/population-per-age-group/'
@@ -59,6 +62,16 @@ const Metrics = () => {
     const [hasEmptyPopulationEstimateCategoryCountPercentage, setHasEmptyhasEmptyPopulationEstimateCategoryCountPercentage] = useState(true);
     const [hasEmptyPropertyAvailable, setHasEmptyPropertyAvailable] = useState(true);
     const [hasEmptyAreaAvailable, setHasEmptyAreaAvailable] = useState(true);
+
+    const { data: userInfoData, isLoading, isSuccess } = useGetUserInfoQuery();
+    const [userPermissions, setUserPermissions] = useState([]);
+
+    useEffect(() => {
+        if (isSuccess) {
+            // Extract user permissions
+            setUserPermissions(userInfoData?.user_permissions.map((permission) => permission.toLowerCase().replace(/\s/g, '')) || []);
+        }
+    }, [isSuccess, userInfoData]);
 
     // Pass callback functions to each child component for the specific type
     const handleEmptyPopulationTrend = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
@@ -178,6 +191,8 @@ const Metrics = () => {
 
 
     }, [propertyId, startYear, endYear, selectedSpecies])
+
+    // downloads all charts rendered on page
     const handleDownloadPdf = async () => {
         const content = contentRef.current;
         if (!content) return;
@@ -195,13 +210,56 @@ const Metrics = () => {
         pdf.save('metrics.pdf');
     }
 
+    type Constants = {
+        [key: string]: boolean;
+    };
+
+    // TODO: Improve this, we don't need constants here, we can simply check the permissions directly
+    const constants: Constants = {
+        canViewPopulationTrend: false,
+        canViewPopulationCategory: false,
+        canViewPropertyType: false,
+        canViewDensityBar: false,
+        canViewPropertyAvailable: false,
+        canViewAgeGroup: false,
+        canViewAreaAvailable: false,
+        canViewProvinceSpeciesCount: false,
+        canViewProvinceSpeciesCountAsPercentage: false,
+        canViewTotalCount: false,
+        canViewCountAsPercentage: false,
+        canViewPopulationEstimate: false,
+        canViewPopulationEstimateAsPercentage: false,
+    };
+    
+
+    function updateConstants(userPermissions: string[], constants: Constants) {
+        for (const permission of userPermissions) {
+            for (const key in constants) {
+              if (constants.hasOwnProperty(key) && key.toLowerCase() === permission) {
+                constants[key] = true;
+              }
+            }
+        }
+    }
+    
+    // Example usage:
+    // userPermissions is an array of permission strings
+    // Example: ['CanViewPopulationCategory', 'CanEditData', ...]
+    
+    // Call the function with user permissions
+    updateConstants(userPermissions, constants);
+
+
     return (
         <Box>
             <Box className="charts-container">
 
                 {showCharts ? (
                         <Grid container spacing={2} ref={contentRef}>
-                           {selectedSpecies && hasEmptyPopulationTrend && (
+                            {
+                            constants.canViewPopulationTrend && 
+                            selectedSpecies && 
+                            hasEmptyPopulationTrend && (
                                 <Grid item xs={12} md={6}>
                                     <PopulationTrend 
                                         selectedSpecies={selectedSpecies} 
@@ -216,7 +274,10 @@ const Metrics = () => {
                             )}
 
 
-                            {selectedSpecies && hasEmptyPopulationCategory && (
+                            {
+                            constants.canViewPopulationCategory && 
+                            selectedSpecies && 
+                            hasEmptyPopulationCategory && (
                                 <Grid item xs={12} md={6}>
                                     <PopulationCategoryChart 
                                         selectedSpecies={selectedSpecies} 
@@ -232,7 +293,9 @@ const Metrics = () => {
                                 </Grid>
                             )}
 
-                             {hasEmptyPropertyType && (
+                             {
+                             constants.canViewPropertyType && 
+                             hasEmptyPropertyType && (
                                 <Grid item xs={12} md={6}>
                                     <PropertyTypeBarChart 
                                         selectedSpecies={selectedSpecies} 
@@ -247,7 +310,10 @@ const Metrics = () => {
                             )}
 
                             
-                            {selectedSpecies && hasEmptyDensity && (
+                            {
+                            constants.canViewDensityBar && 
+                            selectedSpecies && 
+                            hasEmptyDensity && (
                                 <Grid item xs={12} md={6}>
                                     <DensityBarChart 
                                         selectedSpecies={selectedSpecies} 
@@ -264,7 +330,10 @@ const Metrics = () => {
                             )}
 
                             
-                            {selectedSpecies && hasEmptyPropertyAvailable && (
+                            {
+                            constants.canViewPropertyAvailable && 
+                            selectedSpecies && 
+                            hasEmptyPropertyAvailable && (
                                 <Grid item xs={12} md={6}>
                                     <PropertyAvailableBarChart 
                                         selectedSpecies={selectedSpecies} 
@@ -279,7 +348,9 @@ const Metrics = () => {
                             )}
 
 
-                            {ageGroupData.map((data) => (
+                            {
+                            constants.canViewAgeGroup && 
+                            ageGroupData.map((data) => (
                                 <Grid container key={data.id} item xs={12} md={6}>
                                     <AgeGroupBarChart
                                         loading={loading}
@@ -292,7 +363,9 @@ const Metrics = () => {
                             ))}
 
                             
-                            {hasEmptyAreaAvailable && areaData.map((data, index) => (
+                            {
+                            constants.canViewAreaAvailable && 
+                            hasEmptyAreaAvailable && areaData.map((data, index) => (
                                 <Grid container key={index} item xs={12} md={6}>
                                     {data?.area?.owned_species ? (
                                         <AreaAvailableLineChart
@@ -310,7 +383,10 @@ const Metrics = () => {
                             ))}
                             
 
-                            {selectedSpecies && hasEmptyProvinceCount && (
+                            {
+                            constants.canViewProvinceSpeciesCount && 
+                            selectedSpecies && 
+                            hasEmptyProvinceCount && (
                                 <Grid item xs={12} md={6}>
                                     <SpeciesCountPerProvinceChart
                                         selectedSpecies={selectedSpecies}
@@ -325,7 +401,10 @@ const Metrics = () => {
                             )}
 
                             
-                            {selectedSpecies && hasEmptyProvinceCountPercentage && (
+                            {
+                            constants.canViewProvinceSpeciesCountAsPercentage && 
+                            selectedSpecies && 
+                            hasEmptyProvinceCountPercentage && (
                                 <Grid item xs={12} md={6} 
                                     style={{ 
                                         textAlign: 'center', 
@@ -349,7 +428,10 @@ const Metrics = () => {
                             )}
 
                                     
-                            {selectedSpecies && hasEmptyTotalCountPerActivity && (
+                            {
+                            constants.canViewTotalCount && 
+                            selectedSpecies && 
+                            hasEmptyTotalCountPerActivity && (
                                 <Grid item xs={12} md={6}
                                     style={{ 
                                         textAlign: 'center', 
@@ -372,7 +454,10 @@ const Metrics = () => {
                             )}
 
                             
-                            {selectedSpecies && hasEmptyTotalCountPerActivityPercentage && (
+                            {
+                            constants.canViewCountAsPercentage && 
+                            selectedSpecies &&
+                            hasEmptyTotalCountPerActivityPercentage && (
                                 <Grid item xs={12} md={6}
                                     style={{ 
                                         textAlign: 'center', 
@@ -394,7 +479,10 @@ const Metrics = () => {
                                 )}
 
                                 
-                            {selectedSpecies && hasEmptyPopulationEstimateCategoryCount && (
+                            {
+                            constants.canViewPopulationEstimate && 
+                            selectedSpecies && 
+                            hasEmptyPopulationEstimateCategoryCount && (
                                 <Grid item xs={12} md={6}
                                     style={{ 
                                         textAlign: 'center', 
@@ -418,7 +506,10 @@ const Metrics = () => {
                                 )}
                            
                            
-                            {selectedSpecies && hasEmptyPopulationEstimateCategoryCountPercentage && (
+                            {
+                            constants.canViewPopulationEstimateAsPercentage && 
+                            selectedSpecies && 
+                            hasEmptyPopulationEstimateCategoryCountPercentage && (
                                 <Grid item xs={12} md={6}
                                     style={{ 
                                         textAlign: 'center', 

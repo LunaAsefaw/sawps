@@ -67,6 +67,7 @@ from frontend.api_views.upload import (
     BoundaryFileUpload,
 )
 from frontend.views.base_view import get_user_notifications
+
 from .api_views.user import UserInfoAPIView
 
 from .views.about import AboutView

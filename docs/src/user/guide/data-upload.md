@@ -32,7 +32,7 @@ You can then select your property boundary from the existing parcel polygons. Yo
 
 ![Upload Data New 5](img/upload-data-new-5.png)
 
-Once you have selected your property boundary, you can then move onto [saving Your Property](#save-property).
+Once you have selected your property boundary, you can then move onto [saving Your Property Boundary](#save-boundary).
 
 #### Digitise property
 
@@ -52,11 +52,11 @@ Once it has processed the geometry, it will zoom into the bounding box of the po
 
 ![Upload Data New 9](img/upload-data-new-9.png)
 
-Once you have finished digitising your property boundary, you can then move onto [saving Your Property](#save-property).
+Once you have finished digitising your property boundary, you can then move onto [saving Your Property Boundary](#save-boundary).
 
 #### Upload property
 
-Once you have clicked on the `UPLOAD` button, an Upload popup window will appear where you can upload a supported vector file of your property. You can drag and drop the file(s) or `Browse` on your computer for the correct file(s), once you have uploaded your file(s) it will appear on the popup in the 1️⃣ *Uploaded Files* section. 
+Once you have clicked on the `UPLOAD` button, an Upload popup window will appear where you can upload a supported vector file of your property. You can drag and drop the file(s) or `Browse` on your computer for the correct file(s), once you have uploaded your file(s) it will appear on the popup in the 1️⃣ *Uploaded Files* section.
 
 Make sure you zipped your shapefiles directly, **NOT** the directory containing the shapefiles. Otherwise, the shapefiles inside the zip file will not be detected.
 
@@ -70,11 +70,11 @@ Once your file(s) have been processed, the platform will redirect you to the map
 
 ![Upload Data New 12](img/upload-data-new-12.png)
 
-Once you are satisfied with your property boundary, you can then move onto [saving Your Property](#save-property).
+Once you are satisfied with your property boundary, you can then move onto [saving Your Property Boundary](#save-boundary).
 
-#### Save property
+#### Save Boundary
 
-Once you are satisfied with your property boundary, click on 1️⃣ the `SAVE BOUNDARY` button. This will redirect you to `STEP 3`.
+Removing a property can be done by clicking on the ‘dustbin’ icon, and once you are satisfied with your property boundary, click on 1️⃣ the `SAVE BOUNDARY` button. This will redirect you to `STEP 3`.
 
 > Note: this example used a selected property boundary
 
@@ -88,13 +88,13 @@ In this step/tab, you can update the Species Population Data by using 1️⃣ th
 
 #### The Online Form
 
-If you choose to use the `ONLINE FORM` and click on the button of the same name, the site will redirect you to the first part online form (the **SPECIES DETAIL** page). On this page you are required to fill in every field that has an asterisk (little star '*') next to the field title. Once you have filled in the required fields, you can click on 1️⃣ `Next` to move onto the next page (the **ACTIVITY DETAIL** page). If you wish to leave and come back to the form later one, you can click on 2️⃣ `SAVE DRAFT`.
+If you choose to use the `ONLINE FORM` and click on the button of the same name, the site will redirect you to the first part online form (the **SPECIES DETAIL** page). On this page you are required to fill in every field that has an asterisk (little star '*') next to the field title, as these are mandatory. Once you have filled in the required fields, you can click on 1️⃣ `Next` to move onto the next page (the **ACTIVITY DETAIL** page). If you wish to leave and come back to the form later one, you can click on 2️⃣ `SAVE DRAFT`.
 
 ![Upload Data New 15](img/upload-data-new-15.png)
 
 On the **ACTIVITY DETAIL** page, you can add details regarding **Introduction/Reintroduction** and/or **Off-take** of individuals on the property. Once you have filled out the **Introduction/Reintroduction** section you can click on 1️⃣ the `+ ADD` button, and/or once you have filled in the **Off-take** section you can click on 2️⃣ the `+ ADD` button.
 
-After adding a new event, you can click on 3️⃣ the `NEXT` button. If you would like to change the species on your property you can click 4️⃣ the `BACK` button, or if you wish to leave and come back to the form later one, you can click on 5️⃣ `SAVE DRAFT`.
+After adding a new event, you can click on 3️⃣ the `NEXT` button. If you would like to change the species on your property you can click 4️⃣ the `BACK` button, or if you wish to leave and come back to the form later one, you can click on 5️⃣ `SAVE DRAFT`. Again, you are required to fill in every field that has an asterisk (little star '*') next to the field title, as these are mandatory.
 
 ![Upload Data New 16](img/upload-data-new-16.png)
 
@@ -106,23 +106,27 @@ Once you have clicked on `SUBMIT` a popup will appear letting you know your data
 
 ![Upload New Data 18](img/upload-data-new-18.png)
 
-#### Upload Data
+#### Upload Data using template
 
 If you would like to download the data template to then upload it, you can click on 1️⃣ the `DOWNLOAD TEMPLATE` button. This will download the template to your computer as an excel file (a .xlsx file).
 
 ![Upload New Data 19](img/upload-data-new-19.png)
 
-Open the file and navigate to 1️⃣ the `Dataset_pilot` sheet, and then fill in the compulsory fields as specified in 2️⃣ the `Master` sheet.
+When you first open the file, the **`MASTER`** sheet will be displayed. This page is an upload ‘blue-print’ explaining how to input data into the spreadsheet. The key explains the difference between compulsory fields (green), non-compulsory fields (yellow) and automatically calculated fields (grey). It is *critical* to refer to this page when inputting your data to avoid errors.
 
 ![Upload New Data 20](img/upload-data-new-20.png)
 
-Once you have adequately filled in the spreadsheet, you can then click on 1️⃣ the `UPLOAD DATA` button. This will open a popup where you can drag and drop the file(s) or `Browse` on your computer for the correct file(s), once you have uploaded your file(s) it will appear on the popup in the 2️⃣ *Uploaded Files* section. You can then click on 3️⃣ the `UPLOAD FILE` button.
+Navigate to 1️⃣ the `Dataset_pilot` sheet, and start imputing your species data. Keep in mind the compulsory fields as specified in 2️⃣ the `Master` sheet.
 
 ![Upload New Data 21](img/upload-data-new-21.png)
 
-The platform will then process your file.
+Once you have adequately filled in the spreadsheet, you can then click on 1️⃣ the `UPLOAD DATA` button. This will open a popup where you can drag and drop the file(s) or `Browse` on your computer for the correct file(s), once you have uploaded your file(s) it will appear on the popup in the 2️⃣ *Uploaded Files* section. You can then click on 3️⃣ the `UPLOAD FILE` button.
 
 ![Upload New Data 22](img/upload-data-new-22.png)
+
+The platform will then process your file.
+
+![Upload New Data 23](img/upload-data-new-23.png)
 
 <!-- Will continue this when the functionality is available -->
 
@@ -132,7 +136,7 @@ Click on the `UPLOAD DATA` button in the navigation bar. This will redirect you 
 
 ![Upload Data Existing 1](img/upload-data-existing-1.png)
 
-You will be redirected to `Step 3`, where you can update the Species Population Data by using 1️⃣ the `ONLINE FORM` or 2️⃣ download the template and then upload it using the `UPLOAD DATA` button. You can also manage the property boundary using 3️⃣ the `UPDATE PROPERTY BOUNDARY` button, which will redirect you to `STEP 2` where you can edit the property boundary. The property information is also viewable.
+You will be redirected to `Step 3`, where the interactive map will now highlight the property boundary. You can update the Species Population Data by using 1️⃣ the `ONLINE FORM` or 2️⃣ download the template and then upload it using the `UPLOAD DATA` button. You can also manage the property boundary using 3️⃣ the `UPDATE PROPERTY BOUNDARY` button, which will redirect you to `STEP 2` where you can edit the property boundary. The property information is also viewable.
 
 ![Upload Data Existing 2](img/upload-data-existing-2.png)
 

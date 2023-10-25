@@ -52,6 +52,7 @@ nav:
                           - Organisations: user/guide/organisations.md
                           - Working with the Explore Page: user/guide/explore.md
                           - Using the Data Upload Feature: user/guide/data-upload.md
+                          - Viewing Your Property/Properties: user/guide/view-properties.md
                   - Manual :
                           - user/manual/index.md
                           - Landing Page: user/manual/landing-page.md
@@ -59,6 +60,7 @@ nav:
                                 - user/manual/login-logout/index.md
                                 - Login: user/manual/login-logout/login-page.md
                                 - Forgot Password: user/manual/login-logout/forgot-password.md
+                                - Two Factor Authentication: user/manual/login-logout/login-2fa-page.md
                                 - Logout: user/manual/login-logout/logout.md
                           - Register:
                                 - user/manual/register/index.md
@@ -93,6 +95,7 @@ nav:
                         - administrator/guide/index.md
                 - Manual:
                         - administrator/manual/index.md
+                        - Django Administration: administrator/manual/django-admin.md
         - Developer:
                   - developer/index.md
                   - Guide:
