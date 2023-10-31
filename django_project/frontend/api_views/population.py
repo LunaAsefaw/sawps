@@ -30,7 +30,7 @@ from property.models import Property
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from species.models import OwnedSpecies, Taxon
+from species.models import Taxon
 from species.serializers import TaxonSerializer
 from stakeholder.models import OrganisationUser
 
@@ -106,8 +106,8 @@ class UploadPopulationAPIVIew(APIView):
     def check_existing_data(self, property: Property, taxon: Taxon, year):
         # check if no data exist for taxon+property+year
         return AnnualPopulation.objects.filter(
-            year=year, owned_species__property=property,
-            owned_species__taxon=taxon
+            year=year, property=property,
+            taxon=taxon
         ).exists()
 
     def post(self, request, *args, **kwargs):
@@ -169,22 +169,12 @@ class UploadPopulationAPIVIew(APIView):
             population_estimate_category = get_object_or_404(
                 PopulationEstimateCategory, id=population_estimate_category_id
             )
-        # get or create owned species
-        owned_species, is_new = OwnedSpecies.objects.get_or_create(
+        annual_population_obj = AnnualPopulation.objects.create(
+            year=year,
             taxon=taxon,
             property=property,
-            defaults={
-                "user": self.request.user,
-                "area_available_to_species": area_available_to_species,
-            },
-        )
-        if not is_new:
-            owned_species.area_available_to_species = area_available_to_species
-            owned_species.save()
-        # add or update annual population
-        AnnualPopulation.objects.create(
-            year=year,
-            owned_species=owned_species,
+            user=self.request.user,
+            area_available_to_species=area_available_to_species,
             total=annual_population.get("total"),
             adult_male=annual_population.get("adult_male", 0),
             adult_female=annual_population.get("adult_female", 0),
@@ -227,7 +217,7 @@ class UploadPopulationAPIVIew(APIView):
                 continue
             AnnualPopulationPerActivity.objects.create(
                 year=year,
-                owned_species=owned_species,
+                annual_population=annual_population_obj,
                 activity_type=intake_activity,
                 total=intake_population.get("total"),
                 adult_male=intake_population.get("adult_male", 0),
@@ -251,7 +241,7 @@ class UploadPopulationAPIVIew(APIView):
                 continue
             AnnualPopulationPerActivity.objects.create(
                 year=year,
-                owned_species=owned_species,
+                annual_population=annual_population_obj,
                 activity_type=offtake_activity,
                 total=offtake_population.get("total"),
                 adult_male=offtake_population.get("adult_male", 0),

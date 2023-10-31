@@ -16,7 +16,8 @@ export default interface PropertyInterface {
     organisation_id?: number,
     parcels?: ParcelInterface[],
     bbox?: number[],
-    centroid?: number[]
+    centroid?: number[],
+    short_code?: string
 }
 
 export const createNewProperty = ():PropertyInterface => {

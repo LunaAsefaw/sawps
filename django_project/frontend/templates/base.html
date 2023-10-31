@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="/static/favicon.svg" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'js/bootstrap-4.3.1/css/bootstrap.min.css' %}">
-    <title>{% block head_title %}Kartoza{% endblock %}</title>
+    <title>{% block head_title %}SAWPS{% endblock %}</title>
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <link href="{% static 'css/navbar.css' %}" rel="stylesheet">
     <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet"/>
@@ -314,15 +314,27 @@
 {% block content %}
 {% endblock %}
 {% block footer %}
+<script>
+  document.addEventListener('DOMContentLoaded',async function() {
+    var userIsAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+    var exploreLink = document.getElementById('explore-link');
+   if(exploreLink !== null && userIsAuthenticated ){
+     exploreLink.style.display = '';
+   }
+   else if(exploreLink !== null && !userIsAuthenticated){
+      exploreLink.style.display = 'none'
+   }
+  });
+</script>
 <div class='footer' data-testid='footer'>
   <div class='sanbi-footer-logo-container'>
-    <a href="https://biodiversityadvisor.sanbi.org/" target="_blank">
+    <a href="https://www.sanbi.org/" target="_blank">
       <img class='footer-logo' data-testid='sanbi-footer-logo' src='/static/images/footer/sanbi-footer-logo.png' />
     </a>
   </div>
     <div class='footer-nav' data-testid='footer-navigation'>
         <a href='/' target='_self'>HOME</a>
-        <a href='/map' target='_self'>EXPLORE</a>
+        <a id="explore-link" href='/map' target='_self'>EXPLORE</a>
         <a href='https://kartoza.github.io/sawps/' target='_blank'>DOCUMENTATION</a>
         <a href='/contact' target='_self'>CONTACT</a>
   </div>

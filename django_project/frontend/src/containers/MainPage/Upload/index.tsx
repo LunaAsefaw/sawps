@@ -26,6 +26,8 @@ import UploadWizard from './UploadWizard';
 import PropertyInterface from '../../../models/Property';
 import { UploadMode } from '../../../models/Upload';
 import { MapEvents } from '../../../models/Map';
+import { SeachPlaceResult } from '../../../utils/SearchPlaces';
+import SearchPlace from '../../../components/SearchPlace';
 import './index.scss';
 
 const FETCH_PROPERTY_LIST_URL = '/api/property/list/'
@@ -94,25 +96,19 @@ function Upload() {
             <Grid item className='FlexContainerFill'>
                 <Grid container className='UploadContainer'>
                     { uploadMode === UploadMode.SelectProperty &&
-                    <Grid item>
-                        <FormControl className='SearchArea' variant="outlined">
-                            <InputLabel htmlFor="search-area">Search area</InputLabel>
-                            <OutlinedInput
-                                id="search-area"
-                                type={'text'}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                        aria-label="search"
-                                        edge="end"
-                                        >
-                                        <SearchIcon />
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                label="Search Area"
-                            />
-                        </FormControl>
+                    <Grid item className='SearchArea'>
+                        <SearchPlace onPlaceSelected={(place: SeachPlaceResult) => {
+                            if (place && place.bbox && place.bbox.length === 4) {
+                                // trigger zoom to property
+                                let _bbox = place.bbox.map(String)
+                                dispatch(triggerMapEvent({
+                                    'id': uuidv4(),
+                                    'name': MapEvents.ZOOM_INTO_PROPERTY,
+                                    'date': Date.now(),
+                                    'payload': _bbox
+                                }))
+                            }
+                        }} />
                     </Grid>
                     }
                     <Grid item className='FlexContainerFill'>

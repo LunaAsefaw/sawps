@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block head_title %}Login{% endblock %}
-
-
 {% block content %}
 <section class="login-page fs-background registerSignUpAccount" style="background-color: #000000; min-height:var(--min-content-height);">
     <div class="container-fluid full-height">
@@ -28,10 +25,9 @@
                 </button>
                 </form>
                 <div class="login-help text-center">
-                    <a id="lostDeviceLink" href="javascript:void(0)">{% trans "Lost your device?" %}</a>
+                  <p class="m-1 pt-10 text-center" >Lost your device?</p>
+                  <a href="{% url 'contact' %}" style="text-decoration: underline; color: #F9A95D;"> {% trans "Contact" %}</a> SAWPS admin to set a new OTP.
                   </div>
-                  <!-- Hidden paragraph -->
-                  <p id="contactAdmin" style="display: none;">Contact the system administrator.</p> <!-- contact number still to be provided -->
             </div>
             </div>
 </div>

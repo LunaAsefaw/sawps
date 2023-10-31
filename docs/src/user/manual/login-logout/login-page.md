@@ -9,10 +9,14 @@ The Login Page is the entry point to access your account within the application.
 ![Login Form](./img/login-page-1.png)
 
 1. **Email**: Enter your registered email address in this field. This is the email associated with your account.
+
 2. **Password**: Input your password in this field. Passwords are case-sensitive, so ensure you enter it correctly.
+
 3. **Remember Me**: Check this box if you want the application to remember your login credentials for future sessions. This feature is optional and can be useful for quick and convenient access.
+
 4. **Login Button**: Click the `LOGIN` button to submit your credentials and access your account.
 
+5. **Forgot Password**: The `Forgot Password` link opens the [forgot password](forgot-password.md) for reset password.
 ### Remember Me
 
 The "Remember Me" checkbox allows you to opt for the application to remember your login information. When checked, you won't need to re-enter your email and password each time you visit the login page. This is particularly convenient for returning users who want a seamless login experience.

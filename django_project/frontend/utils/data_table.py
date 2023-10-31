@@ -28,7 +28,6 @@ from population_data.models import (
     AnnualPopulationPerActivity
 )
 from property.models import Province, Property
-from species.models import OwnedSpecies
 
 from django.conf import settings
 
@@ -71,19 +70,19 @@ def data_table_reports(queryset: QuerySet, request, user_roles) -> List[Dict]:
 
 
 def get_report_filter(request, report_type):
-    default_species_field = 'owned_species__taxon__scientific_name__in'
+    default_species_field = 'taxon__scientific_name__in'
     filters = {}
     species_fields = {
         SPECIES_REPORT: default_species_field,
-        PROPERTY_REPORT: 'taxon__scientific_name__in',
+        PROPERTY_REPORT: default_species_field,
         SAMPLING_REPORT: default_species_field,
-        ACTIVITY_REPORT: default_species_field
+        ACTIVITY_REPORT: 'annual_population__taxon__scientific_name__in'
     }
 
     default_year_field = 'year__range'
     year_fields = {
         SPECIES_REPORT: default_year_field,
-        PROPERTY_REPORT: 'annualpopulation__year__range',
+        PROPERTY_REPORT: default_year_field,
         SAMPLING_REPORT: default_year_field,
         ACTIVITY_REPORT: default_year_field
     }
@@ -94,33 +93,25 @@ def get_report_filter(request, report_type):
         filters[species_fields[report_type]] = species_list
 
     start_year = request.GET.get("start_year")
-    if start_year and report_type != PROPERTY_REPORT:
+    if start_year:
         start_year = int(start_year)
         end_year = int(request.GET.get("end_year"))
         filters[year_fields[report_type]] = (start_year, end_year)
 
     default_activity_field = (
-        'owned_species__annualpopulationperactivity__'
+        'annualpopulationperactivity__'
         'activity_type_id__in'
     )
-    activity_fields = {
-        SPECIES_REPORT: default_activity_field,
-        PROPERTY_REPORT: (
-            'annualpopulationperactivity__activity_type_id__in'
-        ),
-        SAMPLING_REPORT: default_activity_field,
-        ACTIVITY_REPORT: default_activity_field,
-    }
 
     activity = request.GET.get("activity", "")
     activity = urllib.parse.unquote(activity)
     if activity != 'all':
-        filters[activity_fields[report_type]] = [
+        filters[default_activity_field] = [
             int(act) for act in activity.split(',')
         ] if activity else []
     elif report_type == ACTIVITY_REPORT:
         filters[
-            activity_fields[report_type]
+            default_activity_field
         ] = ActivityType.objects.values_list('id', flat=True)
     return filters
 
@@ -134,7 +125,7 @@ def species_report(queryset: QuerySet, request) -> List:
     """
     filters = get_report_filter(request, SPECIES_REPORT)
     species_population_data = AnnualPopulation.objects.filter(
-        owned_species__property_id__in=queryset.values_list('id', flat=True),
+        property_id__in=queryset.values_list('id', flat=True),
         **filters
     ).distinct()
     species_reports = SpeciesReportSerializer(
@@ -152,10 +143,10 @@ def property_report(queryset: QuerySet, request) -> List:
         request: The HTTP request object.
     """
     filters = get_report_filter(request, PROPERTY_REPORT)
-    area_available_values = OwnedSpecies.objects.filter(
+    area_available_values = AnnualPopulation.objects.filter(
         property__in=queryset,
         **filters
-    )
+    ).distinct('property', 'year')
 
     property_reports = PropertyReportSerializer(
         area_available_values, many=True
@@ -174,7 +165,7 @@ def sampling_report(queryset: QuerySet, request) -> List:
     filters = get_report_filter(request, SAMPLING_REPORT)
 
     sampling_reports_data = AnnualPopulation.objects.filter(
-        owned_species__property__id__in=queryset.values_list('id', flat=True),
+        property__in=queryset,
         **filters
     )
     sampling_reports = SamplingReportSerializer(
@@ -194,7 +185,7 @@ def activity_report(queryset: QuerySet, request) -> Dict[str, List[Dict]]:
     """
     filters = get_report_filter(request, ACTIVITY_REPORT)
     activity_field = (
-        'owned_species__annualpopulationperactivity__'
+        'annualpopulationperactivity__'
         'activity_type_id__in'
     )
     activity_type_ids = filters[activity_field]
@@ -204,7 +195,7 @@ def activity_report(queryset: QuerySet, request) -> Dict[str, List[Dict]]:
     valid_activities = ActivityType.objects.filter(id__in=activity_type_ids)
     for activity in valid_activities:
         activity_data = AnnualPopulationPerActivity.objects.filter(
-            owned_species__property__in=queryset,
+            annual_population__property__in=queryset,
             activity_type=activity,
             **filters
         )
@@ -277,7 +268,7 @@ def common_filters(request: HttpRequest, user_roles: List[str]) -> Dict:
     start_year = request.GET.get("start_year")
     if start_year:
         end_year = request.GET.get("end_year")
-        filters["annualpopulation__year__range"] = (
+        filters["year__range"] = (
             start_year, end_year
         )
 
@@ -347,32 +338,33 @@ def national_level_species_report(
     """
     filters = common_filters(request, user_roles)
 
-    report_data = OwnedSpecies.objects. \
+    report_data = AnnualPopulation.objects. \
         filter(**filters, taxon__in=queryset). \
         values(
             'taxon__common_name_varbatim',
-            'taxon__scientific_name'
+            'taxon__scientific_name',
+            'year'
         ). \
         annotate(
             property_area=Sum("property__property_size_ha"),
             total_area_available=Sum("area_available_to_species"),
             adult_male_total_population=Sum(
-                "annualpopulation__adult_male"
+                "adult_male"
             ),
             adult_female_total_population=Sum(
-                "annualpopulation__adult_female"
+                "adult_female"
             ),
             sub_adult_male_total_population=Sum(
-                "annualpopulation__sub_adult_male"
+                "sub_adult_male"
             ),
             sub_adult_female_total_population=Sum(
-                "annualpopulation__sub_adult_female"
+                "sub_adult_female"
             ),
             juvenile_male_total_population=Sum(
-                "annualpopulation__juvenile_male"
+                "juvenile_male"
             ),
             juvenile_female_total_population=Sum(
-                "annualpopulation__juvenile_female"
+                "juvenile_female"
             ),
         )
     return NationalLevelSpeciesReport(report_data, many=True).data
@@ -555,19 +547,19 @@ def activity_report_rows(queryset: QuerySet, request) -> Dict[str, List[Dict]]:
     """
     filters = get_report_filter(request, ACTIVITY_REPORT)
     activity_field = (
-        'owned_species__annualpopulationperactivity__'
+        'annualpopulationperactivity__'
         'activity_type_id__in'
     )
     activity_type_ids = filters[activity_field]
     del filters[activity_field]
     valid_activities = ActivityType.objects.filter(id__in=activity_type_ids)
     activity_data = AnnualPopulationPerActivity.objects.filter(
-        owned_species__property__in=queryset,
+        annual_population__property__in=queryset,
         **filters
     )
     years = activity_data.order_by().values_list('year', flat=True).distinct()
     properties = activity_data.order_by(
-    ).values_list('owned_species__property__name', flat=True).distinct()
+    ).values_list('annual_population__property__name', flat=True).distinct()
     rows = []
 
     for year in list(years):
@@ -575,7 +567,7 @@ def activity_report_rows(queryset: QuerySet, request) -> Dict[str, List[Dict]]:
         for property in list(properties):
             for activity in valid_activities:
                 activity_data = AnnualPopulationPerActivity.objects.filter(
-                    owned_species__property__name=property,
+                    annual_population__property__name=property,
                     activity_type=activity,
                     year=year,
                     **filters

@@ -1,6 +1,9 @@
 from typing import List
 from activity.models import ActivityType
-from population_data.models import AnnualPopulationPerActivity
+from population_data.models import (
+    AnnualPopulation,
+    AnnualPopulationPerActivity
+)
 from frontend.utils.metrics import calculate_population_categories
 from frontend.filters.metrics import PropertyFilter
 from property.models import Property
@@ -12,7 +15,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from species.models import (
-    OwnedSpecies,
     Taxon
 )
 from django.db.models import Sum
@@ -66,7 +68,7 @@ class NationalStatisticsView(APIView):
         This method calculates the property
         count, total property area, and
         total property area available for
-        owned species (national).
+        species (national).
         """
         national_properties = Property.objects.all()
 
@@ -78,10 +80,10 @@ class NationalStatisticsView(APIView):
             total_area=Sum('property_size_ha')
         )['total_area']
 
-        # Query the OwnedSpecies table and
+        # Query the AnnualPopulation table and
         # get the area available to species for each property
         property_ids = national_properties.values_list('id', flat=True)
-        total_area_available_to_species = OwnedSpecies.objects.filter(
+        total_area_available_to_species = AnnualPopulation.objects.filter(
             property__id__in=property_ids
         ).aggregate(
             total_area_to_species=Sum('area_available_to_species')
@@ -156,7 +158,7 @@ class NationalActivityCountView(APIView):
         properties = Property.objects.filter()
 
         # Retrieve species on each property
-        species_per_property = OwnedSpecies.objects.filter(
+        species_per_property = AnnualPopulation.objects.filter(
             property__in=properties
         ).values('taxon', 'property')
 
@@ -169,7 +171,7 @@ class NationalActivityCountView(APIView):
         for species in species_per_property:
             for activity_type in activity_types:
                 population_count = AnnualPopulationPerActivity.objects.filter(
-                    owned_species__taxon=species['taxon'],
+                    annual_population__taxon=species['taxon'],
                     activity_type=activity_type
                 ).aggregate(
                     population_count=Coalesce(Sum('total'), 0)
@@ -203,7 +205,7 @@ class NationalActivityCountView(APIView):
             ) * 100 if total_population != 0 else 0
 
 
-            taxa = OwnedSpecies.objects.filter(id=species).first()
+            taxa = AnnualPopulation.objects.filter(taxon_id=species).first()
             if taxa:
                 taxon = taxa.taxon
                 common_name = taxon.common_name_varbatim
@@ -243,8 +245,8 @@ class NationalActivityCountPerProvinceView(APIView):
         Get activity count of the total
         population as percentage
         """
-        # Step 1: Get all owned species and filter them
-        owned_species = OwnedSpecies.objects.select_related(
+        # Step 1: Get all Annual Population and filter them
+        annual_population = AnnualPopulation.objects.select_related(
             'taxon', 'property__province'
         )
 
@@ -252,10 +254,10 @@ class NationalActivityCountPerProvinceView(APIView):
         result = {}
 
         # Calculate total area for each species in each province
-        for species in owned_species:
-            species_name = species.taxon.common_name_varbatim
-            province_name = species.property.province.name
-            area_available = species.area_available_to_species
+        for population in annual_population:
+            species_name = population.taxon.common_name_varbatim
+            province_name = population.property.province.name
+            area_available = population.area_available_to_species
 
             if species_name not in result:
                 result[species_name] = {}
@@ -322,8 +324,8 @@ class NationalActivityCountPerPropertyView(APIView):
         Get activity count of the total
         population as percentage
         """
-        # Step 1: Get all owned species and filter them
-        owned_species = OwnedSpecies.objects.select_related(
+        # Step 1: Get all Annual Population and filter them
+        annual_populations = AnnualPopulation.objects.select_related(
             'taxon',
             'property__province',
             'property__property_type'
@@ -335,10 +337,10 @@ class NationalActivityCountPerPropertyView(APIView):
 
         # Calculate total area for each species
         # in each province and property type
-        for species in owned_species:
-            species_name = species.taxon.common_name_varbatim
-            property_type_name = species.property.property_type.name
-            area_available = species.area_available_to_species
+        for population in annual_populations:
+            species_name = population.taxon.common_name_varbatim
+            property_type_name = population.property.property_type.name
+            area_available = population.area_available_to_species
 
             if species_name not in result:
                 result[species_name] = {}

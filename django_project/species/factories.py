@@ -1,13 +1,7 @@
-from random import randint
-
 import factory
 from django.contrib.auth.models import User
-from population_data.factories import (
-    AnnualPopulationF,
-    AnnualPopulationPerActivityFactory,
-)
-from population_data.models import AnnualPopulation
-from species.models import OwnedSpecies, Taxon, TaxonRank, TaxonSurveyMethod
+
+from species.models import Taxon, TaxonRank, TaxonSurveyMethod
 
 
 class TaxonRankFactory(factory.django.DjangoModelFactory):
@@ -44,52 +38,6 @@ class TaxonFactory(factory.django.DjangoModelFactory):
     show_on_front_page = factory.Faker('boolean')
     is_selected = factory.Faker('boolean')
     icon = factory.django.ImageField(filename='icon.jpg', color='blue')
-
-
-
-class OwnedSpeciesFactory(factory.django.DjangoModelFactory):
-    """Owned species factory."""
-    class Meta:
-        model = OwnedSpecies
-
-    taxon = factory.SubFactory(TaxonFactory)
-    user = factory.SubFactory(UserFactory)
-    property = factory.SubFactory('property.factories.PropertyFactory')
-    area_available_to_species = 10.0
-
-    @factory.post_generation
-    def create_annual_population(self, create, extracted, **kwargs):
-        year = randint(1960, 2000)
-        if len(AnnualPopulation.objects.filter(year=year)) > 0:
-            year = randint(2001, 2023)
-        AnnualPopulationF.create(
-            year=year,
-            owned_species=self,
-            total=100,
-            adult_male=50,
-            adult_female=50,
-            juvenile_male=30,
-            juvenile_female=30,
-            sub_adult_total=20,
-            sub_adult_male=10,
-            sub_adult_female=10,
-            juvenile_total=40,
-        )
-
-    @factory.post_generation
-    def create_annual_population_per_activity(self, create, *args):
-        year = randint(1960, 2000)
-        if len(AnnualPopulation.objects.filter(year=year)) > 0:
-            year = randint(2001, 2023)
-        AnnualPopulationPerActivityFactory.create(
-            year=year,
-            owned_species=self,
-            total=100,
-            adult_male=50,
-            adult_female=50,
-            juvenile_male=30,
-            juvenile_female=30,
-        )
 
 
 class TaxonSurveyMethodF(factory.django.DjangoModelFactory):

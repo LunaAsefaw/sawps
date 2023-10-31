@@ -45,7 +45,7 @@ class BaseMetricsFilter(django_filters.FilterSet):
         start_year = int(value)
         end_year = int(self.data.get('end_year'))
         return queryset.filter(
-            ownedspecies__annualpopulation__year__range=(
+            annualpopulation__year__range=(
                 start_year,
                 end_year
             )
@@ -63,7 +63,7 @@ class BaseMetricsFilter(django_filters.FilterSet):
         """
         properties_list = value.split(',')
         return queryset.filter(
-            ownedspecies__property__id__in=properties_list
+            annualpopulation__property__id__in=properties_list
         )
 
 
@@ -80,7 +80,7 @@ class ActivityBaseMetricsFilter(BaseMetricsFilter):
         start_year = int(value)
         end_year = int(self.data.get('end_year'))
         return queryset.filter(
-            ownedspecies__annualpopulationperactivity__year__range=(
+            annualpopulation__annualpopulationperactivity__year__range=(
                 start_year,
                 end_year
             )
@@ -124,7 +124,7 @@ class PropertyFilter(django_filters.FilterSet):
         start_year = int(value)
         end_year = int(self.data.get('end_year'))
         return queryset.filter(
-            ownedspecies__annualpopulation__year__range=(
+            annualpopulation__year__range=(
                 start_year,
                 end_year
             )

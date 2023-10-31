@@ -50,7 +50,8 @@ from frontend.api_views.property import (
     PropertyMetadataList,
     UpdatePropertyBoundaries,
     UpdatePropertyInformation,
-    PropertySearch
+    PropertySearch,
+    CheckPropertyNameIsAvailable
 )
 from frontend.api_views.spatial_filter import (
     SpatialFilterList
@@ -146,6 +147,11 @@ urlpatterns = [
         r'^api/property/create/?$',
         CreateNewProperty.as_view(),
         name='property-create'
+    ),
+    re_path(
+        r'^api/property/check-available-name/?$',
+        CheckPropertyNameIsAvailable.as_view(),
+        name='property-check-available-name'
     ),
     re_path(
         r'^api/property/list/(?P<organisation_id>\d+)?/?$',

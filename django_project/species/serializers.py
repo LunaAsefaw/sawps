@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from population_data.models import AnnualPopulation
 from rest_framework import serializers
-from species.models import OwnedSpecies, Taxon
+from species.models import Taxon
 
 
 class TaxonSerializer(serializers.ModelSerializer):
@@ -27,21 +27,28 @@ class FrontPageTaxonSerializer(serializers.ModelSerializer):
     def get_total_population(self, obj: Taxon):
         # get latest year from current species
         latest_data_per_year = AnnualPopulation.objects.filter(
-            owned_species__taxon=obj
+            taxon=obj
         ).order_by(
-            'owned_species__property', '-year'
+            'property', '-year'
         ).distinct(
-            'owned_species__property'
+            'property'
         )
         data = AnnualPopulation.objects.filter(
             id__in=latest_data_per_year,
-            owned_species__taxon=obj
+            taxon=obj
         ).aggregate(Sum('total'))
         return data['total__sum'] if data['total__sum'] else 0
 
     def get_total_area(self, obj: Taxon):
-        data = OwnedSpecies.objects.filter(
+        populations = AnnualPopulation.objects.filter(
             taxon=obj
+        )
+        latest = populations.order_by('-year').first()
+        if not latest:
+            return 0
+        data = AnnualPopulation.objects.filter(
+            taxon=obj,
+            year=latest.year
         ).aggregate(Sum('area_available_to_species'))
         return (
             data['area_available_to_species__sum'] if

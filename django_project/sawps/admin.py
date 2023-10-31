@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.db.models.signals import post_save
 from django_otp.plugins.otp_static.models import StaticDevice
@@ -55,8 +55,16 @@ class GroupAdmin(BaseGroupAdmin):
     get_description.short_description = 'Description'
 
 
+class PermissionAdmin(admin.ModelAdmin):
+
+    list_display = ['name', 'content_type', 'codename']
+    list_filter = ['content_type']
+    search_fields = ['name']
+
+
 # Unregister the model if it's already registered
 admin.site.unregister(StaticDevice)
 admin.site.register(StaticDevice, CustomStaticDeviceAdmin)
 admin.site.unregister(Group)
 admin.site.register(Group, GroupAdmin)
+admin.site.register(Permission, PermissionAdmin)

@@ -36,7 +36,7 @@ class DataTableAPIView(APIView):
         organisation_id = get_current_organisation_id(self.request.user)
         query_filter = BaseMetricsFilter
         queryset = Taxon.objects.filter(
-            ownedspecies__property__organisation_id=organisation_id,
+            annualpopulation__property__organisation_id=organisation_id,
             taxon_rank__name="Species"
         ).distinct().order_by("scientific_name")
 
@@ -57,12 +57,12 @@ class DataTableAPIView(APIView):
                 ids = organisation.split(",")
                 queryset = Property.objects.filter(
                     organisation_id__in=ids,
-                    ownedspecies__taxon__taxon_rank__name="Species"
+                    annualpopulation__taxon__taxon_rank__name="Species"
                 ).distinct().order_by("name")
             else:
                 queryset = Property.objects.filter(
                     organisation_id=organisation_id,
-                    ownedspecies__taxon__taxon_rank__name="Species"
+                    annualpopulation__taxon__taxon_rank__name="Species"
                 ).distinct().order_by("name")
 
             spatial_filter_values = self.request.GET.get(
@@ -85,7 +85,7 @@ class DataTableAPIView(APIView):
         else:
             query_filter = BaseMetricsFilter
             queryset = Taxon.objects.filter(
-                ownedspecies__property__organisation_id=organisation_id,
+                annualpopulation__property__organisation_id=organisation_id,
                 taxon_rank__name="Species"
             ).distinct().order_by("scientific_name")
 
@@ -109,9 +109,9 @@ class DataTableAPIView(APIView):
             if report_list:
                 report_list = report_list.split(",")
                 if PROVINCE_REPORT in report_list:
-                    queryset = self.get_taxon_queryset()
+                    taxon_queryset = self.get_taxon_queryset()
                     province_reports = national_level_province_report(
-                        queryset,
+                        taxon_queryset,
                         request,
                         user_roles
                     )

@@ -1,14 +1,21 @@
 """Models for population data package.
 """
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class AnnualPopulationAbstract(models.Model):
     """ "Annual Population model.
     """
     year = models.PositiveIntegerField()
-    owned_species = models.ForeignKey("species.OwnedSpecies",
-                                      on_delete=models.CASCADE)
+    # This field is no longer used,
+    # but will be deleted after data
+    # migration success.
+    owned_species = models.ForeignKey(
+        "species.OwnedSpecies",
+        on_delete=models.CASCADE,
+        null=True
+    )
     total = models.IntegerField()
     adult_male = models.IntegerField(null=True, blank=True)
     adult_female = models.IntegerField(null=True, blank=True)
@@ -23,7 +30,22 @@ class AnnualPopulationAbstract(models.Model):
 class AnnualPopulation(AnnualPopulationAbstract):
     """Annual Population model.
     """
-
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True
+    )
+    taxon = models.ForeignKey(
+        "species.Taxon",
+        on_delete=models.CASCADE,
+        null=True
+    )
+    property = models.ForeignKey(
+        "property.Property",
+        on_delete=models.CASCADE,
+        null=True
+    )
+    area_available_to_species = models.FloatField(default=0.0)
     sub_adult_total = models.IntegerField(null=True, blank=True)
     sub_adult_male = models.IntegerField(null=True, blank=True)
     sub_adult_female = models.IntegerField(null=True, blank=True)
@@ -77,7 +99,7 @@ class AnnualPopulation(AnnualPopulationAbstract):
 
     def __str__(self):
         return "{} {}".format(
-            self.owned_species.property.name,
+            self.property.name,
             self.year
         )
 
@@ -94,6 +116,13 @@ class AnnualPopulation(AnnualPopulationAbstract):
                     models.F("adult_male") + models.F("adult_female")
                 ),
             ),
+            models.UniqueConstraint(
+                fields=["year",
+                        "taxon",
+                        "property"
+                        ],
+                name="unique_population_count",
+            )
         ]
 
 
@@ -101,6 +130,11 @@ class AnnualPopulationPerActivity(AnnualPopulationAbstract):
     """Annual Population per activity model.
     """
 
+    annual_population = models.ForeignKey(
+        AnnualPopulation,
+        on_delete=models.CASCADE,
+        null=True
+    )
     activity_type = models.ForeignKey(
         "activity.ActivityType",
         on_delete=models.CASCADE)
@@ -113,7 +147,7 @@ class AnnualPopulationPerActivity(AnnualPopulationAbstract):
 
     def __str__(self):
         return "{} {} {}".format(
-            self.owned_species.property.name,
+            self.annual_population.property.name,
             self.year,
             self.activity_type.name)
 
@@ -124,7 +158,7 @@ class AnnualPopulationPerActivity(AnnualPopulationAbstract):
         constraints = [
             models.UniqueConstraint(
                 fields=["year",
-                        "owned_species",
+                        "annual_population",
                         "activity_type"
                         ],
                 name="unique_population_count_per_activity",

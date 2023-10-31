@@ -66,22 +66,6 @@
         background-color: white;
     }
 }
-.searchBar {
-    margin-bottom: 22px;
-    margin-top: 5%;
-    .MuiFormControl-root {
-        width: 100%;
-        fieldset {
-            border: none;
-            box-shadow: 0px 2px 4px #858585;
-        }
-    }
-    .MuiAutocomplete-root {
-        .MuiInputBase-root {
-            padding-right: 9px !important;
-        }
-    }
-}
 .sidebarBox {
     padding: 0px 16px;
     width: 100%;

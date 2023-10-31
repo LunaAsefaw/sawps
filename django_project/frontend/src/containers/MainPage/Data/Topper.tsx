@@ -24,9 +24,9 @@ const Topper = () => {
       (state: RootState) => state.SpeciesFilter.activityName
     ).split(',').join(', ')
     const organisationName = useAppSelector((state: RootState) => state.SpeciesFilter.organisationName)
-    const organisationCount = organisationName ? organisationName.split(',').length : 0
-    const propertyCount = propertyName ? propertyName.split(',').length : 0
-    const activityCount = activityId !== '' ? activityId.split(',').length : 0
+    const organisationCount = useAppSelector((state: RootState) => state.SpeciesFilter.organisationCount)
+    const propertyCount = useAppSelector((state: RootState) => state.SpeciesFilter.propertyCount)
+    const activityCount = useAppSelector((state: RootState) => state.SpeciesFilter.activityCount)
     const today = new Date()
     const todayDate = String(today.getDate()).padStart(2, '0')
     const todayMonth = String(today.getMonth() + 1).padStart(2, '0')

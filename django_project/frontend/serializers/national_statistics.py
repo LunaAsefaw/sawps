@@ -2,7 +2,7 @@ from typing import List
 from django.db.models import Q, Sum
 from population_data.models import AnnualPopulation
 from rest_framework import serializers
-from species.models import Taxon, OwnedSpecies
+from species.models import Taxon
 from datetime import datetime
 
 
@@ -64,7 +64,7 @@ class SpeciesListSerializer(serializers.ModelSerializer):
                 Q(
                     year__range=(start_year, end_year)
                 ) if start_year and end_year else Q(),
-                owned_species__taxon=obj
+                taxon=obj
             )
             .values("year")
             .annotate(year_total=Sum("total"))
@@ -85,20 +85,20 @@ class SpeciesListSerializer(serializers.ModelSerializer):
     def get_total_population(self, obj: Taxon):
         # get latest year from current species
         latest_data_per_year = AnnualPopulation.objects.filter(
-            owned_species__taxon=obj
+            taxon=obj
         ).order_by(
-            'owned_species__property', '-year'
+            'property', '-year'
         ).distinct(
-            'owned_species__property'
+            'property'
         )
         data = AnnualPopulation.objects.filter(
             id__in=latest_data_per_year,
-            owned_species__taxon=obj
+            taxon=obj
         ).aggregate(Sum('total'))
         return data['total__sum'] if data['total__sum'] else 0
 
     def get_total_area(self, obj: Taxon):
-        data = OwnedSpecies.objects.filter(
+        data = AnnualPopulation.objects.filter(
             taxon=obj
         ).aggregate(Sum('area_available_to_species'))
         return (

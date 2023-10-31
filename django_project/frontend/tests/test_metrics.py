@@ -6,10 +6,11 @@ from django.urls import reverse
 from property.factories import PropertyFactory
 from rest_framework import status
 from species.factories import (
-    OwnedSpeciesFactory,
     TaxonFactory,
     TaxonRankFactory,
 )
+from population_data.models import PopulationEstimateCategory
+from population_data.factories import AnnualPopulationF
 from species.models import TaxonRank
 from stakeholder.factories import organisationFactory, organisationUserFactory
 
@@ -20,7 +21,7 @@ class BaseTestCase(TestCase):
         Set up test data and environment for the test cases.
 
         This method creates necessary test objects like TaxonRank, Taxon, User, Organisation,
-        Property, and OwnedSpecies. It also sets up the client and session for testing.
+        Property, and AnnualPopulation. It also sets up the client and session for testing.
         """
         taxon_rank = TaxonRank.objects.filter(name="Species").first()
         if not taxon_rank:
@@ -48,9 +49,14 @@ class BaseTestCase(TestCase):
         self.property = PropertyFactory.create(
             organisation=self.organisation_1, name="PropertyA"
         )
+        category_a = PopulationEstimateCategory.objects.create(name="Category A")
 
-        self.owned_species = OwnedSpeciesFactory.create_batch(
-            5, taxon=self.taxon, user=self.user, property=self.property
+        self.annual_populations = AnnualPopulationF.create_batch(
+            5,
+            taxon=self.taxon,
+            user=self.user,
+            property=self.property,
+            population_estimate_category=category_a
         )
 
         self.auth_headers = {
@@ -61,6 +67,7 @@ class BaseTestCase(TestCase):
 
         session = self.client.session
         session.save()
+
 
 class PopulationEstimateCategoryTestCase(BaseTestCase):
     """
@@ -136,7 +143,7 @@ class SpeciesPopuationCountPerYearTestCase(BaseTestCase):
         """
         Test species population count filtered by property.
         """
-        id = self.owned_species[0].property_id
+        id = self.annual_populations[0].property_id
         data = {'property':id}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
@@ -150,14 +157,15 @@ class SpeciesPopuationCountPerYearTestCase(BaseTestCase):
         """
         Test species population count filtered by year.
         """
-        year = self.owned_species[1].annualpopulation_set.first().year
+        year = self.annual_populations[1].year
         data = {'start_year': year, "end_year":year}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data[0]['annualpopulation_count'][0].get('year'),
-            year
+            int(response.data[0]['annualpopulation_count'][0].
+                get('year')),
+            int(year)
         )
 
 
@@ -188,7 +196,7 @@ class ActivityPercentageTestCase(BaseTestCase):
         """
         Test activity percentage calculation with year-based filters.
         """
-        year = self.owned_species[1].annualpopulationperactivity_set.first().year
+        year = self.annual_populations[1].annualpopulationperactivity_set.first().year
         data = {'start_year': year, "end_year":year}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
@@ -258,7 +266,7 @@ class SpeciesPopulationDensityPerPropertyTestCase(BaseTestCase):
         """
         Test species population density per property filtered by year.
         """
-        year = self.owned_species[1].annualpopulation_set.first().year
+        year = self.annual_populations[1].year
         data = {'start_year': year, "end_year":year, "species": "Penthera leo"}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
@@ -295,13 +303,13 @@ class PropertiesPerPopulationCategoryTestCase(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # test with property id only to check if response is oke
-        id = self.owned_species[0].property_id
+        id = self.annual_populations[0].property_id
         data = {'property':id}
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         # test property id
-        id = self.owned_species[0].property_id
+        id = self.annual_populations[0].property_id
         data = {'property':id, 'species': 'Penthera leo'}
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -328,7 +336,7 @@ class TotalAreaAvailableToSpeciesTestCase(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]['area'], 50.0)
         
-        data = {'property': self.owned_species[0].property_id, 'species': "Penthera leo"}
+        data = {'property': self.annual_populations[0].property_id, 'species': "Penthera leo"}
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]['area'], 50.0)
@@ -338,7 +346,7 @@ class TotalAreaAvailableToSpeciesTestCase(BaseTestCase):
         """
         Test total area available to species filtered by property.
         """
-        id = self.owned_species[0].property_id
+        id = self.annual_populations[0].property_id
         data = {'property':id}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
@@ -364,7 +372,7 @@ class TotalAreaPerPropertyTypeTestCase(BaseTestCase):
         Test total area per property type
         """
         url = self.url
-        data = {'species': self.owned_species[0].taxon.scientific_name}
+        data = {'species': self.annual_populations[0].taxon.scientific_name}
         response = self.client.get(url, data, **self.auth_headers)
         property_type = self.property.property_type.name
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -378,8 +386,8 @@ class TotalAreaPerPropertyTypeTestCase(BaseTestCase):
         """
         Test total area per property type filtered by property.
         """
-        id = self.owned_species[0].property_id
-        data = {'property':id, 'species': self.owned_species[0].taxon.scientific_name}
+        id = self.annual_populations[0].property_id
+        data = {'property':id, 'species': self.annual_populations[0].taxon.scientific_name}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -423,7 +431,7 @@ class PopulationPerAgeGroupTestCase(BaseTestCase):
         """
         Test population per age group filtered by property.
         """
-        id = self.owned_species[0].property_id
+        id = self.annual_populations[0].property_id
         data = {'property':id}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
@@ -440,7 +448,7 @@ class PopulationPerAgeGroupTestCase(BaseTestCase):
         """
         Test spopulation per age group filtered by year.
         """
-        year = self.owned_species[1].annualpopulation_set.first().year
+        year = self.annual_populations[1].year
         data = {'start_year': year, "end_year":year}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
@@ -484,7 +492,7 @@ class TotalAreaVSAreaAvailableTestCase(BaseTestCase):
         """
         Test total area versus area available filtered by property.
         """
-        id = self.owned_species[0].property_id
+        id = self.annual_populations[0].property_id
         data = {'property':id}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
@@ -497,13 +505,13 @@ class TotalAreaVSAreaAvailableTestCase(BaseTestCase):
         """
         Test total area versus area available filtered by year.
         """
-        year = self.owned_species[1].annualpopulation_set.first().year
-        data = {'start_year': year, "end_year":year}
+        year = self.annual_populations[1].year
+        data = {'start_year': year, "end_year": year}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data[0]['area']['owned_species'][0] \
                 ['annualpopulation__year'],
-            year
+            int(year)
         )

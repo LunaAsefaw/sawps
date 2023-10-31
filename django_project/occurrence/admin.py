@@ -7,4 +7,15 @@ from django.contrib import admin
 from occurrence.models import SurveyMethod
 
 
-admin.site.register(SurveyMethod)
+class SurveyMethodAdmin(admin.ModelAdmin):
+    """Admin page for SurveyMethod model
+
+    """
+    list_display = ('name', 'sort_id')
+    search_fields = [
+        'name',
+        'sort_id'
+    ]
+
+
+admin.site.register(SurveyMethod, SurveyMethodAdmin)

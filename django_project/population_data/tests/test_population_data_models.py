@@ -21,7 +21,7 @@ from population_data.models import (
     PopulationStatus,
     SamplingEffortCoverage
 )
-from species.factories import OwnedSpeciesFactory, TaxonFactory, TaxonRankFactory
+from species.factories import TaxonFactory, TaxonRankFactory
 from species.models import Taxon
 
 
@@ -37,10 +37,10 @@ class PopulationCountTestCase(TestCase):
             taxon_rank=TaxonRankFactory(),
         )
         user = User.objects.create_user(username='testuser', password='12345')
-        owned_species = OwnedSpeciesFactory(taxon=taxon, user=user)
         cls.population_count = AnnualPopulationF(
-            owned_species=owned_species,
-            total = 120,
+            taxon=taxon,
+            user=user,
+            total=120,
             adult_male=19,
             adult_female=100
         )
@@ -91,9 +91,15 @@ class AnnualPopulationPerActivityTestCase(TestCase):
             taxon_rank=TaxonRankFactory(),
         )
         user = User.objects.create_user(username='testuser', password='12345')
-        owned_species = OwnedSpeciesFactory(taxon=taxon, user=user)
+        population = AnnualPopulationF(
+            taxon=taxon,
+            user=user,
+            total=120,
+            adult_male=19,
+            adult_female=100
+        )
         cls.population_count = AnnualPopulationPerActivityFactory(
-            owned_species=owned_species,
+            annual_population=population,
             intake_permit='1',
             offtake_permit='1'
         )
@@ -118,11 +124,11 @@ class AnnualPopulationPerActivityTestCase(TestCase):
             AnnualPopulationPerActivity.objects.get(year=self.population_count.year).total, 100
         )
 
-    def test_year_ownedspecies_activity_type_fields_unique_toghter_constraint(self):
-        """Test year, ownedspecies and activity_type are unique togther."""
-        with self.assertRaises(Exception) as raised:
+    def test_year_activity_type_fields_unique_toghter_constraint(self):
+        """Test year, annual population, and activity_type are unique togther."""
+        with self.assertRaises(IntegrityError) as raised:
             AnnualPopulationPerActivityFactory(
-                owned_species=self.population_count.owned_species,
+                annual_population=self.population_count.annual_population,
                 year=self.population_count.year,
                 activity_type=self.population_count.activity_type,
                 intake_permit='1',
@@ -141,7 +147,6 @@ class AnnualPopulationPerActivityTestCase(TestCase):
             msg="The count of AnnualPopulationPerActivity"
             "instances did not decrease by 1 after deletion."
         )
-
 
 
 class TestCertainty(TestCase):

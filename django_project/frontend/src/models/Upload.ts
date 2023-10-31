@@ -102,6 +102,13 @@ export interface UploadSpeciesDetailValidation {
     offtake_population?: AnnualPopulationPerActivityValidation;
 }
 
+export interface SubpopulationTotal {
+    adult: number;
+    sub_adult: number;
+    juvenile: number;
+}
+
+
 /* Create Default Data Functions */
 const getDefaultAnnualPopulation = ():AnnualPopulationInterface => {
     return {
@@ -118,7 +125,8 @@ const getDefaultAnnualPopulation = ():AnnualPopulationInterface => {
         note: '',
         population_estimate_certainty: 0,
         population_estimate_category_id: 0,
-        population_estimate_certainty_name: ''
+        population_estimate_certainty_name: '',
+        survey_method_other: ''
     }
 }
 
@@ -163,3 +171,13 @@ export const OTHER_NUMBER_FIELDS = [
     'group', 'sampling_effort', 'area_available_to_species',
     'area_covered', 'permit'
 ]
+
+
+export const SUBPOPULATION_FIELD_MAP: { [key: string]: string } = {
+    'adult_male': 'adult',
+    'adult_female': 'adult',
+    'sub_adult_male': 'sub_adult',
+    'sub_adult_female': 'sub_adult',
+    'juvenile_male': 'juvenile',
+    'juvenile_female': 'juvenile'
+}

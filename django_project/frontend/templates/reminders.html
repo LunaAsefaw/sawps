@@ -18,7 +18,7 @@
             </div>
           </div>
 
-          
+
           <!-- save/edit reminder modal -->
           <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
@@ -31,50 +31,55 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="reminderForm">
+                      <form id="reminderForm" class="needs-validation" novalidate>
                             <div class="form-group">
                                 <label for="title">Title</label>
-                                <input type="text" class="form-control" id="title" name="title" required>
+                                <input type="text" style="background-image:none;" class="form-control" id="title" name="title" required>
+                                <div class="invalid-feedback">Please provide a valid Title.</div>
                             </div>
                             <div class="form-group">
                                 <label for="date">Date and Time</label>
-                                <input type="datetime-local" class="form-control" id="date" name="date" required>
+                                <input type="datetime-local" style="background-image: none;" id="date" name="date" required>
                                 <!-- This is the fallback date input -->
-                                <input type="text" id="datetimepicker" class="form-control" style="display: none;" required>
+                                <input type="text" id="datetimepicker" class="form-control" style="display: none; background-image: none;" required>
+                                <div class="invalid-feedback">Please provide a valid Date and Time.</div>
                             </div>
                             <div class="form-group">
                                 <label for="reminder">Reminder</label>
-                                <textarea class="form-control" id="reminder" name="reminder" required></textarea>
+                                <textarea style="background-image: none;" class="form-control" id="reminder" name="reminder" required></textarea>
+                                <div class="invalid-feedback">Please provide a valid Reminder.</div>
                             </div>
                             {% if user.is_superuser or user.user_profile.user_role_type_id == 'Admin' %}
                             <div class="form-group">
                                 <label for="reminderType">Reminder Type</label>
-                                <select class="form-control" id="reminderType" name="reminderType">
+                                <select style="background-image: none;" class="form-control" id="reminderType" name="reminderType">
                                     <option value="personal" selected>Personal</option>
                                     <option value="all">Whole Organisation</option>
                                 </select>
+                                <div class="invalid-feedback">Please select a valid Reminder Type.</div>
                             </div>
                             {% endif %}
-                            <div class="form-group" id="status_field" style="display: none;">
+                            <div class="form-group" id="status_field" style="display: none; background-image: none;">
                               <label for="reminderType">Reminder Status</label>
                               <select class="form-control" id="status" name="status">
                                   <option value="active" selected>Active</option>
                                   <option value="draft">Draft</option>
                                   <option value="passed">Passed</option>
                               </select>
+                              <div class="invalid-feedback">Please select a valid Reminder Status.</div>
                           </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="sawps-font-button green-button mt-0" id="editReminderBtn" style="display: none;">Save</button>
-                        <button type="button" class="sawps-font-button green-button mt-0" style="font-weight: bold;" id="addReminderBtn">Add</button>
-                        <button type="button" class="sawps-font-button red-button mt-0" style="font-weight: bold; height: fit-content;" data-dismiss="modal">Cancel</button>
+                        <div class="modal-footer">
+                          <button type="submit" class="sawps-font-button green-button mt-0" id="editReminderBtn" style="display: none;">Save</button>
+                          <button type="submit" class="sawps-font-button green-button mt-0" style="font-weight: bold;" id="addReminderBtn">Add</button>
+                          <button type="submit" class="sawps-font-button red-button mt-0" id="cancelButton" style="font-weight: bold; height: fit-content;" data-dismiss="modal">Cancel</button>
+                        </div>
+                      </form>
                     </div>
                 </div>
             </div>
         </div>
 
-      
+
       <!-- search and filter row -->
       <div class="my-row green-background row" style="  border-radius: 5px; margin-left:0.1%; padding-top:0.5%; padding-bottom: 0.25%;">
         <div class="col-md-6" style="padding-top: 6px; padding-left: 1%;" >
@@ -93,13 +98,13 @@
             <option value="">Filter</option>
             <option value="title">Title</option>
             <option value="reminder">Reminder</option>
-          </select>          
+          </select>
         </div>
       </div>
       </div>
 
-      
-      
+
+
 
 
       <!-- reminders table -->
@@ -133,12 +138,12 @@
                 <div>
                   <i class="fas fa-trash-alt trash-icon" data-object-id="{{ reminder.id }}"></i>
               </div>
-                
+
               </td>
             </tr>
           {% endfor %}
-        </tbody>        
-          
+        </tbody>
+
         <!-- table footer with pagination -->
         <tfoot>
             <tr>
@@ -168,11 +173,11 @@
                               </a>
                             </li>
                             {% endif %}
-                            
+
                             <li class="page-item disabled">
                               <a class="page-link" href="#">{{ reminders.number }}</a>
                             </li>
-                            
+
                             {% if reminders.has_next %}
                             <li class="page-item">
                               <a class="page-link" href="?reminders_page={{ reminders.next_page_number }}" aria-label="Next">
@@ -192,9 +197,9 @@
           </tfoot>
       </table>
 
-    </div> 
+    </div>
   </div>
-  
+
 
   <script>
 
@@ -220,7 +225,7 @@
         });
 
         useFallbackDate = true
-        
+
       }
 
       function convertToLocalDateTime(datetimeStr) {
@@ -291,12 +296,12 @@
               type: 'POST',
               url: $(this).attr('action'),
               data: {
-                'action': 'delete_reminder', 
+                'action': 'delete_reminder',
                 'ids': JSON.stringify(objectId),
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
               },
               success: function(response) {
-                constructRemindersTable(response.data)   
+                constructRemindersTable(response.data)
                   $('#remindersRowsPerPage').val('{{ reminders.paginator.num_pages }}');
                   $('#remindersRowsPerPage').val(20);
               },
@@ -322,7 +327,7 @@
               type: 'POST',
               url: $(this).attr('action'),
               data: {
-                'action': 'get_reminder', 
+                'action': 'get_reminder',
                 'ids': JSON.stringify(id),
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
               },
@@ -377,7 +382,7 @@
                   type: 'POST',
                   url: $(this).attr('action'),
                   data: {
-                    'action': 'edit_reminder', 
+                    'action': 'edit_reminder',
                     'title': title,
                     'date': date,
                     'reminder': reminder,
@@ -398,7 +403,7 @@
                       $('#myModal').modal('hide');
                     }catch(exception){
                       console.log(exception.message)
-                    }                  
+                    }
                   },
                   error: function(xhr, status, error) {
                     console.error('Error editing reminder:', error);
@@ -424,7 +429,39 @@
         }
       });
 
-    
+      // Function to reset form validation state and hide "invalid-feedback"
+      function resetFormValidation() {
+            var form = document.getElementById('reminderForm');
+            form.reset(); // Reset the form
+            form.classList.remove('was-validated'); // Remove the "was-validated" class
+            var invalidFeedback = document.getElementById('date-invalid-feedback');
+            invalidFeedback.style.display = 'none';
+          }
+
+      // Event listener for the "Cancel" button
+       document.getElementById('cancelButton').addEventListener('click', resetFormValidation);
+
+       // Event listener for closing the modal
+       $('#myModal').on('hidden.bs.modal', resetFormValidation);
+
+       // Function to handle form validation on submission
+       function handleFormValidation(event) {
+         var form = event.currentTarget;
+         if (form.checkValidity() === false) {
+           event.preventDefault();
+           event.stopPropagation();
+         }
+         form.classList.add('was-validated');
+       }
+
+        // Event listener for form submission
+       window.addEventListener('load', function () {
+         var forms = document.getElementsByClassName('needs-validation');
+         var validation = Array.prototype.filter.call(forms, function (form) {
+           form.addEventListener('submit', handleFormValidation, false);
+         });
+       }, false);
+
       // ADD REMINDER
       $(document).ready(function() {
           // Event handler for the "Add" button in the modal
@@ -446,7 +483,7 @@
                   type: 'POST',
                   url: $(this).attr('action'),
                   data: {
-                      'action': 'add_reminder', 
+                      'action': 'add_reminder',
                       'title': title,
                       'date': date,
                       'reminder': reminder,
@@ -463,19 +500,16 @@
 
                         $('#remindersRowsPerPage').val('{{ reminders.paginator.num_pages }}');
                         $('#remindersRowsPerPage').val(20);
-                        
+
                         $('#myModal').modal('hide');
                       }catch(exception){
                         console.log(exception.message)
                       }
-                      
+
                   },
                   error: function(xhr, status, error) {
                       // Handle the error response
                       console.error('Error adding reminder:', error);
-                      $('#myModal').modal('hide');
-                      // Display an error message to the user
-                      alert('Error adding reminder. Please try again.');
                   }
               });
           });
@@ -492,7 +526,7 @@
           row += '<td class="clickable-row clickable" data-href="' + data[i].id + '">' + data[i].title + '</td>';
           row += '<td class="clickable-row clickable" data-href="' + data[i].id + '">' + data[i].date + '</td>';
           row += '<td class="clickable-row clickable" data-href="' + data[i].id + '">' + data[i].reminder + '</td>';
-                          
+
           // Condition for the status column
           if (data[i].status === 'Active') {
             row += '<td class="clickable-row clickable" data-href="' + data[i].pk + '"><span class="badge badge-success" style="width: 57px;">ACTIVE</span></td>';
@@ -505,7 +539,7 @@
           }
 
           row += '<td><i class="fas fa-trash-alt trash-icon" data-object-id='+ data[i].id + '></i></td>';
-                          
+
           row += '</tr>';
 
           tableBody.append(row);
@@ -528,24 +562,24 @@
       var selectedValue = selectBox.value;
 
       var filter = ''
-      if (selectedValue !== undefined && selectedValue !== '') 
+      if (selectedValue !== undefined && selectedValue !== '')
         filter = selectedValue
 
       $.ajax({
         type: 'POST',
         url: $(this).attr('action'),
         data: {
-          'action': 'search_reminders', 
+          'action': 'search_reminders',
           'query': formData,
           'filter': filter,
           'csrfmiddlewaretoken': '{{ csrf_token }}'
         },
         success: function(response) {
-          constructRemindersTable(response.data)   
+          constructRemindersTable(response.data)
           $('#remindersRowsPerPage').val('{{ reminders.paginator.num_pages }}');
           $('#remindersRowsPerPage').val(20);
-          $('#remindersRowsPerPage option').prop('disabled', false);         
-        },            
+          $('#remindersRowsPerPage option').prop('disabled', false);
+        },
       });
     }
 
@@ -579,14 +613,14 @@
 <style>
     .btn-custom {
         background-color: var(--green);
-        border-color: var(--green); 
+        border-color: var(--green);
         color: #FFFFFF;
     }
 
     .btn-custom:hover {
-        background-color: var(--green); 
+        background-color: var(--green);
         border-color: var(--green);
-        color: #FFFFFF; 
+        color: #FFFFFF;
     }
 
     .badge-purple {
@@ -669,7 +703,7 @@
     }
 
   </style>
-  
+
 </section>
 <section style="margin-top: -5%;">
     {% endblock %}

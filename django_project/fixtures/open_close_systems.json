@@ -10,14 +10,14 @@
     "model": "population_data.openclosesystem",
     "pk": 2,
     "fields": {
-        "name": "Close"
+        "name": "Closed"
     }
 },
 {
     "model": "population_data.openclosesystem",
     "pk": 3,
     "fields": {
-        "name": "Open Partially"
+        "name": "Partially Open"
     }
 }
 ]

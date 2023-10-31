@@ -168,6 +168,10 @@
     height: 1px;
     background-color: gray;
   }
+
+  .select-value.error::after {
+    background-color: #d32f2f;
+  }
   
   .select-box:hover .select-value {
     color: inherit;

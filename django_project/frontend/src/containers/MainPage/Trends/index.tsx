@@ -61,7 +61,7 @@ const Trends = () => {
           >
             {selectedSpecies && rerender && (
               <Grid item xs={12} md={6}>
-                <div className='species-card-container' data-testid='species-card-container'>
+                <div className='species-card-container-trends' data-testid='species-card-container-trends'>
                   <div className='species-card-image-container'>
                     <img
                       src={taxonDetail.graph_icon ? taxonDetail.graph_icon : '/static/images/default-species.png'}

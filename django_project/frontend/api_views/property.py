@@ -50,7 +50,31 @@ from stakeholder.models import Organisation, OrganisationUser
 from frontend.utils.parcel import find_province
 
 
-class CreateNewProperty(APIView):
+class CheckPropertyNameIsAvailable(APIView):
+    """Validate if property name is available."""
+    permission_classes = [IsAuthenticated]
+
+    def validate_property_name(self, name, property_id=None):
+        properties = Property.objects.filter(
+            name=name
+        )
+        if property_id:
+            properties = properties.exclude(id=property_id)
+        return not properties.exists()
+
+    def post(self, request, *args, **kwargs):
+        name = request.data.get('name')
+        property_id = request.data.get('id', None)
+        return Response(
+            status=200,
+            data={
+                'name': name,
+                'available': self.validate_property_name(name, property_id)
+            }
+        )
+
+
+class CreateNewProperty(CheckPropertyNameIsAvailable):
     """Create new property API."""
     permission_classes = [IsAuthenticated]
 
@@ -159,8 +183,15 @@ class CreateNewProperty(APIView):
                     status=403,
                     data='User does not belong to this organisation!'
                 )
+        property_name = request.data.get('name')
+        if not self.validate_property_name(property_name):
+            return Response(
+                status=400, data=(
+                    f'There is existing property with name {property_name}! '
+                    'Please use other name for the property!'
+                ))
         data = {
-            'name': request.data.get('name'),
+            'name': property_name,
             'owner_email': request.data.get('owner_email'),
             'property_type_id': request.data.get('property_type_id'),
             'province_id': province.id,
@@ -251,7 +282,7 @@ class PropertyList(APIView):
         return response
 
 
-class UpdatePropertyInformation(APIView):
+class UpdatePropertyInformation(CheckPropertyNameIsAvailable):
     """Update property information."""
     permission_classes = [IsAuthenticated]
 
@@ -260,7 +291,14 @@ class UpdatePropertyInformation(APIView):
             Property,
             id=request.data.get('id')
         )
-        property.name = request.data.get('name')
+        property_name = request.data.get('name')
+        if not self.validate_property_name(property_name, property.id):
+            return Response(
+                status=400, data=(
+                    f'There is existing property with name {property_name}! '
+                    'Please use other name for the property!'
+                ))
+        property.name = property_name
         property.property_type = (
             PropertyType.objects.get(id=request.data.get('property_type_id'))
         )

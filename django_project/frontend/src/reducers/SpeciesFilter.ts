@@ -16,6 +16,9 @@ export interface SpeciesFilterInterface {
   activityName: string,
   propertyName:string;
   organisationName:string;
+  propertyCount:number;
+  organisationCount:number;
+  activityCount:number;
 }
 
 const initialState: SpeciesFilterInterface = {
@@ -32,7 +35,10 @@ const initialState: SpeciesFilterInterface = {
   spatialFilterValues: "",
   activityName: "",
   propertyName:"",
-  organisationName: ""
+  organisationName: "",
+  propertyCount: 0,
+  organisationCount: 0,
+  activityCount: 0
 };
 
 export const SpeciesFilterSlice = createSlice({
@@ -103,6 +109,15 @@ export const SpeciesFilterSlice = createSlice({
     },
     selectedOrganisationName: (state, action: PayloadAction<string>) => {
       state.organisationName = action.payload;
+    },
+    setPropertyCount: (state, action: PayloadAction<number>) => {
+      state.propertyCount = action.payload;
+    },
+    setOrganisationCount: (state, action: PayloadAction<number>) => {
+      state.organisationCount = action.payload;
+    },
+    setActivityCount: (state, action: PayloadAction<number>) => {
+      state.activityCount = action.payload;
     }
   },
 });
@@ -121,7 +136,10 @@ export const {
   setSpatialFilterValues,
   selectedActivityName,
   selectedPropertyName,
-  selectedOrganisationName
+  selectedOrganisationName,
+  setPropertyCount,
+  setOrganisationCount,
+  setActivityCount
 } = SpeciesFilterSlice.actions;
 
 export default SpeciesFilterSlice.reducer;

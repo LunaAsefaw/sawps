@@ -25,12 +25,16 @@ import {
     CommonUploadMetadata,
     UploadSpeciesDetailValidation,
     FIELD_COUNTER,
-    OTHER_NUMBER_FIELDS
+    OTHER_NUMBER_FIELDS,
+    SUBPOPULATION_FIELD_MAP,
+    SubpopulationTotal
 } from '../../../models/Upload';
+import PropertyInterface from '../../../models/Property';
 import { REQUIRED_FIELD_ERROR_MESSAGE } from '../../../utils/Validation';
 import ConfidenceRating from './ConfidenceRating';
 
 interface SpeciesDetailInterface {
+    propertyItem: PropertyInterface;
     initialData: UploadSpeciesDetailInterface;
     taxonMetadataList: TaxonMetadata[];
     surveyMethodMetadataList: CommonUploadMetadata[];
@@ -55,13 +59,18 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
         setIsConfidenceRatingOpen(true);
     };
     const { 
-        initialData, taxonMetadataList,
+        propertyItem, initialData, taxonMetadataList,
         surveyMethodMetadataList, sampling_effort_coverages,
         population_statuses, population_estimate_categories,
         setIsDirty, handleNext, handleSaveDraft
     } = props
     const [data, setData] = useState<UploadSpeciesDetailInterface>(getDefaultUploadSpeciesDetail(0))
     const [validation, setValidation] = useState<UploadSpeciesDetailValidation>({})
+    const [subpopulationTotal, setSubpopulationTotal] = useState<SubpopulationTotal>({
+        adult: 0,
+        sub_adult: 0,
+        juvenile: 0
+    })
 
     const updateSpecies = (value: number) => {
         // find taxon
@@ -113,23 +122,37 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                 intake_populations: [...data.intake_populations],
                 offtake_populations: [...data.offtake_populations]     
             })
+            setSubpopulationTotal({
+                adult: 0,
+                sub_adult: 0,
+                juvenile: 0
+            })
         } else {
             let _total = data.annual_population.total
             if (FIELD_COUNTER.includes(field)) {
                 if (isNaN(value)) {
                     value = 0
                 }
+                let _subpopulation = {
+                    adult: 0,
+                    sub_adult: 0,
+                    juvenile: 0
+                }
                 // sum the counter fields
                 _total = 0
                 for (let _field of FIELD_COUNTER) {
+                    let _keySubField = SUBPOPULATION_FIELD_MAP[_field] as keyof SubpopulationTotal
                     if (_field === field) {
                         _total += value
+                        _subpopulation[_keySubField] += value
                     } else {
                         let _keyField = _field as keyof AnnualPopulationInterface
                         let _fieldVal = data.annual_population[_keyField] as number
                         _total += isNaN(_fieldVal) ? 0 : _fieldVal
+                        _subpopulation[_keySubField] += isNaN(_fieldVal) ? 0 : _fieldVal
                     }
                 }
+                setSubpopulationTotal(_subpopulation)
             } else if (OTHER_NUMBER_FIELDS.includes(field)) {
                 if (isNaN(value)) {
                     value = 0
@@ -208,6 +231,15 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
         //         }
         //     }
         // }
+        if (data.annual_population.area_available_to_species <= 0 || data.annual_population.area_available_to_species > propertyItem.size) {
+            _error_validation = {
+                ..._error_validation,
+                annual_population: {
+                    ..._error_validation.annual_population,
+                    area_available_to_species: true
+                }
+            }
+        }
         if (data.annual_population.survey_method_id === 0) {
             _error_validation = {
                 ..._error_validation,
@@ -244,6 +276,15 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                     }
                 }
         }
+        if (data.annual_population.population_estimate_certainty == 0) {
+            _error_validation = {
+                ..._error_validation,
+                annual_population: {
+                    ..._error_validation.annual_population,
+                    population_estimate_certainty: true
+                }
+            }
+        }
         setValidation(_error_validation)
         return Object.keys(_error_validation).length === 0
     }
@@ -256,6 +297,11 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
             offtake_populations: [...initialData.offtake_populations]
         })
         setValidation({})
+        setSubpopulationTotal({
+            adult: initialData.annual_population.adult_male + initialData.annual_population.adult_female,
+            sub_adult: initialData.annual_population.sub_adult_male + initialData.annual_population.sub_adult_female,
+            juvenile: initialData.annual_population.juvenile_male + initialData.annual_population.juvenile_female
+        })
     }, [initialData])
 
     return (
@@ -354,7 +400,8 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                                             <TextField id='survey_method_other' label='If other, please explain' value={data.annual_population.survey_method_other}
                                                 variant='standard'
                                                 onChange={(e) => updateAnnualPopulation('survey_method_other', e.target.value) } fullWidth
-                                                helperText=" " />
+                                                helperText={validation.annual_population?.survey_method_other ? REQUIRED_FIELD_ERROR_MESSAGE : ' '}
+                                                error={validation.annual_population?.survey_method_other} />
                                         }
                                     </Grid>
                                 </Grid>
@@ -412,7 +459,7 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                             <Grid item className='InputContainer'>
                                 <Grid container spacing={2}>
                                     <Grid item xs={6}>
-                                        <FormControl variant="standard" required className='DropdownInput' fullWidth>
+                                        <FormControl variant="standard" required className='DropdownInput' fullWidth error={validation.annual_population?.population_estimate_category_id}>
                                             <InputLabel id="population-estimate-category-label">Population Estimate Category</InputLabel>
                                             <Select
                                                 labelId="population-estimate-category-label"
@@ -431,7 +478,7 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                                                 })                                            
                                                 }
                                             </Select>
-                                            <FormHelperText>{' '}</FormHelperText>
+                                            <FormHelperText>{validation.annual_population?.population_estimate_category_id ? REQUIRED_FIELD_ERROR_MESSAGE : ' '}</FormHelperText>
                                         </FormControl>
                                     </Grid>
                                     <Grid item xs={6}>
@@ -439,7 +486,8 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                                             <TextField id='population_estimate_category_other' label='If other, please explain' value={data.annual_population.population_estimate_category_other}
                                                 variant='standard'
                                                 onChange={(e) => updateAnnualPopulation('population_estimate_category_other', e.target.value) } fullWidth
-                                                helperText={validation.annual_population?.population_estimate_category_other ? REQUIRED_FIELD_ERROR_MESSAGE : ' '} />
+                                                helperText={validation.annual_population?.population_estimate_category_other ? REQUIRED_FIELD_ERROR_MESSAGE : ' '}
+                                                error={validation.annual_population?.population_estimate_category_other}/>
                                         }
                                     </Grid>
                                 </Grid>
@@ -456,7 +504,19 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                         <Grid container flexDirection={'column'} rowSpacing={1}>
                             <Grid item className='InputContainer'>
                                 <Grid container flexDirection={'row'} spacing={2}>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={4}>
+                                        <TextField
+                                            id='subpopulation_total_adult'
+                                            label='Total Adult'
+                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                                            variant="standard"
+                                            fullWidth
+                                            disabled
+                                            value={subpopulationTotal.adult}
+                                            helperText=" "
+                                        />
+                                    </Grid>
+                                    <Grid item xs={4}>
                                         <TextField
                                             id='adult_male'
                                             label='Adult Males'
@@ -475,7 +535,7 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                                             helperText=" "
                                         />
                                     </Grid>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={4}>
                                         <TextField
                                             id='adult_female'
                                             label='Adult Females'
@@ -498,7 +558,19 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                             </Grid>
                             <Grid item className='InputContainer'>
                                 <Grid container flexDirection={'row'} spacing={2}>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={4}>
+                                        <TextField
+                                            id='subpopulation_total_subadult'
+                                            label='Total Subadult'
+                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                                            variant="standard"
+                                            fullWidth
+                                            disabled
+                                            value={subpopulationTotal.sub_adult}
+                                            helperText=" "
+                                        />
+                                    </Grid>
+                                    <Grid item xs={4}>
                                         <TextField
                                             id='subadult_male'
                                             label='Subadult Males'
@@ -517,7 +589,7 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                                             helperText=" "
                                         />
                                     </Grid>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={4}>
                                         <TextField
                                             id='subadult_female'
                                             label='Subadult Females'
@@ -540,7 +612,19 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                             </Grid>
                             <Grid item className='InputContainer'>
                                 <Grid container flexDirection={'row'} spacing={2}>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={4}>
+                                        <TextField
+                                            id='subpopulation_total_juvenile'
+                                            label='Total Juvenile'
+                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                                            variant="standard"
+                                            fullWidth
+                                            disabled
+                                            value={subpopulationTotal.juvenile}
+                                            helperText=" "
+                                        />
+                                    </Grid>
+                                    <Grid item xs={4}>
                                         <TextField
                                             id='juvenile_male'
                                             label='Juvenile Males'
@@ -559,7 +643,7 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                                             helperText=" "
                                         />
                                     </Grid>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={4}>
                                         <TextField
                                             id='juvenile_female'
                                             label='Juvenile Females'
@@ -615,7 +699,8 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
                                             fullWidth
                                             value={data.annual_population.area_available_to_species.toString()}
                                             onChange={(e) => updateAnnualPopulation('area_available_to_species', parseFloat(e.target.value))}
-                                            helperText=" "
+                                            helperText={validation.annual_population?.area_available_to_species ? 'Area available to species must be greater than 0 and less than property area size' : ' '}
+                                            error={validation.annual_population?.area_available_to_species}
                                         />
                                     </Grid>
                                 </Grid>
@@ -646,33 +731,33 @@ export default function SpeciesDetail(props: SpeciesDetailInterface) {
 
                                     <Grid item xs={6}>
                                         <div className="select-container">
-                                            <InputLabel id="population-estimate-certainty-label">
-                                            Population Estimate Certainty*
+                                            <InputLabel id="population-estimate-certainty-label" error={validation.annual_population?.population_estimate_certainty}>
+                                                Population Estimate Certainty*
                                             </InputLabel>
                                             <FormControl
-                                            variant="standard"
-                                            required
-                                            className="DropdownInput"
-                                            fullWidth
-                                            error={validation.annual_population?.population_estimate_certainty}
+                                                variant="standard"
+                                                required
+                                                className="DropdownInput"
+                                                fullWidth
+                                                error={validation.annual_population?.population_estimate_certainty}
                                             >
-                                            <div
-                                                className="select-box"
-                                                onClick={handleOpenConfidenceRating}
-                                            >
-                                                {/* Display the selected value or placeholder */}
-                                                <div className="select-value">
-                                                {data.annual_population.population_estimate_certainty ||
-                                                data.annual_population.population_estimate_certainty == 0
-                                                    ? data.annual_population.population_estimate_certainty.toString()
-                                                    : 'Select an option'}
+                                                <div
+                                                    className="select-box"
+                                                    onClick={handleOpenConfidenceRating}
+                                                >
+                                                    {/* Display the selected value or placeholder */}
+                                                    <div className={'select-value' + (validation.annual_population?.population_estimate_certainty ? ' error' : '') }>
+                                                    {data.annual_population.population_estimate_certainty ||
+                                                    data.annual_population.population_estimate_certainty == 0
+                                                        ? data.annual_population.population_estimate_certainty.toString()
+                                                        : 'Select an option'}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <FormHelperText>
-                                                {validation.annual_population?.population_estimate_certainty
-                                                ? REQUIRED_FIELD_ERROR_MESSAGE
-                                                : ' '}
-                                            </FormHelperText>
+                                                <FormHelperText>
+                                                    {validation.annual_population?.population_estimate_certainty
+                                                    ? REQUIRED_FIELD_ERROR_MESSAGE
+                                                    : ' '}
+                                                </FormHelperText>
                                             </FormControl>
                                         </div>
                                     </Grid>

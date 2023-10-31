@@ -20,6 +20,11 @@ class ActivityTypeAdmin(admin.ModelAdmin):
         'display_color',
         'display_export_fields'
     ]
+    search_fields = [
+        'name',
+        'width',
+        'export_fields'
+    ]
     form = ActivityTypeForm
 
     def display_export_fields(self, obj):

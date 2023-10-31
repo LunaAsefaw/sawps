@@ -19,10 +19,10 @@ interface SpeciesDataItem {
 }
 
   const availableColors = [
-    'rgba(112, 178, 118, 1)', 
-    'rgba(250, 167, 85, 1)', 
-    'rgba(157, 133, 190, 1)', 
-    '#FF5252', 
+    'rgba(112, 178, 118, 1)',
+    'rgba(250, 167, 85, 1)',
+    'rgba(157, 133, 190, 1)',
+    '#FF5252',
     '#616161',
     // additional transparency colors for years
     'rgba(112, 178, 118, 0.5)',  // 50% transparency
@@ -31,7 +31,7 @@ interface SpeciesDataItem {
     'rgba(157, 133, 190, 0.5)',  // 50% transparency
     'rgba(250, 167, 85, 0.5)',  // 50% transparency
   ];
-  
+
 
   const TotalCountPerActivity = (props: any) => {
     const {
@@ -54,7 +54,7 @@ interface SpeciesDataItem {
         }
       }else onEmptyDatasets(false)
     }, [propertyId,startYear,endYear,activityData, selectedSpecies]);
-  
+
     // Initialize variables
     const labels: string[] = [];
     const data: number[] = [];
@@ -78,7 +78,7 @@ interface SpeciesDataItem {
 
           // Check if the activityType is not in the labels list
           if (!labels.includes(activityType)) {
-            let paddedLabel = activityType
+            let paddedLabel = activityType + '';
             if (activityType.length > 25) {
               // Trim the name to 22 characters and add '...' at the end
               paddedLabel = activityType.substring(0, 22) + '...';
@@ -91,7 +91,7 @@ interface SpeciesDataItem {
         } else onEmptyDatasets(false)
       });
     }
-  
+
     // Create the chartData object
     const chartData = {
       labels: labels,
@@ -102,18 +102,18 @@ interface SpeciesDataItem {
         },
       ],
     };
-  
+
     // Define chart title based on conditions
     let chartTitle = 'No data available for current filter selections';
-  
+
     if (selectedSpecies && activityData && activityData.length > 0) {
       chartTitle = `Total count per activity for ${selectedSpecies} year ${year}`;
     }
-    
+
     if (!selectedSpecies){
         chartTitle = "Please select a species for the chart to show available data";
     }
-  
+
     const options = {
       cutout: '54%',
       plugins: {
@@ -156,7 +156,7 @@ interface SpeciesDataItem {
         backgroundRepeat: "no-repeat",
         whiteSpace: "pre-wrap", // Allow text to wrap
     };
-  
+
     return (
         <>
           {!loading ? (
@@ -171,5 +171,5 @@ interface SpeciesDataItem {
         </>
       );
   };
-  
+
   export default TotalCountPerActivity;

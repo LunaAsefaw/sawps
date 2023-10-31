@@ -125,23 +125,55 @@ def clear_vector_tiles(modeladmin, request, queryset):
 
 
 class TilingTaskAdmin(admin.ModelAdmin):
+    """Admin page for TilingTask model
+
+    """
     list_display = ('status', 'started_at',
                     'finished_at', 'total_size')
+    search_fields = [
+        'status',
+        'total_size',
+        'started_at',
+        'finished_at'
+    ]
     actions = [generate_vector_tiles, resume_generate_vector_tiles,
                cancel_generate_vector_tiles, clear_vector_tiles]
 
 
 class BoundaryFileAdmin(admin.ModelAdmin):
+    """Admin page for BoundaryFile model
+
+    """
     list_display = ('meta_id', 'name', 'upload_date', 'session', 'file_type')
+    search_fields = [
+        'name',
+        'meta_id',
+        'file_type',
+        'upload_date',
+        'session'
+    ]
 
 
 class BoundarySearchRequestAdmin(admin.ModelAdmin):
+    """Admin page for BoundarySearchRequest model
+
+    """
     list_display = ('session', 'type', 'status', 'progress')
+    search_fields = [
+        'session',
+        'type',
+        'status',
+        'progress'
+    ]
 
 
 class ContextLayerAdmin(admin.ModelAdmin):
+    """Admin page for ContextLayer model
+
+    """
     change_list_template = "admin/context_layer.html"
     list_display = ('name', 'is_static')
+    search_fields = ['name']
 
     def get_urls(self):
         urls = super().get_urls()
@@ -176,7 +208,14 @@ class ContextLayerLegendForm(ModelForm):
 
 
 class ContextLayerLegendAdmin(admin.ModelAdmin):
+    """Admin page for ContextLayerLegend model
+
+    """
     list_display = ('name', 'layer', 'display_color')
+    search_fields = [
+        'name',
+        'layer__name',
+    ]
     form = ContextLayerLegendForm
 
     def display_color(self, obj):
@@ -189,7 +228,17 @@ class ContextLayerLegendAdmin(admin.ModelAdmin):
 
 
 class DraftSpeciesUploadAdmin(admin.ModelAdmin):
+    """Admin page for DraftSpeciesUpload model
+
+    """
     list_display = ('name', 'property', 'upload_by', 'taxon', 'year')
+    search_fields = [
+        'name',
+        'property__name',
+        'upload_by__username',
+        'taxon__scientific_name',
+        'year'
+    ]
 
 
 @admin.action(description='Restart plumber process')
@@ -208,9 +257,12 @@ class StatisticalModelOutputInline(admin.TabularInline):
 
 
 class StatisticalModelAdmin(admin.ModelAdmin):
+    """Admin page for StatisticalModel model
+
+    """
     change_form_template = "admin/statistical_model_change_form.html"
     list_display = ('taxon', 'name')
-    search_fields = ['taxon', 'name']
+    search_fields = ['taxon__scientific_name', 'name']
     actions = [restart_plumber_process]
     inlines = [StatisticalModelOutputInline]
 
@@ -231,22 +283,44 @@ class StatisticalModelAdmin(admin.ModelAdmin):
 
 
 class LayerAdmin(admin.ModelAdmin):
+    """Admin page for Layer model
+
+    """
     list_display = (
         'name', 'context_layer', 'spatial_filter_field'
     )
+    search_fields = [
+        'name',
+        'context_layer__name'
+    ]
 
 
 class SpatialDataValueModelAdmin(admin.StackedInline):
+    """Admin page for SpatialDataValueMode model
+
+    """
     list_display = (
         'spatial_data', 'layer', 'context_layer_value'
     )
+    search_fields = [
+        'spatial_data',
+        'layer',
+        'context_layer_value'
+    ]
     model = SpatialDataValueModel
 
 
 class SpatialDataModelAdmin(admin.ModelAdmin):
+    """Admin page for SpatialDataModel model
+
+    """
     list_display = (
         'property', 'context_layer'
     )
+    search_fields = [
+        'property__name',
+        'context_layer__name'
+    ]
     inlines = (
         SpatialDataValueModelAdmin,
     )

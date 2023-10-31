@@ -27,7 +27,6 @@ from population_data.models import (
     PopulationEstimateCategory,
     SamplingEffortCoverage
 )
-from species.models import OwnedSpecies
 from population_data.factories import (
     CertaintyF
 )
@@ -166,7 +165,7 @@ class TestPopulationAPIViews(TestCase):
                 'reintroduction_source': 'Source A',
                 'permit': 900,
                 'note': 'This is invalid notes'
-            },]
+            }]
         }
         kwargs = {
             'property_id': property.id
@@ -179,28 +178,24 @@ class TestPopulationAPIViews(TestCase):
         view = UploadPopulationAPIVIew.as_view()
         response = view(request, **kwargs)
         self.assertEqual(response.status_code, 204)
-        # assert owned species
-        owned_species = OwnedSpecies.objects.filter(
-            taxon=taxon,
-            property=property
-        ).first()
-        self.assertTrue(owned_species)
         # assert annual population data
         annual_population = AnnualPopulation.objects.filter(
-            owned_species=owned_species,
+            taxon=taxon,
+            property=property,
             year=2023
         ).first()
         self.assertTrue(annual_population)
+        self.assertEqual(annual_population.area_available_to_species, 5.5)
         # assert annual population per activity - intake
         annual_intake = AnnualPopulationPerActivity.objects.filter(
-            owned_species=owned_species,
+            annual_population=annual_population,
             year=2023,
             activity_type_id=1
         ).first()
         self.assertTrue(annual_intake)
         # assert annual population per activity - offtake
         annual_offtake = AnnualPopulationPerActivity.objects.filter(
-            owned_species=owned_species,
+            annual_population=annual_population,
             year=2023,
             activity_type_id=2
         ).first()

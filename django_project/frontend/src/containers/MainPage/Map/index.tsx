@@ -123,8 +123,8 @@ export default function Map() {
     axios.get(`${UPLOAD_FILE_URL}${session}/status/`).then((response) => {
         if (response.data) {
             let _status = response.data['status']
-            setSavingBoundaryDigitise(false)
             if (_status === 'DONE') {
+                setSavingBoundaryDigitise(false)
                 let _parcels = response.data['parcels'] as ParcelInterface[]
                 dispatch(setSelectedParcels(_parcels))
                 onDrawCancelled(true)
@@ -139,11 +139,12 @@ export default function Map() {
                         'payload': _bbox_str
                     }))
                 }
-
+                removeDrawMapLoadingIndicator()
             } else if (_status === 'ERROR') {
+                setSavingBoundaryDigitise(false)
                 alert('There is unexpected error! Please try again!')
+                removeDrawMapLoadingIndicator()
             }
-            removeDrawMapLoadingIndicator()
         }
     }).catch((error) => {
         console.log(error)

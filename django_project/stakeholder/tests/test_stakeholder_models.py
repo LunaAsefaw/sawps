@@ -27,8 +27,16 @@ from stakeholder.models import (
     UserRoleType,
     UserTitle,
     create_user_profile,
-    save_user_profile
+    save_user_profile,
+    MANAGER,
+    MEMBER
 )
+from sawps.tests.model_factories import GroupF
+from frontend.static_mapping import (
+    ORGANISATION_MANAGER,
+    ORGANISATION_MEMBER
+)
+from species.factories import UserFactory
 
 
 class TestUserRoleType(TestCase):
@@ -268,14 +276,50 @@ class OrganizationUserTestCase(TestCase):
     def setUpTestData(cls):
         """Setup test data for organisation user model."""
         cls.organizationUser = organisationUserFactory()
+        cls.user = UserFactory()
+        cls.organisation = organisationFactory()
 
-    def test_create_organisation_user(self):
-        """Test creating organisation user."""
+    def test_create_organisation_user_default(self):
+        """Test creating organisation user, defaulted to Organisation Member."""
         self.assertEqual(OrganisationUser.objects.count(), 1)
         self.assertTrue(isinstance(self.organizationUser, OrganisationUser))
-        self.assertTrue(
+        self.assertEqual(
             self.organizationUser.user.groups.first().name,
-            'Data contributor'
+            ORGANISATION_MEMBER
+        )
+
+    def test_create_organisation_user_manager(self):
+        """Test creating organisation user as manager."""
+        OrganisationInvites.objects.create(
+            email=self.user.email,
+            joined=True,
+            assigned_as=MANAGER,
+            organisation=self.organisation
+        )
+        organisation_user = organisationUserFactory(
+            user=self.user,
+            organisation=self.organisation
+        )
+        self.assertEqual(
+            organisation_user.user.groups.first().name,
+            ORGANISATION_MANAGER
+        )
+
+    def test_create_organisation_user_member(self):
+        """Test creating organisation user as member."""
+        OrganisationInvites.objects.create(
+            email=self.user.email,
+            joined=True,
+            assigned_as=MEMBER,
+            organisation=self.organisation
+        )
+        organisation_user = organisationUserFactory(
+            user=self.user,
+            organisation=self.organisation
+        )
+        self.assertEqual(
+            organisation_user.user.groups.first().name,
+            ORGANISATION_MEMBER
         )
 
     def test_update_organisation_user(self):
@@ -290,25 +334,53 @@ class OrganizationUserTestCase(TestCase):
     def test_delete_organisation_user(self):
         """Test deleting organisation user."""
         user = self.organizationUser.user
-        organisation_user_2 = organisationUserFactory(
+        group = GroupF.create(name='Data contributor')
+        user.groups.add(group)
+        organisation_user_2 = organisationUserFactory.create(
             user=user
         )
+
+        OrganisationInvites.objects.create(
+            email=self.user.email,
+            joined=True,
+            assigned_as=MANAGER,
+            organisation=self.organisation
+        )
+        organisation_user_3 = organisationUserFactory(
+            user=self.user,
+            organisation=self.organisation
+        )
+        organisation_user_4 = organisationUserFactory(
+            user=self.user
+        )
+        self.assertEqual(
+            sorted(organisation_user_3.user.groups.values_list('name', flat=True)),
+            [ORGANISATION_MANAGER, ORGANISATION_MEMBER]
+        )
+
         # delete organizationUser
-        # user would still be in group Data contributor
+        # user would still be in group Organisation Member
         # because he still belongs to other organisation
         self.organizationUser.delete()
-        self.assertEqual(OrganisationUser.objects.count(), 1)
-        self.assertTrue(len(user.groups.all()), 1)
-        self.assertTrue(user.groups.first().name, 'Data contributpr')
+        self.assertEqual(OrganisationUser.objects.count(), 3)
+        self.assertEqual(len(user.groups.all()), 1)
+        self.assertEqual(user.groups.first().name, ORGANISATION_MEMBER)
 
         # delete organisation_user_2
-        # user would be removed from group Data contributor
+        # user would be removed from group Organisation Member
         # because he no longer belongs any organisation
         organisation_user_2.delete()
-        self.assertEqual(OrganisationUser.objects.count(), 0)
+        self.assertEqual(OrganisationUser.objects.count(), 2)
         self.assertFalse(
             user.groups.exists()
         )
+
+        # delete organisation_user_4
+        # user would not be removed from group Organisation Manager
+        # because is still a manager of other organisation
+        organisation_user_4.delete()
+        self.assertEqual(OrganisationUser.objects.count(), 1)
+        self.assertTrue(ORGANISATION_MANAGER in self.user.groups.values_list('name', flat=True))
 
 
 class OrganizationRepresentativeTestCase(TestCase):

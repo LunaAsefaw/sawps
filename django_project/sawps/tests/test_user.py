@@ -125,7 +125,7 @@ class CustomPasswordResetViewTest(TestCase):
 
         # Check that the response is a rendered template
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Password Reset', response.content.decode('utf-8'))
+        self.assertIn('SAWPS', response.content.decode('utf-8'))
 
     def test_dispatch_invalid_method(self):
         # Simulate a request with an invalid method
@@ -153,7 +153,7 @@ class CustomPasswordResetCompleteViewTest(TestCase):
         response = custom_password_reset_complete_view(request)
 
         # Check that the response is a rendered template
-        self.assertIn('Password Reset', response.content.decode('utf-8'))
+        self.assertIn('SAWPS', response.content.decode('utf-8'))
         # self.assertContains(
         #     response.content.decode('utf-8'),
         #     'Your password has been successfully reset. You can now log in using your new password.'

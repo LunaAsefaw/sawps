@@ -87,16 +87,16 @@ const PopulationCategoryChart = () => {
         const specieName = Object.keys(speciesData)[0];
         const specieData = speciesData[specieName];
         const specie = species.find(specie => specie.species_name === specieName);
-    
+
         if (index % 2 === 0 && index + 1 < populationDataArray.length) {
             const nextSpeciesData = populationDataArray[index + 1];
             const nextSpecieName = Object.keys(nextSpeciesData)[0];
             const nextSpecieData = nextSpeciesData[nextSpecieName];
             const nextSpecie = species.find(specie => specie.species_name === nextSpecieName);
-    
+
             const hasNonZeroValues = Object.values(specieData).some(value => value !== 0);
             const nextHasNonZeroValues = Object.values(nextSpecieData).some(value => value !== 0);
-    
+
             if (hasNonZeroValues || nextHasNonZeroValues) {
                 return (
                     <Box key={index} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -131,15 +131,6 @@ const PopulationCategoryChart = () => {
                                         legend: {
                                             display: false,
                                         },
-                                        // title: {
-                                        //     display: true,
-                                        //     text: specieName,
-                                        //     align: 'start' as 'start',
-                                        //     font: {
-                                        //         size: 24,
-                                        //         weight: "bold" as "bold"
-                                        //     }
-                                        // },
                                     },
                                     scales: {
                                         x: {
@@ -198,15 +189,6 @@ const PopulationCategoryChart = () => {
                                         legend: {
                                             display: false,
                                         },
-                                        // title: {
-                                        //     display: true,
-                                        //     text: nextSpecieName,
-                                        //     align: 'start' as 'start',
-                                        //     font: {
-                                        //         size: 24,
-                                        //         weight: "bold" as "bold"
-                                        //     }
-                                        // },
                                     },
                                     scales: {
                                         x: {
@@ -240,7 +222,7 @@ const PopulationCategoryChart = () => {
             return null;
         }
     });
-    
+
 
     const hasNonZeroCharts = generatedCharts.some(chart => chart !== null);
 

@@ -5,9 +5,10 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from unittest.mock import patch
 from activity.models import ActivityType
-from population_data.models import AnnualPopulationPerActivity
+from population_data.models import AnnualPopulation, AnnualPopulationPerActivity
+from population_data.factories import AnnualPopulationF
 from stakeholder.factories import organisationFactory
-from species.models import OwnedSpecies, Taxon, TaxonRank
+from species.models import Taxon, TaxonRank
 from frontend.serializers.national_statistics import (
     SpeciesListSerializer
 )
@@ -127,14 +128,14 @@ class NationalStatisticsViewTest(APITestCase):
         self.client = Client()
 
     @patch('property.models.Property.objects.filter')
-    @patch('species.models.OwnedSpecies.objects.filter')
-    def test_get_statistics(self, mock_owned_species_filter, mock_property_filter):
+    @patch('population_data.models.AnnualPopulation.objects.filter')
+    def test_get_statistics(self, mock_annual_population_filter, mock_property_filter):
         # Mock Property objects and aggregate result
         mock_property_filter.return_value.count.return_value = 5
         mock_property_filter.return_value.aggregate.return_value = {'total_area': 100}
 
-        # Mock OwnedSpecies objects and aggregate result
-        mock_owned_species_filter.return_value.aggregate.return_value = {'total_area_to_species': 50}
+        # Mock Annual Population objects and aggregate result
+        mock_annual_population_filter.return_value.aggregate.return_value = {'total_area_to_species': 50}
 
         client = self.client
         client.login(username='testuser', password='testpassword')
@@ -143,13 +144,13 @@ class NationalStatisticsViewTest(APITestCase):
         self.assertIsNotNone(response)
 
     @patch('property.models.Property.objects.filter')
-    @patch('species.models.OwnedSpecies.objects.filter')
-    def test_get_statistics_empty(self, mock_owned_species_filter, mock_property_filter):
+    @patch('population_data.models.AnnualPopulation.objects.filter')
+    def test_get_statistics_empty(self, mock_annual_population_filter, mock_property_filter):
         # Mock Property objects and aggregate result
         mock_property_filter.return_value.count.return_value = 0
 
-        # Mock OwnedSpecies objects and aggregate result
-        mock_owned_species_filter.return_value.aggregate.return_value = {'total_area_to_species': 0}
+        # Mock Annual Population objects and aggregate result
+        mock_annual_population_filter.return_value.aggregate.return_value = {'total_area_to_species': 0}
 
         client = self.client
         client.login(username='testuser', password='testpassword')
@@ -198,6 +199,7 @@ class NationalPropertiesViewTest(TestCase):
         response = self.client.get(url, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+
 class NationalActivityCountViewTestCase(TestCase):
 
     def setUp(self):
@@ -229,10 +231,15 @@ class NationalActivityCountViewTestCase(TestCase):
             scientific_name='Lion',
             common_name_varbatim='Lion'
         )
-        specie = OwnedSpecies.objects.create(
+        specie = AnnualPopulation.objects.create(
             user=self.test_user,
             taxon=taxon,
-            property= property
+            property=property,
+            total=10,
+            adult_male=4,
+            adult_female=6,
+            year=2023,
+            area_available_to_species=5
         )
         ActivityType.objects.create(
             name='unplanned'
@@ -241,8 +248,8 @@ class NationalActivityCountViewTestCase(TestCase):
             name='hunting'
         )
         AnnualPopulationPerActivity.objects.create(
+            annual_population=specie,
             activity_type=activity,
-            owned_species=specie,
             year=2023,
             total=50
         )
@@ -296,10 +303,14 @@ class NationalActivityCountPerProvinceViewTestCase(TestCase):
             scientific_name='Lion',
             common_name_varbatim='Lion'
         )
-        specie = OwnedSpecies.objects.create(
+        specie = AnnualPopulation.objects.create(
             user=self.test_user,
             taxon=taxon,
-            property= property
+            property=property,
+            total=10,
+            adult_male=4,
+            adult_female=6,
+            year=2023
         )
         ActivityType.objects.create(
             name='unplanned'
@@ -309,7 +320,7 @@ class NationalActivityCountPerProvinceViewTestCase(TestCase):
         )
         AnnualPopulationPerActivity.objects.create(
             activity_type=activity,
-            owned_species=specie,
+            annual_population=specie,
             year=2023,
             total=50
         )
@@ -373,10 +384,14 @@ class NationalActivityCountPerPropertyTypeViewTestCase(TestCase):
             scientific_name='Lion',
             common_name_varbatim='Lion'
         )
-        specie = OwnedSpecies.objects.create(
+        specie = AnnualPopulation.objects.create(
             user=self.test_user,
             taxon=taxon,
-            property= property
+            property=property,
+            total=10,
+            adult_male=4,
+            adult_female=6,
+            year=2023
         )
         ActivityType.objects.create(
             name='unplanned'
@@ -386,7 +401,7 @@ class NationalActivityCountPerPropertyTypeViewTestCase(TestCase):
         )
         AnnualPopulationPerActivity.objects.create(
             activity_type=activity,
-            owned_species=specie,
+            annual_population=specie,
             year=2023,
             total=50
         )

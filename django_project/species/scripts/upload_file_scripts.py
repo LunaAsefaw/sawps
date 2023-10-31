@@ -1,4 +1,4 @@
-PROPERTY = "Property_name"
+PROPERTY = "Property_code"
 SCIENTIFIC_NAME = "Scientific_name"
 COMMON_NAME = "Common_name_verbatim"
 OPEN_SYS = "open/close_system"
@@ -68,7 +68,7 @@ UNPLANNED_HUNT_OFFTAKE_FEMALE_JUV = \
 
 
 COMPULSORY_FIELDS = [
-    "Property_name",
+    "Property_code",
     "Scientific_name",
     "Common_name_verbatim",
     "open/close_system",

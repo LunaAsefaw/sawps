@@ -37,7 +37,14 @@ export default function PropertySummaryTable(props: PropertySummaryTableInterfac
                 <TableHead>
                 </TableHead>
                 <TableBody>
-                    
+                    <TableRow key='property_short_code'>
+                        <TableCell component="th" scope="row">
+                            Property Code
+                        </TableCell>
+                        <TableCell>
+                            {props.propertyItem.short_code ? props.propertyItem.short_code : '-'}
+                        </TableCell>
+                    </TableRow>
                     <TableRow key='property_name'>
                         <TableCell component="th" scope="row">
                             Property Name

@@ -21,6 +21,7 @@ from frontend.api_views.property import (
     PropertyDetail,
     PropertySearch,
     UpdatePropertyInformation,
+    CheckPropertyNameIsAvailable
 )
 from frontend.models.parcels import Erf, Holding
 from frontend.tests.model_factories import UserF
@@ -129,6 +130,7 @@ class TestPropertyAPIViews(TestCase):
             Parcel.objects.filter(property=property).count(),
             2
         )
+        self.assertEqual(property.short_code, response.data['short_code'])
         # get property
         kwargs = {
             'id': property.id
@@ -142,6 +144,18 @@ class TestPropertyAPIViews(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['bbox']), 4)
         self.assertEqual(len(response.data['parcels']), 2)
+        self.assertEqual(response.data['short_code'], property.short_code)
+        # test insert with existing name should return 400
+        request = self.factory.post(
+            reverse('property-create'), data=data,
+            format='json'
+        )
+        request.user = self.user_1
+        view = CreateNewProperty.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('existing property with name Property A', response.data)
+
 
     def test_metadata_list(self):
         request = self.factory.get(
@@ -174,6 +188,7 @@ class TestPropertyAPIViews(TestCase):
         _property = response.data[0]
         self.assertEqual(_property['id'], property.id)
         self.assertEqual(_property['name'], property.name)
+        self.assertEqual(_property['short_code'], property.short_code)
 
     def test_get_property_list_for_organisations(self):
         """Taxon list API test for organisations."""
@@ -301,6 +316,23 @@ class TestPropertyAPIViews(TestCase):
         updated = Property.objects.get(id=property.id)
         self.assertEqual(updated.name, data['name'])
         self.assertEqual(updated.open_id, data['open_id'])
+        # add other property and assert cannot use same name
+        other_property = PropertyFactory.create(
+            geometry=self.holding_1.geom,
+            name='Property ABCD',
+            created_by=self.user_1
+        )
+        data['name'] = other_property.name
+        request = self.factory.post(
+            reverse('property-update-detail'), data=data,
+            format='json'
+        )
+        request.user = self.user_1
+        view = UpdatePropertyInformation.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('existing property with name Property ABCD',
+                      response.data)
 
     def test_update_boundaries(self):
         property_type = PropertyType.objects.all().first()
@@ -365,6 +397,8 @@ class TestPropertyAPIViews(TestCase):
             Parcel.objects.filter(property_id=property_id).count(),
             1
         )
+        updated = Property.objects.get(id=property_id)
+        self.assertEqual(response.data['short_code'], updated.short_code)
 
     def test_search_property(self):
         # insert place names
@@ -407,3 +441,31 @@ class TestPropertyAPIViews(TestCase):
         response = view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 4)
+
+    def test_check_property_name(self):
+        data = {
+            'name': 'Property ABC'
+        }
+        request = self.factory.post(
+            reverse('property-check-available-name'), data=data,
+            format='json'
+        )
+        request.user = self.user_1
+        view = CheckPropertyNameIsAvailable.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data['available'])
+        PropertyFactory.create(
+            geometry=self.holding_1.geom,
+            name='Property ABC',
+            created_by=self.user_1
+        )
+        request = self.factory.post(
+            reverse('property-check-available-name'), data=data,
+            format='json'
+        )
+        request.user = self.user_1
+        view = CheckPropertyNameIsAvailable.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data['available'])

@@ -71,6 +71,7 @@ class PropertySerializer(serializers.ModelSerializer):
             'province', 'province_id',
             'open', 'open_id',
             'size', 'organisation', 'organisation_id',
+            'short_code'
         ]
 
 
@@ -144,7 +145,7 @@ class PropertyDetailSerializer(PropertySerializer):
             'open', 'open_id',
             'province', 'province_id',
             'size', 'organisation', 'organisation_id',
-            'parcels', 'bbox', 'centroid'
+            'parcels', 'bbox', 'centroid', 'short_code'
         ]
 
 

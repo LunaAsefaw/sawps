@@ -50,8 +50,32 @@ class ParcelAdmin(admin.ModelAdmin):
     search_fields = ['sg_number', 'property__name', 'parcel_type__name']
 
 
-admin.site.register(PropertyType)
-admin.site.register(Province)
-admin.site.register(ParcelType)
+class PropertyTypeAdmin(admin.ModelAdmin):
+    """Admin page for PropertyType model.
+
+    """
+    list_display = ('id', 'name')
+    search_fields = ['name']
+
+
+class ProvinceAdmin(admin.ModelAdmin):
+    """Admin page for Province model.
+
+    """
+    list_display = ('id', 'name')
+    search_fields = ['name']
+
+
+class ParcelTypeAdmin(admin.ModelAdmin):
+    """Admin page for ParcelType model.
+
+    """
+    list_display = ('id', 'name')
+    search_fields = ['name']
+
+
+admin.site.register(PropertyType, PropertyTypeAdmin)
+admin.site.register(Province, ProvinceAdmin)
+admin.site.register(ParcelType, ParcelTypeAdmin)
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(Parcel, ParcelAdmin)

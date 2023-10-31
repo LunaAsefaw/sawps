@@ -43,7 +43,6 @@ const Metrics = () => {
     const [areaData, setAreaData] = useState([])
 
     const [densityData, setDensityData] = useState([])
-    const [populationData, setPopulationData] = useState([])
     const [speciesData, setSpeciesData] = useState([])
     const contentRef = useRef(null);
 
@@ -230,7 +229,7 @@ const Metrics = () => {
         canViewPopulationEstimate: false,
         canViewPopulationEstimateAsPercentage: false,
     };
-    
+
 
     function updateConstants(userPermissions: string[], constants: Constants) {
         for (const permission of userPermissions) {
@@ -241,11 +240,11 @@ const Metrics = () => {
             }
         }
     }
-    
+
     // Example usage:
     // userPermissions is an array of permission strings
     // Example: ['CanViewPopulationCategory', 'CanEditData', ...]
-    
+
     // Call the function with user permissions
     updateConstants(userPermissions, constants);
 
@@ -257,16 +256,16 @@ const Metrics = () => {
                 {showCharts ? (
                         <Grid container spacing={2} ref={contentRef}>
                             {
-                            constants.canViewPopulationTrend && 
-                            selectedSpecies && 
+                            constants.canViewPopulationTrend &&
+                            selectedSpecies &&
                             hasEmptyPopulationTrend && (
                                 <Grid item xs={12} md={6}>
-                                    <PopulationTrend 
-                                        selectedSpecies={selectedSpecies} 
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
-                                        endYear={endYear} 
-                                        loading={loading} 
+                                    <PopulationTrend
+                                        selectedSpecies={selectedSpecies}
+                                        propertyId={propertyId}
+                                        startYear={startYear}
+                                        endYear={endYear}
+                                        loading={loading}
                                         setLoading={setLoading}
                                         onEmptyDatasets={handleEmptyPopulationTrend}
                                     />
@@ -275,81 +274,77 @@ const Metrics = () => {
 
 
                             {
-                            constants.canViewPopulationCategory && 
-                            selectedSpecies && 
+                            constants.canViewPopulationCategory &&
+                            selectedSpecies &&
                             hasEmptyPopulationCategory && (
                                 <Grid item xs={12} md={6}>
-                                    <PopulationCategoryChart 
-                                        selectedSpecies={selectedSpecies} 
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
-                                        endYear={endYear} 
-                                        loading={loading} 
-                                        setLoading={setLoading} 
-                                        populationData={populationData} 
-                                        setPopulationData={setPopulationData}
+                                    <PopulationCategoryChart
+                                        selectedSpecies={selectedSpecies}
+                                        propertyId={propertyId}
+                                        startYear={startYear}
+                                        endYear={endYear}
                                         onEmptyDatasets={handleEmptyPopulationCategory}
                                     />
                                 </Grid>
                             )}
 
                              {
-                             constants.canViewPropertyType && 
+                             constants.canViewPropertyType &&
                              hasEmptyPropertyType && (
                                 <Grid item xs={12} md={6}>
-                                    <PropertyTypeBarChart 
-                                        selectedSpecies={selectedSpecies} 
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
-                                        endYear={endYear} 
-                                        loading={loading} 
+                                    <PropertyTypeBarChart
+                                        selectedSpecies={selectedSpecies}
+                                        propertyId={propertyId}
+                                        startYear={startYear}
+                                        endYear={endYear}
+                                        loading={loading}
                                         setLoading={setLoading}
                                         onEmptyDatasets={handleEmptyPropertyType}
                                     />
                                 </Grid>
                             )}
 
-                            
+
                             {
-                            constants.canViewDensityBar && 
-                            selectedSpecies && 
+                            constants.canViewDensityBar &&
+                            selectedSpecies &&
                             hasEmptyDensity && (
                                 <Grid item xs={12} md={6}>
-                                    <DensityBarChart 
-                                        selectedSpecies={selectedSpecies} 
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
-                                        endYear={endYear} 
-                                        loading={loading} 
-                                        setLoading={setLoading} 
-                                        densityData={densityData} 
+                                    <DensityBarChart
+                                        selectedSpecies={selectedSpecies}
+                                        propertyId={propertyId}
+                                        startYear={startYear}
+                                        endYear={endYear}
+                                        loading={loading}
+                                        setLoading={setLoading}
+                                        densityData={densityData}
                                         setDensityData={setDensityData}
                                         onEmptyDatasets={handleEmptyDensity}
-                                    /> 
+                                    />
                                 </Grid>
                             )}
 
-                            
+
                             {
-                            constants.canViewPropertyAvailable && 
-                            selectedSpecies && 
+                            constants.canViewPropertyAvailable &&
+                            selectedSpecies &&
                             hasEmptyPropertyAvailable && (
                                 <Grid item xs={12} md={6}>
-                                    <PropertyAvailableBarChart 
-                                        selectedSpecies={selectedSpecies} 
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
-                                        endYear={endYear} 
-                                        loading={loading} 
+                                    <PropertyAvailableBarChart
+                                        selectedSpecies={selectedSpecies}
+                                        propertyId={propertyId}
+                                        startYear={startYear}
+                                        endYear={endYear}
+                                        loading={loading}
                                         setLoading={setLoading}
                                         onEmptyDatasets={handleEmptyPropertyAvailable}
-                                    /> 
+                                    />
                                 </Grid>
                             )}
 
 
                             {
-                            constants.canViewAgeGroup && 
+                            constants.canViewAgeGroup &&
                             ageGroupData.map((data) => (
                                 <Grid container key={data.id} item xs={12} md={6}>
                                     <AgeGroupBarChart
@@ -362,9 +357,9 @@ const Metrics = () => {
                                 </Grid>
                             ))}
 
-                            
+
                             {
-                            constants.canViewAreaAvailable && 
+                            constants.canViewAreaAvailable &&
                             hasEmptyAreaAvailable && areaData.map((data, index) => (
                                 <Grid container key={index} item xs={12} md={6}>
                                     {data?.area?.owned_species ? (
@@ -381,11 +376,11 @@ const Metrics = () => {
                                     ) : null}
                                 </Grid>
                             ))}
-                            
+
 
                             {
-                            constants.canViewProvinceSpeciesCount && 
-                            selectedSpecies && 
+                            constants.canViewProvinceSpeciesCount &&
+                            selectedSpecies &&
                             hasEmptyProvinceCount && (
                                 <Grid item xs={12} md={6}>
                                     <SpeciesCountPerProvinceChart
@@ -400,26 +395,26 @@ const Metrics = () => {
                                 </Grid>
                             )}
 
-                            
+
                             {
-                            constants.canViewProvinceSpeciesCountAsPercentage && 
-                            selectedSpecies && 
+                            constants.canViewProvinceSpeciesCountAsPercentage &&
+                            selectedSpecies &&
                             hasEmptyProvinceCountPercentage && (
-                                <Grid item xs={12} md={6} 
-                                    style={{ 
-                                        textAlign: 'center', 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                <Grid item xs={12} md={6}
+                                    style={{
+                                        textAlign: 'center',
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'center',
                                         maxHeight: '380px'
                                     }}
                                 >
                                     <SpeciesCountAsPercentage
-                                        selectedSpecies={selectedSpecies} 
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
+                                        selectedSpecies={selectedSpecies}
+                                        propertyId={propertyId}
+                                        startYear={startYear}
                                         endYear={endYear}
-                                        loading={loading} 
+                                        loading={loading}
                                         setLoading={setLoading}
                                         activityData={activityData}
                                         onEmptyDatasets={handleEmptyProvinceCountPercentage}
@@ -427,104 +422,104 @@ const Metrics = () => {
                                 </Grid>
                             )}
 
-                                    
+
                             {
-                            constants.canViewTotalCount && 
-                            selectedSpecies && 
+                            constants.canViewTotalCount &&
+                            selectedSpecies &&
                             hasEmptyTotalCountPerActivity && (
                                 <Grid item xs={12} md={6}
-                                    style={{ 
-                                        textAlign: 'center', 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                    style={{
+                                        textAlign: 'center',
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'center',
                                         maxHeight: '380px'
                                     }}
                                 >
                                     <TotalCountPerActivity
                                         selectedSpecies={selectedSpecies}
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
+                                        propertyId={propertyId}
+                                        startYear={startYear}
                                         endYear={endYear}
-                                        loading={loading} 
+                                        loading={loading}
                                         activityData={totalCoutData}
                                         onEmptyDatasets={handleEmptyTotalCountPerActivity}
                                     />
                                 </Grid>
                             )}
 
-                            
+
                             {
-                            constants.canViewCountAsPercentage && 
+                            constants.canViewCountAsPercentage &&
                             selectedSpecies &&
                             hasEmptyTotalCountPerActivityPercentage && (
                                 <Grid item xs={12} md={6}
-                                    style={{ 
-                                        textAlign: 'center', 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                    style={{
+                                        textAlign: 'center',
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'center',
                                         maxHeight: '380px'
                                     }}
                                 >
                                     <ActivityCountAsPercentage
                                         selectedSpecies={selectedSpecies}
-                                        startYear={startYear} 
+                                        startYear={startYear}
                                         endYear={endYear}
-                                        loading={loading} 
+                                        loading={loading}
                                         activityData={totalCoutData}
                                         onEmptyDatasets={handleEmptyTotalCountPerActivityPercentage}
                                     />
                                 </Grid>
                                 )}
 
-                                
+
                             {
-                            constants.canViewPopulationEstimate && 
-                            selectedSpecies && 
+                            constants.canViewPopulationEstimate &&
+                            selectedSpecies &&
                             hasEmptyPopulationEstimateCategoryCount && (
                                 <Grid item xs={12} md={6}
-                                    style={{ 
-                                        textAlign: 'center', 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                    style={{
+                                        textAlign: 'center',
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'center',
                                         maxHeight: '380px'
                                     }}
                                 >
                                     <PopulationEstimateCategoryCount
-                                        selectedSpecies={selectedSpecies} 
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
+                                        selectedSpecies={selectedSpecies}
+                                        propertyId={propertyId}
+                                        startYear={startYear}
                                         endYear={endYear}
-                                        loading={loading} 
+                                        loading={loading}
                                         setLoading={setLoading}
                                         activityData={activityData}
                                         onEmptyDatasets={handleEmptyTopulationEstimateCategoryCount}
                                     />
                                 </Grid>
                                 )}
-                           
-                           
+
+
                             {
-                            constants.canViewPopulationEstimateAsPercentage && 
-                            selectedSpecies && 
+                            constants.canViewPopulationEstimateAsPercentage &&
+                            selectedSpecies &&
                             hasEmptyPopulationEstimateCategoryCountPercentage && (
                                 <Grid item xs={12} md={6}
-                                    style={{ 
-                                        textAlign: 'center', 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                    style={{
+                                        textAlign: 'center',
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'center',
                                         maxHeight: '380px'
                                     }}
                                 >
                                     <PopulationEstimateAsPercentage
-                                        selectedSpecies={selectedSpecies} 
-                                        propertyId={propertyId} 
-                                        startYear={startYear} 
+                                        selectedSpecies={selectedSpecies}
+                                        propertyId={propertyId}
+                                        startYear={startYear}
                                         endYear={endYear}
-                                        loading={loading} 
+                                        loading={loading}
                                         setLoading={setLoading}
                                         activityData={activityData}
                                         onEmptyDatasets={handleEmptyPopulationEstimateCategoryCountPercentage}

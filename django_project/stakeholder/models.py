@@ -4,6 +4,10 @@ from django.db import models
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
+from stakeholder.utils import (
+    add_user_to_organisation_group,
+    remove_organisation_user_from_group
+)
 
 from property.models import Province
 
@@ -384,12 +388,9 @@ def post_create_organisation_user(
 ):
     """
     Handle OrganisationUser creation by
-    automatically add them to Data contributor group.
+    automatically add them to Organisation Member group.
     """
-
-    if created:
-        group, _ = Group.objects.get_or_create(name='Data contributor')
-        instance.user.groups.add(group)
+    add_user_to_organisation_group(instance, OrganisationInvites, Group)
 
 
 @receiver(post_delete, sender=OrganisationUser)
@@ -401,11 +402,7 @@ def post_delete_organisation_user(
 ):
     """
     Handle OrganisationUser deletion by removing them
-    from Data contributor group, if they are no longer
+    from Data contributor and Organisation Member group, if they are no longer
     part of any organisation.
     """
-
-    organisation_users = OrganisationUser.objects.filter(user=instance.user)
-    if not organisation_users.exists():
-        group, _ = Group.objects.get_or_create(name='Data contributor')
-        instance.user.groups.remove(group)
+    remove_organisation_user_from_group(instance)

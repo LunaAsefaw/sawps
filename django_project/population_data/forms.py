@@ -10,6 +10,10 @@ class AnnualPopulationForm(ModelForm):
         fields = (
             "year",
             "owned_species",
+            "user",
+            "taxon",
+            "property",
+            "area_available_to_species",
             "total",
             "adult_male",
             "adult_female",

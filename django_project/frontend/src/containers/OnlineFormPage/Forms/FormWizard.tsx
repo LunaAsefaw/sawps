@@ -246,7 +246,7 @@ function FormWizard(props: FormWizardInterface) {
             <Box className='TabPanels FlexContainerFill'>
                 <Box className='OnlineFormWizardContent'>
                     <TabPanel key={0} value={activeStep} index={0} noPadding>
-                        <SpeciesDetail initialData={data} setIsDirty={setIsDirty} handleNext={(formData)=>onFormSave(0, formData)}
+                        <SpeciesDetail propertyItem={props.propertyItem} initialData={data} setIsDirty={setIsDirty} handleNext={(formData)=>onFormSave(0, formData)}
                             taxonMetadataList={props.metadata.taxons}
                             surveyMethodMetadataList={props.metadata.survey_methods}
                             sampling_effort_coverages={props.metadata.sampling_effort_coverages} population_statuses={props.metadata.population_statuses}

@@ -19,7 +19,6 @@ from species.factories import (
 from species.models import Taxon, TaxonRank
 from population_data.factories import AnnualPopulationF
 from property.factories import PropertyFactory
-from species.models import OwnedSpecies
 from occurrence.models import SurveyMethod
 
 def mocked_cache_get(self, *args, **kwargs):
@@ -60,19 +59,15 @@ class TestSpeciesTrend(TestCase):
             name="Property 1"
         )
 
-        self.owned_species_one = OwnedSpecies.objects.create(
-            property=self.property1,
-            user=self.user_1,
-            taxon=self.taxon
-        )
-
         survey_method = SurveyMethod.objects.create(
             name='test_survey'
         )
 
-        AnnualPopulationF.create(
+        self.annual_population = AnnualPopulationF.create(
             year=2020,
-            owned_species=self.owned_species_one,
+            property=self.property1,
+            user=self.user_1,
+            taxon=self.taxon,
             total=100,
             adult_male=10,
             adult_female=10,
@@ -89,7 +84,7 @@ class TestSpeciesTrend(TestCase):
                 mock.Mock(side_effect=mocked_cache_get))
     def test_species_trend_from_cache(self):
         url = reverse('species-population-trend')
-        url += f'?species={self.owned_species_one.taxon.scientific_name}&start_year=1960&end_year=2023&property={self.property1.id}'
+        url += f'?species={self.annual_population.taxon.scientific_name}&start_year=1960&end_year=2023&property={self.property1.id}'
         request = self.factory.get(url)
         
         request.user = UserF.create()
@@ -120,7 +115,7 @@ class TestSpeciesTrend(TestCase):
             type=SPECIES_PER_PROPERTY
         )
         url = reverse('species-population-trend')
-        url += f'?species={self.owned_species_one.taxon.scientific_name}&start_year=1960&end_year=2023&property={self.property1.id}'
+        url += f'?species={self.annual_population.taxon.scientific_name}&start_year=1960&end_year=2023&property={self.property1.id}'
         request = self.factory.get(url)
         with requests_mock.Mocker() as m:
             json_response = {'species_per_property': 'abcde'}
@@ -150,7 +145,7 @@ class TestSpeciesTrend(TestCase):
                 mock.Mock(side_effect=mocked_cache_get_empty))
     def test_species_trend_without_output(self):
         url = reverse('species-population-trend')
-        url += f'?species={self.owned_species_one.taxon.scientific_name}&start_year=1960&end_year=2023&property={self.property1.id}'
+        url += f'?species={self.annual_population.taxon.scientific_name}&start_year=1960&end_year=2023&property={self.property1.id}'
         request = self.factory.get(url)
         with requests_mock.Mocker() as m:
             json_response = {'species_per_property': 'qwerty'}
@@ -180,7 +175,7 @@ class TestSpeciesTrend(TestCase):
                 mock.Mock(side_effect=mocked_cache_get_empty))
     def test_species_trend_model_failure(self):
         url = reverse('species-population-trend')
-        url += f'?species={self.owned_species_one.taxon.scientific_name}&start_year=1960&end_year=2023&property={self.property1.id}'
+        url += f'?species={self.annual_population.taxon.scientific_name}&start_year=1960&end_year=2023&property={self.property1.id}'
         request = self.factory.get(url)
         with requests_mock.Mocker() as m:
             # without national trend model, it will use generic model

@@ -171,6 +171,7 @@ class TestMapAPIViews(TestCase):
         response = view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], property.name)
+        self.assertEqual(response.data['short_code'], property.short_code)
         # set current organisation_2 in the request
         request = self.factory.get(
             reverse('find-property') + (

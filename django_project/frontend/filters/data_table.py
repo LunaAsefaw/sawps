@@ -7,7 +7,7 @@ from property.models import Property
 
 
 class DataContributorsFilter(django_filters.FilterSet):
-    property = django_filters.CharFilter(method ='filter_property')
+    property = django_filters.CharFilter(method='filter_property')
 
     class Meta:
         model = Property

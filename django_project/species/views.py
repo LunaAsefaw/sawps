@@ -23,14 +23,14 @@ class TaxonListAPIView(APIView):
         if organisation:
             _organisation = organisation.split(",")
             taxon = Taxon.objects.filter(
-                ownedspecies__property__organisation_id__in=(
+                annualpopulation__property__organisation_id__in=(
                     [int(id) for id in _organisation]
                 ),
-                ownedspecies__taxon__taxon_rank__name__iexact="Species"
+                annualpopulation__taxon__taxon_rank__name__iexact="Species"
             ).order_by("scientific_name").distinct()
         else:
             taxon = Taxon.objects.filter(
-                ownedspecies__property__organisation_id=organisation_id,
+                annualpopulation__property__organisation_id=organisation_id,
                 taxon_rank__name="Species"
             ).order_by("scientific_name").distinct()
 

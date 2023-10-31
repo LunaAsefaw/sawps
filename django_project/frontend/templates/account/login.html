@@ -2,9 +2,6 @@
 {% load i18n %}
 {% load account %}
 
-{% block head_title %}Login{% endblock %}
-
-
 {% block content %}
 <section class="login-page fs-background registerSignUpAccount" style="background-color: #000000; min-height:var(--min-content-height);">
     <div class="container-fluid full-height">
@@ -37,7 +34,7 @@
                     {% endif %}
                         {% for field in form %}
                         {% if field.name == 'remember' %}
-                        <div class="form-check" style="margin-left: 35px; margin-bottom: 7px;">
+                        <div class="form-check pl-0 text-center" style="margin-bottom: 7px;">
                             {{ field.label }}
                             {{ field }}
                         </div>
@@ -56,9 +53,9 @@
                         <button class="sawps-from-submit account-button" type="submit">{% trans "LOGIN" %}</button>
                     </form>
                     <div class="login-help text-center">
-                    Don’t have an account? Register <a href="{% url 'account_signup' %}">Here</a>                            </div>
+                    Don’t have an account? Register <a href="{% url 'account_signup' %}" style="text-decoration: underline; color: #F9A95D;">Here</a>                            </div>
                     <div class="login-help text-center">
-                    <a href="{% url 'password_reset' %}">{% trans "Forgot Password" %}</a>
+                    <a href="{% url 'password_reset' %} " style="text-decoration: underline; color: #F9A95D;">{% trans "Forgot Password" %}</a>
                     </div>
 
                 </div>

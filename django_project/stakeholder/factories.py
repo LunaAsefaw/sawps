@@ -6,6 +6,7 @@ from stakeholder.models import (
     Organisation,
     OrganisationUser,
     OrganisationRepresentative,
+    OrganisationInvites,
     UserLogin
 )
 import factory
@@ -115,3 +116,13 @@ class organisationRepresentativeFactory(factory.django.DjangoModelFactory):
     organisation = factory.SubFactory(
         'stakeholder.factories.organisationFactory')
     user = factory.SubFactory('stakeholder.factories.userFactory')
+
+
+class OrganisationInvitesFactory(factory.django.DjangoModelFactory):
+    """Factory class for Organisation Invites model."""
+
+    class Meta:
+        model = OrganisationInvites
+
+    organisation = factory.SubFactory(
+        'stakeholder.factories.organisationFactory')

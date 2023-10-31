@@ -41,6 +41,27 @@ class TaxonAdmin(admin.ModelAdmin):
     display_color.allow_tags = True
 
 
-admin.site.register(TaxonRank)
+class TaxonRankAdmin(admin.ModelAdmin):
+    """Admin page for TaxonRank model
+
+    """
+    list_display = ('id', 'name')
+    search_fields = ['name']
+
+
+class OwnedSpeciesAdmin(admin.ModelAdmin):
+    """Admin page for OwnedSpecies model
+
+    """
+    list_display = ('user', 'taxon', 'property', 'area_available_to_species')
+    search_fields = [
+        'user__username',
+        'taxon__scientific_name',
+        'property__name',
+        'area_available_to_species'
+    ]
+
+
+admin.site.register(TaxonRank, TaxonRankAdmin)
 admin.site.register(Taxon, TaxonAdmin)
-admin.site.register(OwnedSpecies)
+admin.site.register(OwnedSpecies, OwnedSpeciesAdmin)

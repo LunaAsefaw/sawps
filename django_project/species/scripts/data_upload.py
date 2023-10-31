@@ -16,7 +16,7 @@ from population_data.models import (
     SamplingEffortCoverage,
 )
 from property.models import Property
-from species.models import OwnedSpecies, Taxon
+from species.models import Taxon
 
 from species.scripts.upload_file_scripts import *  # noqa
 
@@ -222,6 +222,11 @@ class SpeciesCSVUpload(object):
         if success_message:
             self.upload_session.success_notes = success_message
 
+        if self.total_rows == 0:
+            self.upload_session.error_notes = (
+                'You have uploaded empty spreadsheet, please check again.'
+            )
+
         self.upload_session.processed = True
         self.upload_session.progress = 'Finished'
         self.upload_session.save()
@@ -269,15 +274,17 @@ class SpeciesCSVUpload(object):
             self.error_file(row)
         self.finish(self.csv_dict_reader.fieldnames)
 
-    def get_property(self, property_name):
+    def get_property(self, property_code):
 
-        property_selected = self.upload_session.property.name
-        if property_name == property_selected:
+        property_selected = self.upload_session.property.short_code
+        if property_code == property_selected:
             try:
                 property = Property.objects.get(
-                        name=property_selected,
+                        short_code=property_selected,
                 )
             except Property.DoesNotExist:
+                return
+            except Property.MultipleObjectsReturned:
                 return
 
             return property
@@ -344,7 +351,7 @@ class SpeciesCSVUpload(object):
                 )
 
     def save_population_per_activity(
-            self, row, activity, year, owned_species, total, total_males,
+            self, row, activity, year, annual_population, total, total_males,
             total_females, male_juv, female_juv
     ):
 
@@ -354,7 +361,7 @@ class SpeciesCSVUpload(object):
                 activity_type=ActivityType.objects.get(
                     name=activity),
                 year=int(string_to_number(year)),
-                owned_species=owned_species,
+                annual_population=annual_population,
                 total=int(string_to_number(
                     self.row_value(row, total))),
                 adult_male=int(string_to_number(
@@ -381,16 +388,16 @@ class SpeciesCSVUpload(object):
         # check compulsory fields
         self.check_compulsory_fields(row)
         property = taxon = None
-        property_name = self.row_value(row, PROPERTY)
-        if property_name:
-            property = self.get_property(property_name)
+        property_code = self.row_value(row, PROPERTY)
+        if property_code:
+            property = self.get_property(property_code)
 
             if not property:
                 self.error_row(
-                    message="Property name {} doesn't match the selected "
+                    message="Property code {} doesn't match the selected "
                             "property. Please replace it with {}.".format(
                                 self.row_value(row, PROPERTY),
-                                self.upload_session.property.name)
+                                self.upload_session.property.short_code)
                 )
 
         scientific_name = self.row_value(row, SCIENTIFIC_NAME)
@@ -407,6 +414,22 @@ class SpeciesCSVUpload(object):
                 )
 
         area_available_to_species = self.row_value(row, AREA)
+        # validate area_available_to_species must be greater than 0 and
+        # less than property size
+        area_available_to_species_num = int(
+            string_to_number(area_available_to_species))
+        if (
+            area_available_to_species_num <= 0 or
+            area_available_to_species_num >
+            self.upload_session.property.property_size_ha
+        ):
+            self.error_row(
+                message="Area available to species must be greater than 0 "
+                        "and less than property area size "
+                        "({:.2f} ha).".format(
+                            self.upload_session.property.property_size_ha
+                        )
+            )
 
         survey = self.row_value(row, SURVEY_METHOD)
         survey_method = self.survey_method(survey)
@@ -443,18 +466,14 @@ class SpeciesCSVUpload(object):
         if len(self.row_error) > 0:
             return
 
-        owned_species, cr = OwnedSpecies.objects.get_or_create(
-            taxon=taxon,
-            user=self.upload_session.uploader,
-            property=property,
-            area_available_to_species=area_available_to_species
-        )
-
         # Save AnnualPopulation
         try:
             annual, annual_created = AnnualPopulation.objects.get_or_create(
                 year=int(string_to_number(year)),
-                owned_species=owned_species,
+                taxon=taxon,
+                user=self.upload_session.uploader,
+                property=property,
+                area_available_to_species=area_available_to_species,
                 total=int(string_to_number(count_total)),
                 adult_male=int(string_to_number(
                     self.row_value(row, COUNT_ADULT_MALES))),
@@ -511,7 +530,7 @@ class SpeciesCSVUpload(object):
         if self.row_value(row, INTRODUCTION_TOTAL):
             intake = self.save_population_per_activity(
                 row, "Translocation (Intake)", year,
-                owned_species, INTRODUCTION_TOTAL,
+                annual, INTRODUCTION_TOTAL,
                 INTRODUCTION_TOTAL_MALES, INTRODUCTION_TOTAL_FEMALES,
                 INTRODUCTION_MALE_JUV, INTRODUCTION_FEMALE_JUV
             )
@@ -535,7 +554,7 @@ class SpeciesCSVUpload(object):
         if self.row_value(row, TRANS_OFFTAKE_TOTAL):
             off_take = self.save_population_per_activity(
                 row, "Translocation (Offtake)", year,
-                owned_species, TRANS_OFFTAKE_TOTAL,
+                annual, TRANS_OFFTAKE_TOTAL,
                 TRANS_OFFTAKE_ADULTE_MALES, TRANS_OFFTAKE_ADULTE_FEMALES,
                 TRANS_OFFTAKE_MALE_JUV, TRANS_OFFTAKE_FEMALE_JUV
             )
@@ -555,7 +574,7 @@ class SpeciesCSVUpload(object):
         if self.row_value(row, PLANNED_HUNT_TOTAL):
             hunt = self.save_population_per_activity(
                 row, "Planned Hunt/Cull", year,
-                owned_species, PLANNED_HUNT_TOTAL,
+                annual, PLANNED_HUNT_TOTAL,
                 PLANNED_HUNT_OFFTAKE_ADULT_MALES,
                 PLANNED_HUNT_OFFTAKE_ADULT_FAMALES,
                 PLANNED_HUNT_OFFTAKE_MALE_JUV,
@@ -577,7 +596,7 @@ class SpeciesCSVUpload(object):
         if self.row_value(row, PLANNED_EUTH_TOTAL):
             planned = self.save_population_per_activity(
                 row, "Planned Euthanasia/DCA", year,
-                owned_species, PLANNED_EUTH_TOTAL,
+                annual, PLANNED_EUTH_TOTAL,
                 PLANNED_EUTH_OFFTAKE_ADULT_MALES,
                 PLANNED_EUTH_OFFTAKE_ADULT_FAMALES,
                 PLANNED_EUTH_OFFTAKE_MALE_JUV,
@@ -599,7 +618,7 @@ class SpeciesCSVUpload(object):
         if self.row_value(row, UNPLANNED_HUNT_TOTAL):
             hunting = self.save_population_per_activity(
                 row, "Unplanned/Illegal Hunting", year,
-                owned_species, UNPLANNED_HUNT_TOTAL,
+                annual, UNPLANNED_HUNT_TOTAL,
                 UNPLANNED_HUNT_OFFTAKE_ADULT_MALES,
                 UNPLANNED_HUNT_OFFTAKE_ADULT_FAMALES,
                 UNPLANNED_HUNT_OFFTAKE_MALE_JUV,

@@ -87,6 +87,16 @@ export default function PropertyInfo(props: PropertyInfoInterface) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
+                    {!props.enableForm && (
+                    <TableRow key='property_short_code'>
+                        <TableCell component="th" scope="row">
+                            Property Code
+                        </TableCell>
+                        <TableCell className='TableCellText'>
+                            <span>{props.property.short_code ? props.property.short_code : '-'}</span>
+                        </TableCell>
+                    </TableRow>
+                    )}
                     <TableRow key='property_name'>
                         <TableCell component="th" scope="row">
                             Property Name
@@ -147,7 +157,7 @@ export default function PropertyInfo(props: PropertyInfoInterface) {
 
                     <TableRow key='open'>
                         <TableCell component="th" scope="row">
-                            Open/Close System
+                            Open/Closed System
                         </TableCell>
                         <TableCell>
                             <FormControl fullWidth size="small">

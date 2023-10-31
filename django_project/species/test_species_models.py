@@ -11,12 +11,11 @@ from population_data.factories import AnnualPopulationF
 from property.factories import PropertyFactory
 from rest_framework import status
 from species.factories import (
-    OwnedSpeciesFactory,
     TaxonFactory,
     TaxonRankFactory,
     TaxonSurveyMethodF,
 )
-from species.models import OwnedSpecies, Taxon, TaxonRank, TaxonSurveyMethod
+from species.models import Taxon, TaxonRank, TaxonSurveyMethod
 from species.serializers import TaxonSerializer
 from stakeholder.factories import organisationFactory
 
@@ -79,8 +78,8 @@ class TaxonTestCase(TestCase):
         )
         cls.url = reverse('species')
 
-    def test_get_taxon_list(self):
-        """Taxon list API test within the organisation"""
+    def test_get_taxon_list_empty(self):
+        """Taxon list API test when no Annual Population has been made"""
         organisation = organisationFactory.create()
 
         user = User.objects.create_user(
@@ -91,13 +90,34 @@ class TaxonTestCase(TestCase):
         user.user_profile.current_organisation = organisation
         user.save()
 
-        property = PropertyFactory.create(
-            organisation=organisation,
-            name='PropertyA'
+        auth_headers = {
+            'HTTP_AUTHORIZATION': 'Basic ' +
+            base64.b64encode(b'testuserd:testpasswordd').decode('ascii'),
+        }
+        client = Client()
+        response = client.get(self.url, **auth_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), [])
+
+    def test_get_taxon_list(self):
+        """Taxon list API test within the organisation"""
+        organisation = organisationFactory.create()
+        property_obj = PropertyFactory.create(organisation=organisation)
+        AnnualPopulationF.create(
+            taxon=self.taxon,
+            total=10,
+            adult_male=5,
+            adult_female=5,
+            property=property_obj
         )
 
-        owned_species = OwnedSpeciesFactory.create_batch(
-            1, taxon=self.taxon, user=user, property=property)
+        user = User.objects.create_user(
+            username='testuserd',
+            password='testpasswordd'
+        )
+
+        user.user_profile.current_organisation = organisation
+        user.save()
 
         auth_headers = {
             'HTTP_AUTHORIZATION': 'Basic ' +
@@ -112,6 +132,14 @@ class TaxonTestCase(TestCase):
     def test_get_taxon_list_for_organisations(self):
         """Taxon list API test for organisations."""
         organisation = organisationFactory.create(national=True)
+        property_obj = PropertyFactory.create(organisation=organisation)
+        AnnualPopulationF.create(
+            taxon=self.taxon,
+            total=10,
+            adult_male=5,
+            adult_female=5,
+            property=property_obj
+        )
 
         user = User.objects.create_user(
             username='testuserd',
@@ -126,15 +154,12 @@ class TaxonTestCase(TestCase):
             name='PropertyA'
         )
 
-        owned_species = OwnedSpeciesFactory.create_batch(
-            1, taxon=self.taxon, user=user, property=property)
-
         auth_headers = {
             'HTTP_AUTHORIZATION': 'Basic ' +
             base64.b64encode(b'testuserd:testpasswordd').decode('ascii'),
         }
         client = Client()
-        data = {"organisation":organisation.id}
+        data = {"organisation": organisation.id}
         response = client.get(self.url, data, **auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -160,28 +185,41 @@ class TaxonTestCase(TestCase):
         self.assertEqual(taxon_1[0]['total_population'], 0)
         self.assertEqual(taxon_1[0]['species_name'], taxon.scientific_name)
         user_1 = User.objects.create_user(username='testuser_taxon_1', password='12345')
-        owned_species_1 = OwnedSpeciesFactory(
+        user_2 = User.objects.create_user(username='testuser_taxon_2', password='12345')
+
+        # create two years of data
+        AnnualPopulationF(
+            year=2021, total=30,
+            adult_male=10, adult_female=10,
             taxon=taxon,
             user=user_1,
             property=property_1,
             area_available_to_species=2
         )
-        user_2 = User.objects.create_user(username='testuser_taxon_2', password='12345')
-        owned_species_2 = OwnedSpeciesFactory(
+        AnnualPopulationF(
+            year=2022, total=35,
+            adult_male=10, adult_female=10,
+            taxon=taxon,
+            user=user_1,
+            property=property_1,
+            area_available_to_species=2
+        )
+        AnnualPopulationF(
+            year=2020, total=15,
+            adult_male=10, adult_female=5,
             taxon=taxon,
             user=user_2,
             property=property_2,
             area_available_to_species=1
         )
-        # create two years of data
-        AnnualPopulationF(owned_species=owned_species_1, year=2021, total=30,
-                          adult_male=10, adult_female=10)
-        AnnualPopulationF(owned_species=owned_species_1, year=2022, total=35,
-                          adult_male=10, adult_female=10)
-        AnnualPopulationF(owned_species=owned_species_2, year=2020, total=15,
-                          adult_male=10, adult_female=5)
-        AnnualPopulationF(owned_species=owned_species_2, year=2022, total=22,
-                          adult_male=10, adult_female=10)
+        AnnualPopulationF(
+            year=2022, total=22,
+            adult_male=10, adult_female=10,
+            taxon=taxon,
+            user=user_2,
+            property=property_2,
+            area_available_to_species=1
+        )
         response = client.get(reverse('species-front-page'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -213,28 +251,40 @@ class TaxonTestCase(TestCase):
         self.assertEqual(response.json()['species_name'], taxon.scientific_name)
         self.assertIsNone(response.json()['graph_icon'])
         user_1 = User.objects.create_user(username='testuser_taxon_1', password='12345')
-        owned_species_1 = OwnedSpeciesFactory(
+        user_2 = User.objects.create_user(username='testuser_taxon_2', password='12345')
+        # create two years of data
+        AnnualPopulationF(
+            year=2021, total=30,
+            adult_male=10, adult_female=10,
             taxon=taxon,
             user=user_1,
             property=property_1,
             area_available_to_species=2
         )
-        user_2 = User.objects.create_user(username='testuser_taxon_2', password='12345')
-        owned_species_2 = OwnedSpeciesFactory(
+        AnnualPopulationF(
+            year=2022, total=35,
+            adult_male=10, adult_female=10,
+            taxon=taxon,
+            user=user_1,
+            property=property_1,
+            area_available_to_species=2
+        )
+        AnnualPopulationF(
+            year=2020, total=15,
+            adult_male=10, adult_female=5,
             taxon=taxon,
             user=user_2,
             property=property_2,
             area_available_to_species=1
         )
-        # create two years of data
-        AnnualPopulationF(owned_species=owned_species_1, year=2021, total=30,
-                          adult_male=10, adult_female=10)
-        AnnualPopulationF(owned_species=owned_species_1, year=2022, total=35,
-                          adult_male=10, adult_female=10)
-        AnnualPopulationF(owned_species=owned_species_2, year=2020, total=15,
-                          adult_male=10, adult_female=5)
-        AnnualPopulationF(owned_species=owned_species_2, year=2022, total=22,
-                          adult_male=10, adult_female=10)
+        AnnualPopulationF(
+            year=2022, total=22,
+            adult_male=10, adult_female=10,
+            taxon=taxon,
+            user=user_2,
+            property=property_2,
+            area_available_to_species=1
+        )
         response = client.get(
             reverse('taxon-trend-page'),
             {
@@ -357,41 +407,6 @@ class TaxonTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, 'cache has been cleared')
-
-
-class OwnedSpeciesTestCase(TestCase):
-    """Owned species test case."""
-    @classmethod
-    def setUpTestData(cls):
-        """Set up test data for owned species test case."""
-        user = User.objects.create_user(username='testuser', password='12345')
-        taxon = Taxon.objects.create(
-            scientific_name='taxon_0',
-            common_name_varbatim='taxon_0',
-            colour_variant=False,
-            taxon_rank=TaxonRankFactory(),
-        )
-        cls.ownedSpecies = OwnedSpeciesFactory(taxon=taxon, user=user)
-
-    def test_create_owned_species(self):
-        """Test create owned species."""
-        self.assertTrue(isinstance(self.ownedSpecies, OwnedSpecies))
-        self.assertEqual(OwnedSpecies.objects.count(), 1)
-
-    def test_update_owned_species(self):
-        """Test update owned species."""
-        self.ownedSpecies.area_available_to_species = 45.67
-        self.ownedSpecies.save()
-        self.assertEqual(
-            OwnedSpecies.objects.get(
-            id=self.ownedSpecies.id).area_available_to_species,
-            45.67
-        )
-
-    def test_delete_owned_species(self):
-        """Test delete owned species."""
-        self.ownedSpecies.delete()
-        self.assertEqual(OwnedSpecies.objects.count(), 0)
 
 
 class TaxonSurveyMethodTestCase(TestCase):
