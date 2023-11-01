@@ -76,7 +76,8 @@ The filter side panel enhances the user experience by allowing them to focus on 
 
 ![Activity filter](./img/filters-8.png)
 
-1. **Select:** Select activity type to filter the data based on the activity type.
+1. **Select all:** Select all selects all the activities.
+2. **Show selected activity count:** You will see the count of the activities selected.
 
 #### 7. Year Range Filter
 

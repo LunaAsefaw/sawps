@@ -24,6 +24,7 @@ The steps involve:
 1. Reset Password Label
 2. Email Field: the user should enter their email address into this field.
 3. Reset Password button: when clicked sends the reset password email and notifies the user.
+4. Go back link: when clicked returns the user to the login page.
 
 ![Forgot Password 3](./img/forgot-password-3.png)
 
