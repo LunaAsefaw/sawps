@@ -20,21 +20,27 @@ class AnnualPopulationAdmin(admin.ModelAdmin):
         'common_name'
     ]
     search_fields = [
-        'property_name',
+        'property__name',
         'year',
-        'scientific_name',
-        'common_name'
+        'taxon__scientific_name',
+        'taxon__common_name_varbatim'
     ]
     form = AnnualPopulationForm
 
     def property_name(self, obj: AnnualPopulation):
-        return obj.property.name
+        if obj.property:
+            return obj.property.name
+        return None
 
     def scientific_name(self, obj: AnnualPopulation):
-        return obj.taxon.scientific_name
+        if obj.taxon:
+            return obj.taxon.scientific_name
+        return None
 
-    def common_name(self, obj: AnnualPopulation):
-        return obj.taxon.common_name_varbatim
+    def common_name(self, obj: AnnualPopulationPerActivity):
+        if obj.taxon:
+            return obj.taxon.common_name_varbatim
+        return None
 
 
 class OpenCloseSystemAdmin(admin.ModelAdmin):
@@ -67,13 +73,19 @@ class AnnualPopulationPerActivityAdmin(admin.ModelAdmin):
     ]
 
     def property_name(self, obj: AnnualPopulationPerActivity):
-        return obj.owned_species.property.name
+        if obj.owned_species and obj.owned_species.property:
+            return obj.owned_species.property.name
+        return None
 
     def scientific_name(self, obj: AnnualPopulationPerActivity):
-        return obj.owned_species.taxon.scientific_name
+        if obj.owned_species and obj.owned_species.taxon:
+            return obj.owned_species.taxon.scientific_name
+        return None
 
     def common_name(self, obj: AnnualPopulationPerActivity):
-        return obj.owned_species.taxon.common_name_varbatim
+        if obj.owned_species and obj.owned_species.taxon:
+            return obj.owned_species.taxon.common_name_varbatim
+        return None
 
 
 class SamplingEffortCoverageAdmin(admin.ModelAdmin):

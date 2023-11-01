@@ -11,26 +11,54 @@ import "./index.scss";
 Chart.register(CategoryScale);
 Chart.register(ChartDataLabels);
 
+const availableColors = [
+  'rgba(112, 178, 118, 1)',
+  'rgba(250, 167, 85, 1)',
+  'rgba(157, 133, 190, 1)',
+  '#FF5252',
+  '#616161',
+  // additional transparency colors for years
+  'rgba(112, 178, 118, 0.5)',  // 50% transparency
+  'rgba(255, 82, 82, 0.5)',  // 50% transparency
+  'rgba(97, 97, 97, 0.5)',  // 50% transparency
+  'rgba(157, 133, 190, 0.5)',  // 50% transparency
+  'rgba(250, 167, 85, 0.5)',  // 50% transparency
+];
+
+
+function processDataForChart(data: any) {
+  const activityCounts: any = {};
+  const colors = [];
+
+  data.forEach((item: any) => {
+    item.activities.forEach((activity: any) => {
+      if (!activityCounts[activity.activity_type]) {
+        activityCounts[activity.activity_type] = 0;
+      }
+      activityCounts[activity.activity_type] += activity.total;
+    });
+  });
+
+  for (const activityType of Object.keys(activityCounts)) {
+      colors.push(availableColors[Object.keys(activityCounts).indexOf(activityType)]);
+  }
+
+  return {
+    labels: Object.keys(activityCounts),
+    datasets: [{
+      label: 'Total Count per Activity Type',
+      data: Object.values(activityCounts),
+      backgroundColor: colors
+    }]
+  };
+}
+
 interface SpeciesDataItem {
     province: string;
     species: string;
     year: number | null;
     count: number | null;
 }
-
-  const availableColors = [
-    'rgba(112, 178, 118, 1)',
-    'rgba(250, 167, 85, 1)',
-    'rgba(157, 133, 190, 1)',
-    '#FF5252',
-    '#616161',
-    // additional transparency colors for years
-    'rgba(112, 178, 118, 0.5)',  // 50% transparency
-    'rgba(255, 82, 82, 0.5)',  // 50% transparency
-    'rgba(97, 97, 97, 0.5)',  // 50% transparency
-    'rgba(157, 133, 190, 0.5)',  // 50% transparency
-    'rgba(250, 167, 85, 0.5)',  // 50% transparency
-  ];
 
 
   const TotalCountPerActivity = (props: any) => {
@@ -93,15 +121,7 @@ interface SpeciesDataItem {
     }
 
     // Create the chartData object
-    const chartData = {
-      labels: labels,
-      datasets: [
-        {
-          data: data,
-          backgroundColor: uniqueColors,
-        },
-      ],
-    };
+    const chartData = processDataForChart(activityData);
 
     // Define chart title based on conditions
     let chartTitle = 'No data available for current filter selections';

@@ -214,6 +214,7 @@ class TotalCountPerPopulationEstimateSerializer(serializers.Serializer):
         for record in annual_populations:
             population_estimate_category = (
                 record.population_estimate_category.name
+                if record.population_estimate_category else ''
             )
             year = record.year
             total = record.total
@@ -317,18 +318,18 @@ class TotalCountPerActivitySerializer(serializers.ModelSerializer):
 
         populations = AnnualPopulationPerActivity.objects.values(
             'year',
-            'activity_type',
+            'activity_type__name',
             'total',
         ).filter(q_filters)
 
         activities_list = [
             {
-                "activity_type": item["activity_type"],
+                "activity_type": item["activity_type__name"],
                 "year": item["year"],
                 "total": item["total"],
             }
             for item in populations
-            if item["activity_type"] and item["total"]
+            if item["activity_type__name"] and item["total"]
         ]
         return activities_list
 
