@@ -18,9 +18,9 @@ The `Charts` is a powerful tool for visualising data through various charts and 
 
 To utilise the `Download Data Visualisation` functionality, follow these steps:
 
-- Navigate to the `Charts Page` where you have visualised your data using charts and graphs.
+- Navigate to the `Charts` tab where you have visualised your data using charts and graphs.
 
-- Locate the `DOWNLOAD DATA VISUALISATION` button, usually placed in a prominent position on the page.
+- Locate the `DOWNLOAD DATA VISUALISATION` button, which is placed at the bottom of the screen.
 
 - Click on the button to initiate the download process.
 

@@ -2,7 +2,7 @@
 
 ## Description
 
-The Two-Factor Authentication (2FA) Page is a critical security feature that adds an extra layer of protection to your account. With 2FA, you'll be required to enter a OTP (One-Time Password) code in addition to your regular login credentials. This documentation provides an explanation of the 2FA page.
+The Two-Factor Authentication (2FA) Page is a critical security feature that adds an extra layer of protection to your account. With 2FA, you'll be required to enter a OTP (One Time Pin) code in addition to your regular login credentials. This documentation provides an explanation of the 2FA page.
 
 ![Two-Factor Authentication Page](./img/login-2fa-page-1.png)
 

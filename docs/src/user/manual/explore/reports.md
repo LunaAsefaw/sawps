@@ -39,7 +39,7 @@ The main area of the page displays your dataset in a tabular format. Each row re
 * **Property Report:** Report on property basis.
 * **Species Report:** Report on species basis.
 * **Province Report:** Report on province basis.
-Only member of `National data consumer` group can see this report.
+This report is visible only to members of the `National data consumer` group.
 * **Sampling Report:** Filter data by property.
 Member of `National data consumer` or `Regional data consumer` **CAN NOT** see this report.
 
@@ -232,4 +232,4 @@ See Activities section in the [Django Admin](../../../administrator/manual/djang
 
 ### Summary
 
-The reports table page is a comprehensive platform for exploring, analysing, and interacting with your data. With filters, column search, and data export options, you have the tools necessary to customise your data view, find specific information, and export data in the format that suits your needs.
+The reports table page is a comprehensive platform for exploring, analysing, and interacting with your data. With filters, column search, and data export options, you have the tools necessary to customise your data view, find specific information, and export data in a format that suits your needs.

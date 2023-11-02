@@ -28,7 +28,7 @@ This documentation outlines the functionalities available in the map view, inclu
 
     * **Light Mode (Sun Icon):** Click on the sun icon to switch to light mode, offering a brighter color scheme for daytime or well-lit environments.
 
-5. **Printing Out the Current Map Preview**: The print icon allows you to generate a physical or digital copy of the current map preview. When clicked, this icon initiates the printing process, enabling you to obtain a hard copy or a digital image of the map for reference or sharing.
+5. **Printing Out the Current Map Preview**: The print icon allows you to generate either a physical or digital copy of the current map preview. When clicked, this icon initiates the printing process, enabling you to obtain a hard copy or a digital image of the map for reference or sharing.
 
 ## Summary
 
