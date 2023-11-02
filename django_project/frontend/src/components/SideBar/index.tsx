@@ -30,8 +30,6 @@ interface AutoCompleteCheckboxProps {
   selectedOption: any[],
   singleTerm: string,
   pluralTerms: string,
-  selectAllFlag: boolean,
-  setSelectAll(value: boolean): void,
   setSelectedOption(values: any[]): void,
   setSelectedOption(values: any[]): void,
 }
@@ -43,8 +41,6 @@ export function AutoCompleteCheckbox(props: AutoCompleteCheckboxProps) {
     selectedOption,
     singleTerm,
     pluralTerms,
-    selectAllFlag,
-    setSelectAll,
     setSelectedOption
   } = props
 
@@ -83,19 +79,8 @@ export function AutoCompleteCheckbox(props: AutoCompleteCheckboxProps) {
           }}
           onChange={(_e, value, reason) => {
             if (reason === "clear")
-              setSelectAll(false);
-            else if (
-              reason === "selectOption" && value.length === options.length
-            )
-              setSelectAll(true);
-            else if (
-              reason === "removeOption" && value.length === 0
-            ) {
-                setSelectAll(false);
-            }
-            else if (
-              reason === "removeOption" || reason === "selectOption"
-            ) {
+              setSelectedOption([]);
+            else {
                 const valueIds = value.map(val => val.id)
                 setSelectedOption(valueIds);
             }
@@ -115,12 +100,15 @@ export function AutoCompleteCheckbox(props: AutoCompleteCheckboxProps) {
                   <FormControlLabel
                     onClick={(e) => {
                       e.preventDefault(); // prevent blur
-                      setSelectAll(!selectAllFlag);
+                      if (options.length === selectedOption.length)
+                        setSelectedOption([])
+                      else
+                        setSelectedOption(options.map(option => option.id))
                     }}
                     style={{color: 'black'}}
                     label="Select All"
                     control={
-                      <Checkbox checked={selectAllFlag} style={{color: 'black'}}/>
+                      <Checkbox checked={options.length === selectedOption.length} style={{color: 'black'}}/>
                     }
                   />
                 </Box>

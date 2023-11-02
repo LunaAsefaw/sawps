@@ -34,7 +34,10 @@ from frontend.serializers.property import (
     PropertySearchSerializer
 )
 from frontend.serializers.stakeholder import OrganisationSerializer
+from frontend.static_mapping import DATA_CONTRIBUTORS, SUPER_USER
 from frontend.utils.organisation import get_current_organisation_id
+from frontend.utils.parcel import find_province
+from frontend.utils.user_roles import get_user_roles
 from population_data.models import OpenCloseSystem
 from population_data.serializers import (
     OpenCloseSystemSerializer,
@@ -47,7 +50,6 @@ from property.models import (
     Province
 )
 from stakeholder.models import Organisation, OrganisationUser
-from frontend.utils.parcel import find_province
 
 
 class CheckPropertyNameIsAvailable(APIView):
@@ -245,7 +247,11 @@ class PropertyList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, organisation_id=None, *args, **kwargs):
-        if organisation_id is not None:
+        current_organisation_id = get_current_organisation_id(
+            request.user
+        ) or 0
+
+        if organisation_id:
             # Fetch properties based on
             # the organisation ID provided in the URL
             properties = Property.objects.filter(
@@ -254,9 +260,6 @@ class PropertyList(APIView):
         else:
             # Fetch properties based on
             # the current organisation set on the user profile
-            current_organisation_id = get_current_organisation_id(
-                request.user
-            ) or 0
             organisation_id = current_organisation_id
 
             organisation = request.GET.get("organisation")
@@ -264,13 +267,22 @@ class PropertyList(APIView):
                 _organisation = organisation.split(",")
                 properties = Property.objects.filter(
                     organisation_id__in=(
-                        [int(id) for id in _organisation]
+                        [int(oid) for oid in _organisation]
                     ),
                 ).order_by("name")
             else:
                 properties = Property.objects.filter(
                     organisation_id=organisation_id
                 ).order_by('name')
+
+        user_roles = get_user_roles(self.request.user)
+
+        # If role is DATA_CONTRIBUTORS and not a super user, limit properties
+        if set(user_roles) & set(DATA_CONTRIBUTORS) and \
+            SUPER_USER not in user_roles:
+            properties = properties.filter(
+                organisation_id=current_organisation_id
+            ).order_by('name')
 
         return Response(
             status=200,

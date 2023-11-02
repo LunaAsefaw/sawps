@@ -6,6 +6,8 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import Loading from "../../../components/Loading";
 import axios from "axios";
 import "./index.scss";
+import ChartContainer from "../../../components/ChartContainer";
+import DoughnutChart from "../../../components/DoughnutChart";
 
 Chart.register(CategoryScale);
 Chart.register(ChartDataLabels);
@@ -32,13 +34,12 @@ const PopulationEstimateCategoryCount = (props: any) => {
     propertyId,
     startYear,
     endYear,
-    loading,
-    setLoading,
     activityData,
     onEmptyDatasets
   } = props;
   let year: number | null = null;
   const [speciesData, setSpeciesData] = useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | undefined>(undefined);
 
@@ -47,8 +48,11 @@ const PopulationEstimateCategoryCount = (props: any) => {
       const firstItem = activityData[0];
       if (firstItem.graph_icon) {
         setBackgroundImageUrl(firstItem.graph_icon);
+      } else {
+        setBackgroundImageUrl(undefined);
       }
-
+    } else {
+      setBackgroundImageUrl(undefined)
     }
   }, [activityData]);
 
@@ -90,7 +94,7 @@ const PopulationEstimateCategoryCount = (props: any) => {
       const categoryData = speciesData[category];
       const count = categoryData.count;
       year = categoryData.years[0];
-      
+
       let paddedLabel = category
 
       if(category.length > 25){
@@ -129,57 +133,16 @@ const PopulationEstimateCategoryCount = (props: any) => {
     }
   }
 
-  const options = {
-    cutout: "54%",
-    plugins: {
-      legend: {
-        position: "right" as "right",
-        display: true,
-        labels: {
-          boxWidth: 20,
-          boxHeight: 13,
-          padding: 12,
-          font: {
-            size: 12,
-          },
-        },
-      },
-      datalabels: {
-        color: "#fff",
-        font: {
-          size: 12,
-        },
-      },
-      title: {
-        display: true,
-        text: chartTitle,
-        align: 'start' as 'start',
-        font: {
-          size: 20,
-          weight: 'bold' as 'bold',
-        },
-      },
-    },
-  };
-
-  // custom styling for donut charts
-  const chartContainerStyle: React.CSSProperties = {
-    position: "relative",
-    backgroundImage: `url(${backgroundImageUrl})`,
-    backgroundSize: "18% 20%", // width and height of image
-    backgroundPosition: "19.5% 57%", //horizontal and vertical position respectively
-    backgroundRepeat: "no-repeat",
-    whiteSpace: "pre-wrap", // Allow text to wrap
-  };
-
   return (
     <>
       {!loading ? (
-          <Doughnut
-            data={chartData}
-            options={options}
-            style={chartContainerStyle}
-          />
+          <ChartContainer title={chartTitle} chart={
+            <DoughnutChart
+                chartId={'population-estimate-category'}
+                chartData={chartData}
+                icon={backgroundImageUrl}
+            />
+          }/>
       ) : (
         <Loading containerStyle={{ minHeight: 160 }} />
       )}

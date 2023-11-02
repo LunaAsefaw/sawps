@@ -42,11 +42,9 @@ function processChartData(input: any) {
 
         for (const category of input.category_labels) {
             const entry = input.data.find((e: any) => e.year === year && e.category === category);
-            dataset.data.push(entry ? entry.area : null);
+            dataset.data.push(entry && entry.property_count ? entry.property_count : null);
         }
-
         datasets.push(dataset);
-
         colorIndex = (colorIndex + 1) % availableColors.length;
     }
 
@@ -97,7 +95,8 @@ const PopulationCategoryChart = (props: any) => {
 
     const data = processChartData(populationData);
 
-      const options = {
+    const options = {
+        indexAxis: "y",
         plugins: {
             skipNull: true,
             responsive: true,
@@ -132,7 +131,7 @@ const PopulationCategoryChart = (props: any) => {
             },
         },
         scales: {
-            x: {
+            y: {
                 skipNull: true,
                 beginAtZero: true,
                 stacked: false,
@@ -144,13 +143,13 @@ const PopulationCategoryChart = (props: any) => {
                     },
                 },
             },
-            y: {
+            x: {
                 beginAtZero: true,
                 stacked: false,
                 type: 'linear' as 'linear',
                 title: {
                     display: true,
-                    text: 'Area (ha)',
+                    text: 'Number of properties (count)',
                     font: {
                         size: 14,
                     },
@@ -169,6 +168,7 @@ return (
         {!loading ? (
             <Bar
                 data={data}
+                // @ts-ignore
                 options={options}
             />
         ) : (

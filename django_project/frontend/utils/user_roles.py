@@ -22,6 +22,10 @@ def is_organisation_member(user: User) -> bool:
     :param user: The user object
     :return:  True if the user is a member, otherwise False
     """
+
+    # TODO: Update organisation member checking to use group
+    # Since user with OrganisationUser record will be added to
+    # organisation member/manager group.
     if not UserProfile.objects.filter(
         user=user
     ).exists():
@@ -46,6 +50,11 @@ def is_organisation_manager(
     :return: True if the user is a manager of the organisation,
         otherwise False.
     """
+
+    # TODO: Update organisation member checking to use group
+    # Since user with OrganisationUser record will be added to
+    # organisation member/manager group.
+
     if not UserProfile.objects.filter(
             user=user
     ).exists():

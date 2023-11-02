@@ -253,6 +253,107 @@ class TestPropertyAPIViews(TestCase):
         self.assertEqual(response.data[0]['name'], "PropertyA")
         self.assertEqual(response.data[1]['name'], "PropertyB")
 
+    def test_property_list_multiple_organisations_data_contributor(self):
+        """
+        Test property list for data contributor, which will only return
+        property directly related to their current organisation.
+        """
+        organisation = organisationFactory.create(national=True)
+        organisation_2 = organisationFactory.create(national=False)
+
+        user = User.objects.create_user(
+            username='testuserd',
+            password='testpasswordd'
+        )
+
+        organisationUserFactory.create(
+            user=user,
+            organisation=organisation
+        )
+
+        user.user_profile.current_organisation = organisation
+        user.save()
+        # Create properties related to the organisation
+        PropertyFactory.create(
+            organisation=organisation,
+            name='PropertyA'
+        )
+        PropertyFactory.create(
+            organisation=organisation,
+            name='PropertyB'
+        )
+        PropertyFactory.create(
+            organisation=organisation_2,
+            name='PropertyC'
+        )
+
+        auth_headers = {
+            'HTTP_AUTHORIZATION': 'Basic ' +
+            base64.b64encode(b'testuserd:testpasswordd').decode('ascii'),
+        }
+
+        url = reverse("property-list")
+        client = Client()
+        response = client.get(
+            url,
+            {'organisation': f'{organisation.id}, {organisation_2.id}'},
+            **auth_headers
+        )
+
+        # PropertyC is not returned because it does not belong to
+        # user's current organisation
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['name'], "PropertyA")
+        self.assertEqual(response.data[1]['name'], "PropertyB")
+
+    def test_property_list_multiple_organisations_data_scientist(self):
+        """
+        Test property list for data scientist, which will return
+        all property related to the organisation ID supplied in parameter.
+        """
+        organisation = organisationFactory.create(national=True)
+        organisation_2 = organisationFactory.create(national=False)
+
+        user = User.objects.create_user(
+            username='testuserd',
+            password='testpasswordd'
+        )
+
+        user.user_profile.current_organisation = organisation
+        user.save()
+        # Create properties related to the organisation
+        PropertyFactory.create(
+            organisation=organisation,
+            name='PropertyA'
+        )
+        PropertyFactory.create(
+            organisation=organisation,
+            name='PropertyB'
+        )
+        PropertyFactory.create(
+            organisation=organisation_2,
+            name='PropertyC'
+        )
+
+        auth_headers = {
+            'HTTP_AUTHORIZATION': 'Basic ' +
+            base64.b64encode(b'testuserd:testpasswordd').decode('ascii'),
+        }
+
+        url = reverse("property-list")
+        client = Client()
+        response = client.get(
+            url,
+            {'organisation': f'{organisation.id}, {organisation_2.id}'},
+            **auth_headers
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+        self.assertEqual(response.data[0]['name'], "PropertyA")
+        self.assertEqual(response.data[1]['name'], "PropertyB")
+        self.assertEqual(response.data[2]['name'], "PropertyC")
+
     def test_property_list_without_organisation_id(self):
         organisation = organisationFactory.create(national=True)
 

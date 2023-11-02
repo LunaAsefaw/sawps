@@ -1,24 +1,17 @@
-import React, {useEffect, useCallback, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Box, Button, Checkbox, Grid, ListItemText, Typography} from "@mui/material";
 import InputLabel from '@mui/material/InputLabel';
-import Menu, { MenuProps } from '@mui/material/Menu';
+import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import Select, {SelectChangeEvent} from '@mui/material/Select';
+import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import Loading from '../../../components/Loading';
-import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
 import axios from "axios";
-import { useAppSelector } from "../../../app/hooks";
-import { RootState } from "../../../app/store";
-import { getTitle } from "../../../utils/Helpers";
-import {
-    Activity,
-    useGetUserInfoQuery,
-    useGetActivityAsObjQuery,
-    UserInfo
-} from "../../../services/api";
+import {useAppSelector} from "../../../app/hooks";
+import {RootState} from "../../../app/store";
+import {getTitle} from "../../../utils/Helpers";
+import {Activity, useGetActivityAsObjQuery, useGetUserInfoQuery, UserInfo} from "../../../services/api";
 import Topper from "./Topper";
 import './index.scss';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -140,9 +133,11 @@ const DataList = () => {
 
     useEffect(() => {
         setColumns([])
+        fetchDataList()
         if (selectedSpecies) {
-            fetchDataList()
             setShowReports(true);
+        } else {
+            setShowReports(false);
         }
     }, [selectedSpecies, selectedInfo, propertyId, organisationId, activityId, spatialFilterValues])
 

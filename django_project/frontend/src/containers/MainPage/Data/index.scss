@@ -93,11 +93,16 @@
     color: white;
 }
 
-.dataTable-auto .MuiDataGrid-root{
-   margin-bottom: 0px;
-}
-.dataTable-auto .MuiDataGrid-columnHeaderTitleContainer {
-    text-align: left;
+.dataTable-auto {
+    min-height: 390px;
+
+    .MuiDataGrid-root{
+       margin-bottom: 0px;
+    }
+
+    .MuiDataGrid-columnHeaderTitleContainer {
+        text-align: left;
+    }
 }
 
 .dataContainer {

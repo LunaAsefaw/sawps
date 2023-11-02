@@ -66,6 +66,7 @@ class UserProfileInline(admin.StackedInline):
     list_display = (
         "picture",
     )
+    autocomplete_fields = ['current_organisation']
 
 
 class UserAdmin(BaseUserAdmin):
@@ -86,6 +87,7 @@ class OrganisationUserAdmin(admin.ModelAdmin):
         "user__username",
         "organisation__name"
     ]
+    autocomplete_fields = ["user", "organisation"]
 
 
 @admin.register(OrganisationRepresentative)

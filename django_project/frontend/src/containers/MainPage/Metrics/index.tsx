@@ -427,15 +427,7 @@ const Metrics = () => {
                             constants.canViewTotalCount &&
                             selectedSpecies &&
                             hasEmptyTotalCountPerActivity && (
-                                <Grid item xs={12} md={6}
-                                    style={{
-                                        textAlign: 'center',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        maxHeight: '380px'
-                                    }}
-                                >
+                                <Grid item xs={12} md={6}>
                                     <TotalCountPerActivity
                                         selectedSpecies={selectedSpecies}
                                         propertyId={propertyId}
@@ -478,22 +470,12 @@ const Metrics = () => {
                             constants.canViewPopulationEstimate &&
                             selectedSpecies &&
                             hasEmptyPopulationEstimateCategoryCount && (
-                                <Grid item xs={12} md={6}
-                                    style={{
-                                        textAlign: 'center',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        maxHeight: '380px'
-                                    }}
-                                >
+                                <Grid item xs={12} md={6}>
                                     <PopulationEstimateCategoryCount
                                         selectedSpecies={selectedSpecies}
                                         propertyId={propertyId}
                                         startYear={startYear}
                                         endYear={endYear}
-                                        loading={loading}
-                                        setLoading={setLoading}
                                         activityData={activityData}
                                         onEmptyDatasets={handleEmptyTopulationEstimateCategoryCount}
                                     />

@@ -28,13 +28,12 @@ const CustomButton: React.FC<CustomButtonProps> = (props) => {
         return theme.palette.customColors.green;
       case 'orange':
         return theme.palette.customColors.orange;
-      case 'purple': 
+      case 'purple':
         return theme.palette.customColors.purple;
       default:
         return '#3F51B5';
     }
   };
-  console.log(other)
   return (
     <StyledButton bgcolor={getColor(color)} {...other}>{props.buttonText}</StyledButton>
   );

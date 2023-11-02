@@ -79,7 +79,7 @@ def calculate_population_categories(
         Dict[str, Any]: A dictionary containing:
         - CATEGORY_LABELS: List of population category labels.
         - YEAR_LABELS: List of years for which the data is available.
-        - CATEGORY_DATA: List of dictionaries with year, area,
+        - CATEGORY_DATA: List of dictionaries with year, property count,
             and population category details.
 
     This function takes a queryset of properties and the name of a species.
@@ -89,7 +89,7 @@ def calculate_population_categories(
     It retrieves the annual population data, calculates
     the minimum and maximum populations,
     creates 6 population categories, and counts
-    the area available to the species in each category.
+    the number of properties in each category for each year.
     """
 
     # Extract property IDs from the queryset
@@ -100,8 +100,7 @@ def calculate_population_categories(
     # Fetch the annual population data for the specified property IDs
     annual_population_data = AnnualPopulation.objects.filter(
         property__in=property_ids,
-        taxon__scientific_name=species_name,
-        area_available_to_species__gt=0
+        taxon__scientific_name=species_name
     ).distinct()
 
     if not annual_population_data.exists():
@@ -130,23 +129,30 @@ def calculate_population_categories(
 
         category_labels.append(category_key)
 
-        annual_population_data_by_category = annual_population_data.filter(
-            total__gte=category,
-            total__lte=max_category
-        )
-        for annual_data in annual_population_data_by_category:
+        for year in annual_population_data.values_list(
+                'year', flat=True).distinct():
+            annual_population_data_by_category = annual_population_data.filter(
+                total__gte=category,
+                total__lte=max_category,
+                year=year
+            )
+            property_count = (
+                annual_population_data_by_category.values(
+                    'property').distinct().count()
+            )
+
             results.append({
-                'year': annual_data.year,
-                'area': annual_data.area_available_to_species,
-                'category': category_key
+                'year': year,
+                'category': category_key,
+                'property_count': property_count
             })
 
     return {
         CATEGORY_LABELS: category_labels,
-        YEAR_LABELS: list(set(
-            annual_population_data.values_list(
-                'year', flat=True
-            ).order_by('year'))),
+        YEAR_LABELS: sorted(set(
+            int(year) for year in annual_population_data.values_list(
+                'year', flat=True)
+        )),
         CATEGORY_DATA: results
     }
 

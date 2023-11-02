@@ -145,9 +145,9 @@ class TestCalculatePopulationCategories(TestCase):
             ['100-133', '133-166', '166-200', '200-233', '233-266', '>266']
         )
 
-        self.assertTrue(
-            result['data'][0]['area'],
-            100
+        self.assertEqual(
+            result['data'][0]['property_count'],
+            1
         )
 
 

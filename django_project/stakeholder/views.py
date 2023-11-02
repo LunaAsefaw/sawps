@@ -1,39 +1,42 @@
+import json
 import logging
-from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect, Http404
+from datetime import datetime
+
 import pytz
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from django.core.paginator import (
+    Paginator,
+    EmptyPage,
+    PageNotAnInteger
+)
+from django.db.models import Q
+from django.http import HttpResponseRedirect, Http404
+from django.http import JsonResponse
+from django.utils import timezone
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from core.celery import app
+from frontend.serializers.stakeholder import (
+    ReminderSerializer,
+    OrganisationSerializer
+)
+from frontend.utils.organisation import (
+    get_current_organisation_id
+)
+from frontend.views.base_view import RegisteredOrganisationBaseView
 from stakeholder.models import (
     Organisation,
     UserRoleType,
     UserTitle,
     Reminders
 )
-from django.contrib import messages
 from stakeholder.tasks import send_reminder_emails
-from django.utils import timezone
-from datetime import datetime
-from frontend.utils.organisation import (
-    get_current_organisation_id
-)
-from django.http import JsonResponse
-from django.core.paginator import (
-    Paginator,
-    EmptyPage,
-    PageNotAnInteger
-)
-import json
-from django.db.models import Q
-from core.celery import app
-from frontend.views.base_view import RegisteredOrganisationBaseView
-from frontend.serializers.stakeholder import (
-    ReminderSerializer,
-    OrganisationSerializer
-)
-from django.contrib.auth.models import User
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
+
 logger = logging.getLogger(__name__)
 
 
