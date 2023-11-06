@@ -52,6 +52,14 @@ class Migration(migrations.Migration):
                     ),
                     ("can_view_sampling_report", "Can view sampling report"),
                     ("can_view_province_report", "Can view province report"),
+                    (
+                        "can_view_map_province_layer",
+                        "Can view province layer in the map",
+                    ),
+                    (
+                        "can_view_map_properties_layer",
+                        "Can view properties layer in the map",
+                    ),
                 ]
             },
         ),

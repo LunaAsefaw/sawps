@@ -68,7 +68,6 @@ const TotalCountPerActivity = (props: any) => {
 
   useEffect(() => {
     if (activityData && activityData.length > 0) {
-      onEmptyDatasets(true)
       const firstItem = activityData[0];
       if (firstItem.graph_icon) {
         setBackgroundImageUrl(firstItem.graph_icon);
@@ -77,7 +76,6 @@ const TotalCountPerActivity = (props: any) => {
       }
     }else {
       setBackgroundImageUrl(undefined)
-      onEmptyDatasets(false)
     }
   }, [propertyId,startYear,endYear,activityData, selectedSpecies]);
 
@@ -98,7 +96,6 @@ const TotalCountPerActivity = (props: any) => {
       );
 
       if (matchingActivity) {
-        onEmptyDatasets(true)
         const activityType = matchingActivity.activity_type;
         const total = matchingActivity.total;
 
@@ -114,7 +111,7 @@ const TotalCountPerActivity = (props: any) => {
           data.push(total);
           uniqueColors.push(availableColors[labels.length - 1]);
         }
-      } else onEmptyDatasets(false)
+      }
     });
   }
 

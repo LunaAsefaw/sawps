@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from "react";
 import {Doughnut} from "react-chartjs-2";
+import './style.scss';
 
 
 interface DoughnutChartInterface {
@@ -7,11 +8,6 @@ interface DoughnutChartInterface {
     chartId: string,
     icon?: string
 }
-
-const ChartContainerStyle: React.CSSProperties = {
-    position: "relative",
-    whiteSpace: "pre-wrap",
-};
 
 
 export default function DoughnutChart(props: DoughnutChartInterface) {
@@ -50,11 +46,15 @@ export default function DoughnutChart(props: DoughnutChartInterface) {
     const options = {
         cutout: '54%',
         icon: props.icon,
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'right' as 'right',
+                align: 'center' as 'center',
                 display: true,
                 labels: {
+                    textAlign: 'left' as 'left',
                     boxWidth: 20,
                     boxHeight: 13,
                     padding: 12,
@@ -89,12 +89,13 @@ export default function DoughnutChart(props: DoughnutChartInterface) {
     }, [props.icon]);
 
     return (
-        <Doughnut
-            ref={chartRef}
-            data={props.chartData}
-            options={options}
-            plugins={[doughnutIconPlugin]}
-            style={ChartContainerStyle}
-        />
+        <div className={'DoughnutChartContainer'}>
+            <Doughnut
+                ref={chartRef}
+                data={props.chartData}
+                options={options}
+                plugins={[doughnutIconPlugin]}
+            />
+        </div>
     )
 }

@@ -5,6 +5,9 @@ import { CategoryScale } from "chart.js";
 import Chart from "chart.js/auto";
 import Loading from "../../../components/Loading";
 import "./index.scss";
+import ChartContainer from "../../../components/ChartContainer";
+import DoughnutChart from "../../../components/DoughnutChart";
+
 
 Chart.register(CategoryScale);
 
@@ -109,15 +112,7 @@ const AreaAvailableLineChart = (props: any) => {
                       size: 12,
                     }
                 },
-            },
-            title: {
-                display: true,
-                text: `Total area vs area available to ${speciesName}`,
-                font: {
-                    size: 16, 
-                    weight: 'bold' as 'bold', 
-                },
-            },
+            }
         },
         scales: {
             x: {
@@ -156,11 +151,12 @@ const AreaAvailableLineChart = (props: any) => {
     return (
         <>
             {!loading ? (
-                <Line 
-                    data={AreaDataValue} 
+            <ChartContainer title={`Total area vs area available to ${speciesName}`} chart={
+                <Line
+                    data={AreaDataValue}
                     options={AreaOptions}
                 />
-       
+            }/>
             ) : (
                 <Loading containerStyle={{ minHeight: 160 }} />
             )}

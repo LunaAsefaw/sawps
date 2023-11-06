@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, responsiveFontSizes } from "@mui/material";
 import axios from "axios";
 import Loading from "../../../components/Loading";
 import { Bar } from 'react-chartjs-2';
 import { Grid } from "@mui/material";
+import ChartContainer from "../../../components/ChartContainer";
 
 const FETCH_ACTVITY_COUNT = "/api/species-count-per-province/";
 
@@ -142,6 +142,8 @@ const SpeciesCountPerProvinceChart = (props: any) => {
     labels: horizontalLabels,
     datasets: datasets
   };
+
+  const chartTitle = `Total count of ${selectedSpecies} per province`;
   
   const options = {
     plugins: {
@@ -160,14 +162,6 @@ const SpeciesCountPerProvinceChart = (props: any) => {
                 font: {
                     size: 10,
                 },
-            },
-        },
-        title: {
-            display: true,
-            text: `Total count of ${selectedSpecies} per province`,
-            font: {
-                size: 16,
-                weight: 'bold' as 'bold',
             },
         },
     },
@@ -210,10 +204,13 @@ const SpeciesCountPerProvinceChart = (props: any) => {
   return (
     <Grid>
       {!loading ? (
-        <Bar
-          data={data}
-          options={options}
-        />
+          <ChartContainer title={chartTitle} chart={
+            <Bar
+              data={data}
+              options={options}
+              className={'bar-chart'}
+            />
+          }/>
       ) : (
         <Loading containerStyle={{ minHeight: 160 }} />
       )}

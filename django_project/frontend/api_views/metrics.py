@@ -1,5 +1,6 @@
 """API Views related to metrics.
 """
+import datetime
 from typing import List
 
 from django.db.models.query import QuerySet
@@ -20,7 +21,6 @@ from frontend.serializers.metrics import (
 )
 from frontend.utils.metrics import (
     calculate_population_categories,
-    calculate_total_area_available_to_species,
     calculate_total_area_per_property_type,
     calculate_base_population_of_species,
     calculate_species_count_per_province
@@ -33,6 +33,12 @@ from species.models import Taxon
 from frontend.utils.organisation import (
     get_current_organisation_id
 )
+from frontend.utils.data_table import (
+    get_queryset, get_report_filter, SPECIES_REPORT
+)
+from frontend.utils.user_roles import get_user_roles
+from frontend.serializers.metrics import AreaAvailablePerSpeciesSerializer
+from population_data.models import AnnualPopulation
 
 
 class SpeciesPopuationCountPerYearAPIView(APIView):
@@ -177,8 +183,13 @@ class SpeciesPopulationCountPerProvinceAPIView(APIView):
         """
         species_name = request.GET.get("species")
         queryset = self.get_queryset()
+        start_year = request.GET.get("start_year", 0)
+        end_year = request.GET.get("end_year", datetime.datetime.now().year)
+        year_range = (int(start_year), int(end_year))
         return Response(
-            calculate_species_count_per_province(queryset, species_name)
+            calculate_species_count_per_province(
+                queryset, species_name, year_range
+            )
         )
 
 
@@ -246,9 +257,12 @@ class PropertiesPerPopulationCategoryAPIView(APIView):
         Handle GET request to retrieve population categories for properties.
         """
         species_name = request.GET.get("species")
+        start_year = request.GET.get("start_year", 0)
+        end_year = request.GET.get("end_year", datetime.datetime.now().year)
+        year_range = (int(start_year), int(end_year))
         queryset = self.get_queryset()
         return Response(
-            calculate_population_categories(queryset, species_name)
+            calculate_population_categories(queryset, species_name, year_range)
         )
 
 
@@ -274,13 +288,19 @@ class TotalAreaAvailableToSpeciesAPIView(APIView):
         Retrieve the calculated total area available to species and
         return it as a Response.
         """
-        species_name = request.GET.get("species")
-        queryset = self.get_queryset()
+        user_roles = get_user_roles(request.user)
+        queryset = get_queryset(user_roles, request)
+        filters = get_report_filter(request, SPECIES_REPORT)
+        if 'annualpopulationperactivity__activity_type_id__in' in filters:
+            del filters['annualpopulationperactivity__activity_type_id__in']
+        species_population_data = AnnualPopulation.objects.filter(
+            property__in=queryset,
+            **filters
+        )
         return Response(
-            calculate_total_area_available_to_species(
-                queryset,
-                species_name
-            )
+            AreaAvailablePerSpeciesSerializer(
+                species_population_data, many=True
+            ).data
         )
 
 
@@ -329,7 +349,6 @@ class PopulationPerAgeGroupAPIView(APIView):
             annualpopulation__property__organisation_id=organisation_id,
             taxon_rank__name='Species'
         ).distinct()
-        print(queryset)
         filtered_queryset = BaseMetricsFilter(
             self.request.GET, queryset=queryset
         ).qs

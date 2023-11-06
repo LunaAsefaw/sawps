@@ -5,7 +5,7 @@ let url = '/';
 
 test.describe('about page', () => {
 
-    //test.use({ storageState: ".auth/adminAuth.json" });
+    test.use({ storageState: 'tests/.auth/sawps-auth.json' });
 
     test('page elements', async ({page}) => {
 

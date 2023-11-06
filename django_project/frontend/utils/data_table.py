@@ -1,16 +1,19 @@
 import logging
 import os
+import urllib.parse
+from typing import Dict
+from typing import List
 from zipfile import ZipFile
 
 import pandas as pd
-import urllib.parse
-from typing import Dict, List
-
+from django.conf import settings
 from django.db.models import Sum
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
 
 from activity.models import ActivityType
+from frontend.filters.data_table import DataContributorsFilter
+from frontend.filters.metrics import BaseMetricsFilter
 from frontend.serializers.report import (
     SpeciesReportSerializer,
     SamplingReportSerializer,
@@ -21,15 +24,16 @@ from frontend.serializers.report import (
     NationalLevelActivityReport,
     NationalLevelProvinceReport
 )
+from frontend.static_mapping import DATA_CONTRIBUTORS, DATA_SCIENTISTS
 from frontend.static_mapping import REGIONAL_DATA_CONSUMER
 from frontend.utils.organisation import get_current_organisation_id
 from population_data.models import (
     AnnualPopulation,
     AnnualPopulationPerActivity
 )
-from property.models import Province, Property
-
-from django.conf import settings
+from property.models import Property
+from property.models import Province
+from species.models import Taxon
 
 logger = logging.getLogger('sawps')
 
@@ -38,6 +42,56 @@ PROPERTY_REPORT = 'Property_report'
 SAMPLING_REPORT = 'Sampling_report'
 SPECIES_REPORT = 'Species_report'
 PROVINCE_REPORT = 'Province_report'
+
+
+
+def get_queryset(user_roles: List[str], request):
+    organisation_id = get_current_organisation_id(request.user)
+    if set(user_roles) & set(DATA_CONTRIBUTORS + DATA_SCIENTISTS):
+        query_filter = DataContributorsFilter
+        organisation = request.GET.get("organisation")
+        if organisation and (set(user_roles) & set(DATA_SCIENTISTS)):
+            ids = organisation.split(",")
+            queryset = Property.objects.filter(
+                organisation_id__in=ids,
+                annualpopulation__taxon__taxon_rank__name="Species"
+            ).distinct().order_by("name")
+        else:
+            queryset = Property.objects.filter(
+                organisation_id=organisation_id,
+                annualpopulation__taxon__taxon_rank__name="Species"
+            ).distinct().order_by("name")
+
+        spatial_filter_values = request.GET.get(
+            'spatial_filter_values',
+            ''
+        ).split(',')
+
+        spatial_filter_values = list(
+            filter(None, spatial_filter_values)
+        )
+
+        if spatial_filter_values:
+            queryset = queryset.filter(
+                **({
+                    'spatialdatamodel__spatialdatavaluemodel__'
+                    'context_layer_value__in':
+                        spatial_filter_values
+                })
+            )
+    else:
+        query_filter = BaseMetricsFilter
+        queryset = Taxon.objects.filter(
+            annualpopulation__property__organisation_id=organisation_id,
+            taxon_rank__name="Species"
+        ).distinct().order_by("scientific_name")
+
+    filtered_queryset = query_filter(
+        request.GET, queryset=queryset
+    ).qs
+
+    return filtered_queryset
+
 
 
 def data_table_reports(queryset: QuerySet, request, user_roles) -> List[Dict]:

@@ -18,6 +18,7 @@ import {Line} from 'react-chartjs-2'
 import Grid from '@mui/material/Grid';
 import Loading from '../../../components/Loading';
 import { Typography } from '@mui/material';
+import ChartContainer from "../../../components/ChartContainer";
 
 /*
 a new dataset labeled "Counts" is added to the chartData object. 

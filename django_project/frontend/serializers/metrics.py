@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 from frontend.static_mapping import YEAR_DATA_LIMIT
 from django.db.models import (
@@ -284,12 +285,21 @@ class TotalCountPerActivitySerializer(serializers.ModelSerializer):
         """
         property = self.context['request'].GET.get('property')
         property_list = property.split(',') if property else []
+        start_year = self.context['request'].GET.get("start_year", 0)
+        end_year = self.context['request'].GET.get(
+            "end_year", datetime.datetime.now().year
+        )
+        year_range = (int(start_year), int(end_year))
         populations = AnnualPopulation.objects.values(
-            "taxon__common_name_varbatim").filter(taxon=obj)
+            "taxon__common_name_varbatim").filter(
+            taxon=obj,
+            year__range=year_range
+        )
         if property_list:
             populations = populations.filter(
                 property__id__in=property_list,
             )
+
         populations = populations.annotate(
             total=Sum("annualpopulationperactivity__total")
         )
@@ -311,8 +321,13 @@ class TotalCountPerActivitySerializer(serializers.ModelSerializer):
         """
         property_param = self.context['request'].GET.get('property')
         property_list = property_param.split(',') if property_param else []
+        start_year = self.context['request'].GET.get("start_year", 0)
+        end_year = self.context['request'].GET.get(
+            "end_year", datetime.datetime.now().year
+        )
+        year_range = (int(start_year), int(end_year))
 
-        q_filters = Q(annual_population__taxon=obj)
+        q_filters = Q(annual_population__taxon=obj, year__range=year_range)
         if property_list:
             q_filters &= Q(annual_population__property_id__in=property_list)
 
@@ -363,10 +378,17 @@ class SpeciesPopulationDensityPerPropertySerializer(
         if not species_name:
             return None
 
+        start_year = self.context['request'].GET.get("start_year", 0)
+        end_year = self.context['request'].GET.get(
+            "end_year", datetime.datetime.now().year
+        )
+        year_range = (int(start_year), int(end_year))
+
         populations = (
             AnnualPopulation.objects.filter(
                 property=obj,
-                taxon__scientific_name=species_name
+                taxon__scientific_name=species_name,
+                year__range=year_range
             )
             .values(
                 "property__name",
@@ -421,7 +443,8 @@ class PopulationPerAgeGroupSerialiser(serializers.ModelSerializer):
             "sub_adult_female",
             "juvenile_male",
             "juvenile_female",
-            "year"
+            "year",
+            "total"
         ]
 
         filters = {
@@ -521,3 +544,33 @@ class TotalAreaVSAvailableAreaSerializer(serializers.ModelSerializer):
             }
 
         return data
+
+
+class AreaAvailablePerSpeciesSerializer(serializers.ModelSerializer):
+    species = serializers.SerializerMethodField()
+    property_name = serializers.SerializerMethodField()
+    organisation_name = serializers.SerializerMethodField()
+    province_name = serializers.SerializerMethodField()
+    area = serializers.SerializerMethodField()
+
+    def get_species(self, obj: AnnualPopulation) -> str:
+        return obj.taxon.scientific_name
+
+    def get_property_name(self, obj: AnnualPopulation) -> str:
+        return obj.property.name
+
+    def get_organisation_name(self, obj: AnnualPopulation) -> str:
+        return obj.property.organisation.name
+
+    def get_province_name(self, obj: AnnualPopulation) -> str:
+        return obj.property.province.name
+
+    def get_area(self, obj: AnnualPopulation) -> str:
+        return obj.area_available_to_species
+
+    class Meta:
+        model = AnnualPopulation
+        fields = [
+            'species', 'property_name', 'year',
+            'organisation_name', 'province_name', 'area'
+        ]

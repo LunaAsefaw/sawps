@@ -3,6 +3,7 @@ import { Bar } from 'react-chartjs-2';
 import axios from "axios";
 import { Grid } from "@mui/material";
 import Loading from "../../../components/Loading";
+import ChartContainer from "../../../components/ChartContainer";
 
 const FETCH_SPECIES_DENSITY = "/api/properties-per-population-category/";
 
@@ -115,15 +116,7 @@ const PopulationCategoryChart = (props: any) => {
                         size: 10,
                     },
                 },
-            },
-            title: {
-                display: true,
-                text: `Number of properties per population category for ${selectedSpecies}`,
-                font: {
-                    size: 16,
-                    weight: 'bold' as 'bold',
-                },
-            },
+            }
         },
         layout: {
             padding: {
@@ -166,11 +159,16 @@ const PopulationCategoryChart = (props: any) => {
 return (
     <Grid>
         {!loading ? (
+        <ChartContainer
+          title={`Number of properties per population category for ${selectedSpecies}`}
+          chart={
             <Bar
                 data={data}
                 // @ts-ignore
                 options={options}
+                className={'bar-chart'}
             />
+        }/>
         ) : (
             <Loading containerStyle={{ minHeight: 160 }} />
         )}

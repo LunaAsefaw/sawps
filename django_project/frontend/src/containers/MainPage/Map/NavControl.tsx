@@ -25,10 +25,12 @@ export default class CustomNavControl extends maplibregl.NavigationControl {
       this._currentTheme = customOptions.initialTheme
       // add theme switcher icon
       this._themeSwitcher = this._createButton('maplibregl-ctrl-theme-switcher', (e) => {
-        if (customOptions?.onThemeSwitched) {
-          customOptions.onThemeSwitched()
-          this._toggleThemeSwitcherIcon()
-          this._setThemeSwitcherIcon(this._currentTheme)          
+        if (this._map && this._map.isSourceLoaded('sanbi') && this._map.isSourceLoaded('sanbi-dynamic')) {
+          if (customOptions?.onThemeSwitched) {
+            customOptions.onThemeSwitched()
+            this._toggleThemeSwitcherIcon()
+            this._setThemeSwitcherIcon(this._currentTheme)
+          }
         }
       });
       this._themeSwitcherIcon = this._create_element('span', 'maplibregl-ctrl-icon', this._themeSwitcher);
@@ -97,5 +99,5 @@ export default class CustomNavControl extends maplibregl.NavigationControl {
     updateThemeSwitcherIcon(theme: string) {
       this._currentTheme = theme
       this._setThemeSwitcherIcon(this._currentTheme)
-    }  
+    }
   }

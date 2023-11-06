@@ -1,31 +1,20 @@
 {
-  "name": "CI",
-  "version": "0.0.1",
-  "description": "CI.",
+  "name": "ci-test",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "scripts": {
-    "dev": "webpack serve --mode development",
-    "build": "webpack --mode production",
-    "lint": "eslint src/**/*.jsx"
+  "directories": {
+    "test": "tests"
   },
+  "scripts": {},
   "keywords": [],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/"
-  },
-  "author": {
-    "name": "Irwan Fathurrahman",
-    "url": "https://github.com/meomancer"
-  },
-  "license": "AGPL-3.0",
-  "bugs": {
-    "url": "https://github.com//issues"
-  },
-  "homepage": "https://github.com/",
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.36.2"
+    "@playwright/test": "^1.39.0",
+    "@types/node": "^20.8.9"
   },
   "dependencies": {
-  },
-  "overrides": {}
+    "playwright": "^1.39.0"
+  }
 }

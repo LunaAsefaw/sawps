@@ -18,7 +18,8 @@ from frontend.models import (
     DraftSpeciesUpload,
     StatisticalModel,
     StatisticalModelOutput,
-    Layer
+    Layer,
+    MapSession
 )
 from frontend.models.spatial import SpatialDataModel, SpatialDataValueModel
 from frontend.tasks import (
@@ -326,6 +327,13 @@ class SpatialDataModelAdmin(admin.ModelAdmin):
     )
 
 
+class MapSessionAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'user', 'uuid', 'created_date', 'expired_date'
+    )
+    list_filter = ['user']
+
+
 admin.site.register(ContextLayer, ContextLayerAdmin)
 admin.site.register(ContextLayerLegend, ContextLayerLegendAdmin)
 admin.site.register(ContextLayerTilingTask, TilingTaskAdmin)
@@ -335,3 +343,4 @@ admin.site.register(DraftSpeciesUpload, DraftSpeciesUploadAdmin)
 admin.site.register(StatisticalModel, StatisticalModelAdmin)
 admin.site.register(SpatialDataModel, SpatialDataModelAdmin)
 admin.site.register(Layer, LayerAdmin)
+admin.site.register(MapSession, MapSessionAdmin)

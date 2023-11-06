@@ -1,18 +1,33 @@
-import {expect, test} from '@playwright/test';
+import { test , expect } from '@playwright/test';
 
-// URL That we need to check
-let url = 'http://localhost:2000';
+let url = '/';
 
 
-test.describe('navigation', () => {
-    test.beforeEach(async ({page}) => {
-        // Go to the starting url before each test.
+test.describe('landing page', () => {
+    
+    //test.use({ storageState: ".auth/adminAuth.json" });
+
+    test('page elements', async ({page}) => {
+
         await page.goto(url);
-    });
 
-    // A use case tests scenarios
-    test('Page Loaded', async ({page}) => {
-        await page.waitForSelector('.Home', {timeout: 2000});
-        await expect(page.getByText('Admin panel')).toBeVisible();
-    })
+        await page.locator('#navbarNav').isVisible();
+
+        await page.locator('#navbarNav').getByRole('link', { name: 'ABOUT' }).isVisible();
+
+        await page.locator('#navbarNav').getByRole('link', { name: 'HELP' }).isVisible();
+
+        await page.locator('#navbarNav').getByRole('link', { name: 'CONTACT' }).isVisible();
+
+        await page.locator('#navbarNav').getByRole('link', { name: 'LOGIN' }).isVisible();
+
+        await page.locator('#navbarNav').getByRole('link', { name: 'REGISTER' }).isVisible();
+
+        await page.getByTestId('landing-page-banner-image').isVisible();
+
+        await page.getByTestId('landing-page-population-overview-container').isVisible();
+        
+        await page.getByTestId('footer').isVisible();
+
+    });
 });

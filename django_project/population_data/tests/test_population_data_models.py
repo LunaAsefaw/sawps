@@ -1,6 +1,7 @@
 """Test case for population data models.
 """
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from population_data.factories import (
@@ -72,11 +73,20 @@ class PopulationCountTestCase(TestCase):
             AnnualPopulation.objects.filter(id=self.population_count.id).exists()
         )
 
-    def test_annual_population_total_constraint(self):
-        """Test update population count."""
-        self.population_count.total = 110
-        with self.assertRaises(Exception) as raised:
-            self.population_count.save()
+    def test_adult_population_validation(self):
+        """
+        Test that a ValidationError is raised when the sum of adult_male and
+        adult_female exceeds the total.
+        """
+        data = {
+            'year': 2023,
+            'total': 100,
+            'adult_male': 60,
+            'adult_female': 50,
+        }
+        with self.assertRaises(ValidationError):
+            population_instance = AnnualPopulation(**data)
+            population_instance.clean()
 
 
 class AnnualPopulationPerActivityTestCase(TestCase):

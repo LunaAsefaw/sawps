@@ -1,20 +1,50 @@
-import {test as setup} from '@playwright/test';
+import { test as setup, expect } from '@playwright/test';
 
-const authFile = 'states/.auth/user.json';
-let url = 'http://localhost:2000/';
+let url = '/';
 
-setup('authenticate', async ({page}) => {
+let user_email = 'admin@example.com';
+let password = 'admin';
+const authFile = 'tests/.auth/sawps-auth.json';
 
-    await page.goto(url + 'login/');
-    await page.waitForSelector('.BasicForm', {timeout: 2000});
-    await page.locator('#app input[name="username"]').fill('admin');
-    await page.locator('#app input[name="password"]').fill('admin');
-    await page.getByRole('button', {name: 'LOG IN'}).click();
-    //
-    // Sometimes login flow sets cookies in the process of several redirects.
-    // Wait for the final URL to ensure that the cookies are actually set.
-    await page.waitForURL(url, {timeout: 2000});
 
-    // End of authentication steps.
-    await page.context().storageState({path: authFile});
+setup.describe('login and 2fa-authentication ', () => {
+
+  setup('login and 2fa', async ({page}) => {
+
+    await page.goto(url);
+
+    const buttonSelector = 'div.landing-page-banner-text-btns button:text("LOGIN")';
+
+    await page.waitForSelector(buttonSelector, {timeout: 2000});
+
+    const initialURL = page.url();
+
+    await page.click(buttonSelector);
+
+    await page.waitForURL('**/accounts/login/');
+
+    await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
+
+    await page.getByPlaceholder('E-mail address').fill(user_email);
+    
+    await page.getByPlaceholder('Password').fill(password);
+    
+    await page.getByRole('button', { name: 'LOGIN' }).click();
+
+    //await page.waitForURL('**/accounts/two-factor/authenticate/');
+
+    //await expect(page.getByRole('heading', { name: 'Two-Factor Authentication' })).toBeVisible();
+
+    //await page.locator('input[id="id_otp_token"]').fill(token);
+
+    //await page.getByRole('button', { name: 'Authenticate' }).click();
+
+    const finalURL = page.url();
+
+    expect(finalURL).not.toBe(initialURL);
+
+    await page.context().storageState({ path: authFile });
+    
+  });
+
 });

@@ -17,7 +17,7 @@ class PropertyType(models.Model):
 
 
 class Province(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
@@ -72,6 +72,7 @@ class Property(models.Model):
     open = models.ForeignKey(
         "population_data.OpenCloseSystem", on_delete=models.CASCADE, null=True
     )
+    centroid = models.PointField(srid=4326, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Property'

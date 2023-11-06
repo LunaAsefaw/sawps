@@ -73,18 +73,18 @@ class AnnualPopulationPerActivityAdmin(admin.ModelAdmin):
     ]
 
     def property_name(self, obj: AnnualPopulationPerActivity):
-        if obj.owned_species and obj.owned_species.property:
-            return obj.owned_species.property.name
+        if obj.annual_population and obj.annual_population.property:
+            return obj.annual_population.property.name
         return None
 
     def scientific_name(self, obj: AnnualPopulationPerActivity):
-        if obj.owned_species and obj.owned_species.taxon:
-            return obj.owned_species.taxon.scientific_name
+        if obj.annual_population and obj.annual_population.taxon:
+            return obj.annual_population.taxon.scientific_name
         return None
 
     def common_name(self, obj: AnnualPopulationPerActivity):
-        if obj.owned_species and obj.owned_species.taxon:
-            return obj.owned_species.taxon.common_name_varbatim
+        if obj.annual_population and obj.annual_population.taxon:
+            return obj.annual_population.taxon.common_name_varbatim
         return None
 
 

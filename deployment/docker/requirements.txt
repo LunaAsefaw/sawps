@@ -1,4 +1,4 @@
-Django==4.1.10
+Django==4.1.13
 
 # Web APIs for Django
 djangorestframework==3.14.0

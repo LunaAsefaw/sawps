@@ -226,7 +226,7 @@ class TotalCountPerActivityTestCase(BaseTestCase):
         self.assertEqual(len(response.data[0]['activities']), 5)
         self.assertGreater(len(response.data), 0)
         # test with property id
-        data = { 'property': self.property.id }
+        data = {'property': self.property.id}
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -334,24 +334,31 @@ class TotalAreaAvailableToSpeciesTestCase(BaseTestCase):
         url = self.url
         response = self.client.get(url, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]['area'], 50.0)
+        self.assertEqual(len(response.data), len(self.annual_populations))
+        self.assertEqual(response.data[0]['area'], 10)
         
-        data = {'property': self.annual_populations[0].property_id, 'species': "Penthera leo"}
+        data = {
+            'property': self.annual_populations[0].property_id,
+            'species': "Penthera leo",
+            'start_year': self.annual_populations[0].year,
+            'end_year': self.annual_populations[0].year
+        }
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]['area'], 50.0)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['area'], 10)
 
 
     def test_total_area_available_to_species_filter_by_property(self) -> None:
         """
         Test total area available to species filtered by property.
         """
-        id = self.annual_populations[0].property_id
-        data = {'property':id}
+        prop_id = self.annual_populations[0].property_id
+        data = {'property': prop_id}
         url = self.url
         response = self.client.get(url, data, **self.auth_headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]['property_name'], 'Propertya')
+        self.assertEqual(response.data[0]['property_name'], 'PropertyA')
 
 
 class TotalAreaPerPropertyTypeTestCase(BaseTestCase):

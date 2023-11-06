@@ -5,6 +5,8 @@ import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import Loading from "../../../components/Loading";
 import "./index.scss";
+import ChartContainer from "../../../components/ChartContainer";
+import DoughnutChart from "../../../components/DoughnutChart";
 
 Chart.register(CategoryScale);
 Chart.register(ChartDataLabels);
@@ -28,7 +30,6 @@ interface Props {
   endYear: number;
   loading: boolean;
   activityData: ActivityDataItem[];
-  onEmptyDatasets: any
 }
 
 const availableColors = [
@@ -50,11 +51,10 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
   startYear,
   endYear,
   loading,
-  activityData,
-  onEmptyDatasets
+  activityData
 }: Props) => {
   // Initialize variables
-  const labels: string[] = [];
+  let labels: string[] = [];
   const data: string[] = [];
   const uniqueColors: string[] = [];
   let year: number | null = null; //use effect to update this guy
@@ -73,12 +73,6 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
 
   // Iterate through activityData
   activityData.forEach((speciesData: ActivityDataItem) => {
-    if (speciesData.species_name.toLocaleLowerCase() !== selectedSpecies.toLocaleLowerCase()) {
-      // Rule 1: If species doesn't match, assign null data
-      year = null;
-      return;
-    }
-
     const speciesActivities = speciesData.activities;
 
     // Iterate through activities to find the most recent year
@@ -88,10 +82,11 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
       }
     });
 
+    // TODO: confirm rule
     // Rule 3: If the year doesn't match startYear or endYear, use the most recent year
-    if (year !== null && (year < startYear || year > endYear)) {
-      year = null;
-    }
+    // if (year !== null && (year < startYear || year > endYear)) {
+    //   year = year;
+    // }
 
     // Rule 2: Only save the activities with the most recent year
     const recentActivities = speciesActivities.filter(
@@ -99,7 +94,7 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
     );
 
     // Get the total for the most recent year
-    const totalForMostRecentYear = speciesData.total;
+    const totalForMostRecentYear = recentActivities.reduce((partialSum, act) => partialSum + act.total, 0);
 
     // Rule 4: Store activities in a cleaner object and calculate percentages
     recentActivities.forEach((recentActivity: ActivityItem) => {
@@ -122,7 +117,7 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
         data.push(percentage);
         uniqueColors.push(availableColors[labels.length - 1]);
      }
-      
+
 
       // Rule 4: Store activities in a cleaner object
       if (!recentActivitiesMap[activityType]) {
@@ -135,10 +130,6 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
     });
   });
 
-   if(labels.length>0){
-    onEmptyDatasets(true)
-  }else onEmptyDatasets(false);
-
   // Create the chartData object
   const chartData = {
     labels: labels,
@@ -150,62 +141,20 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
     ],
   };
 
-  const options = {
-    cutout: "54%",
-    plugins: {
-      legend: {
-        position: "right" as "right",
-        display: true,
-        labels: {
-          boxWidth: 20,
-          boxHeight: 13,
-          padding: 12,
-          font: {
-            size: 12,
-          },
-        },
-      },
-      datalabels: {
-        color: "#fff",
-        formatter: (value: number) => {
-            return `${value}%`;
-        },
-        font: {
-          size: 12,
-        },
-      },
-      title: {
-        display: true,
-        text: year
-          ? `Activity count as % of total population for ${selectedSpecies} year ${year}`
-          : `No data available for ${selectedSpecies} current filter selections`,
-        align: 'start' as 'start',
-        font: {
-          size: 20,
-          weight: 'bold' as 'bold',
-        },
-      },
-    },
-  };
-
-  // custom styling for donut charts
-   const chartContainerStyle: React.CSSProperties = {
-    position: "relative",
-    backgroundImage: `url(${backgroundImageUrl})`,
-    backgroundSize: "18% 20%", // width and height of image
-    backgroundPosition: "19.5% 57%", //horizontal and vertical position respectively
-    backgroundRepeat: "no-repeat",
-    whiteSpace: "pre-wrap", // Allow text to wrap
-  };
+  const chartTitle = year ?
+    `Activity count as % of total population for ${selectedSpecies} year ${year}` :
+    `No data available for ${selectedSpecies} current filter selections`;
 
   return (
     <>
       {!loading ? (
-          <Doughnut
-            data={chartData}
-            options={options}
-            style={chartContainerStyle}
-          />
+        <ChartContainer title={chartTitle} chart={
+              <DoughnutChart
+                  chartData={chartData}
+                  chartId={'activity-count-as-percentage'}
+                  icon={backgroundImageUrl}
+              />
+            } icon={backgroundImageUrl}/>
       ) : (
         <Loading containerStyle={{ minHeight: 160 }} />
       )}

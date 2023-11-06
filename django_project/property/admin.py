@@ -39,7 +39,28 @@ class PropertyAdmin(admin.ModelAdmin):
                 property_obj.id
             )
 
-    actions = [generate_spatial_filters_for_properties]
+    @admin.action(
+        description="Patch centroid field in properties"
+    )
+    def run_patch_property_centroid(self, request, queryset):
+        """Admin action to patch property without centroid."""
+        from property.tasks.generate_property_centroid import (
+            generate_property_centroid
+        )
+        generate_property_centroid.delay()
+
+    @admin.action(
+        description="Patch province in properties"
+    )
+    def run_patch_property_province(self, request, queryset):
+        """Admin action to patch province in properties."""
+        from frontend.tasks.patch_province import (
+            patch_province_in_properties
+        )
+        patch_province_in_properties.delay()
+
+    actions = [generate_spatial_filters_for_properties,
+               run_patch_property_centroid, run_patch_property_province]
 
 
 class ParcelAdmin(admin.ModelAdmin):

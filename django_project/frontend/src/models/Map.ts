@@ -27,3 +27,10 @@ export enum MapEvents {
     HIGHLIGHT_SELECTED_PARCEL = "HIGHLIGHT_SELECTED_PARCEL",
     ZOOM_INTO_PROPERTY = "ZOOM_INTO_PROPERTY",
 }
+
+export interface PopulationCountLegend {
+    minLabel: number;
+    maxLabel: number;
+    value: number;
+    color: string;
+}

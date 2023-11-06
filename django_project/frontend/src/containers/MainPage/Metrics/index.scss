@@ -304,22 +304,11 @@
 
 
 .charts-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(65vw, 1fr)); /* Automatically adjust to fit two charts per row */
-    gap: 16px; /* Adjust the gap between charts */
-    max-width: 100%; /* Ensure the charts don't exceed the container width */
-    padding: 16px; /* Add padding to the container */
-    // background-color: #fff; /* make background same color can increase visibility on downloaded pdf */
+    padding: 5px;
     box-shadow: none;
     border-bottom: none;
     flex-wrap: wrap; /* Allow charts to wrap to the next line if there's not enough space */
 }
-
-  
-  .charts-container  > * {
-    flex: 1;
-    margin: 8px;
-  }
 
   /* Adjust column width for smaller screens */
 @media screen and (max-width: 768px) {
@@ -335,5 +324,16 @@
         grid-template-columns: repeat(auto-fill, minmax(90vw, 1fr));
     }
 }
-  
 
+
+#pdf-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .MuiBox-root {
+        background-color: white;
+        width: 20%;
+        text-align: center;
+    }
+}

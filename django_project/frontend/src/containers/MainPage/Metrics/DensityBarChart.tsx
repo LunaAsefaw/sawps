@@ -4,6 +4,7 @@ import { Bar } from 'react-chartjs-2';
 import "./index.scss";
 import Loading from '../../../components/Loading';
 import axios from 'axios';
+import ChartContainer from "../../../components/ChartContainer";
 
 const FETCH_SPECIES_DENSITY = "/api/species-population-total-density/";
 
@@ -210,25 +211,22 @@ const DensityBarChart = (props: any) => {
                         size: 10,
                     },
                 },
-            },
-            title: {
-                display: true,
-                text: `${selectedSpecies} population density per property`, // Dynamic chart title
-                font: {
-                    size: 16,
-                    weight: 'bold' as 'bold',
-                },
-            },
+            }
         },
     } as const;
 
     return (
         <Grid>
             {!loading ? (
-                <Bar 
-                    data={{ labels: labels, datasets: datasets }} 
-                    options={options}
-                />
+                <ChartContainer
+                  title={`${selectedSpecies} population density per property`}
+                  chart={
+                    <Bar
+                        data={{ labels: labels, datasets: datasets }}
+                        options={options}
+                        className={'bar-chart'}
+                    />
+                  }/>
             ) : (
                 <Loading containerStyle={{ minHeight: 160 }} />
             )}

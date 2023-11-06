@@ -119,7 +119,7 @@ const SpeciesSideBarLineChart = (props: {
         axios.get(`${FETCH_PROPERTY_POPULATION_SPECIES}?start_year=${startYear}&end_year=${endYear}&species=${selectedSpecies}&property=${propertyId}`).then((response) => {
             setLoading(false);
             if (response.data) {
-                if(response.data[0].annualpopulation_count.length > 0){
+                if(response.data[0]?.annualpopulation_count.length > 0){
                     setNoData(false);
                     setSpeciesData(response.data);
                 }

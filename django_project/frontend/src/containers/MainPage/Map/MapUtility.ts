@@ -2,16 +2,19 @@ import axios from "axios";
 import ContextLayerInterface from '../../../models/ContextLayer';
 import ParcelInterface from '../../../models/Parcel';
 import PropertyInterface from "../../../models/Property";
+import { MapTheme, PopulationCountLegend } from "../../../models/Map";
 
 const SEARCH_PARCEL_URL = '/api/map/search/parcel/'
 const SEARCH_PROPERTY_URL = '/api/map/search/property/'
 export const MIN_SELECT_PARCEL_ZOOM_LEVEL = 12
-export const MIN_SELECT_PROPERTY_ZOOM_LEVEL = 12
+export const MIN_SELECT_PROPERTY_ZOOM_LEVEL = 10
 const PARCELS_ORIGINAL_ZOOM_LEVELS: any = {
     'erf': 14,
     'holding': 12,
     'farm_portion': 12
 }
+export const MIN_PROVINCE_ZOOM_LEVEL = 5
+export const MAX_PROVINCE_ZOOM_LEVEL = 8
 
 /**
  * Determine layer visibility based on selected context layers
@@ -184,6 +187,18 @@ export const addLayerToMap = (layerId: string, mapObj: maplibregl.Map, layerObj:
 }
 
 /**
+ * Remove layer from map if exists
+ * @param layerId name of the layer
+ * @param mapObj map reference object
+ */
+export const removeLayerFromMap = (layerId: string, mapObj: maplibregl.Map) => {
+    let _layer = mapObj.getLayer(layerId)
+    if (typeof _layer !== 'undefined') {
+        mapObj.removeLayer(layerId)
+    }
+}
+
+/**
  * Search property by coordinate
  * Note: LngLat is in srid 4326
  * @param lngLat
@@ -205,6 +220,7 @@ export const searchProperty = (lngLat: maplibregl.LngLat, callback: (parcel: Pro
     })
 }
 
+// Mapping of LayerName with FeatureName to be queried and display in the popup
 const FEATURE_NAME_MAPPING:{ [id: string] : string; } = {
     'ecosystems': 'name_18',
     'biodiversity': 'sensfeat',
@@ -214,6 +230,7 @@ const FEATURE_NAME_MAPPING:{ [id: string] : string; } = {
     'holding': 'cname'
 }
 
+// Mapping of LayerName with its Label to displayed in the popup
 const GROUP_NAME_MAPPING:{ [id: string] : string; } = {
     'ecosystems': 'Ecosystem Type',
     'biodiversity': 'Critical Biodiversity Area',
@@ -328,4 +345,269 @@ export const addParcelInvisibleFillLayers = (mapObj: maplibregl.Map) => {
             'fill-opacity': 0
         }
     }, 'erf')
+}
+
+const getMapPopulationStops = (legends: PopulationCountLegend[]) => {
+    let _stops: any = []
+    for (let i=0; i<legends.length; ++i) {
+        let _stop = [
+            {
+                "zoom": 5,
+                "value": legends[i].value
+            },
+            `${legends[i].color}`
+        ]
+        _stops.push(_stop)
+    }
+    return _stops
+}
+
+/**
+ * 
+ * @param showPopulationCount 
+ * @param mapObj 
+ * @param propertiesCount 
+ * @param provinceCount 
+ */
+export const drawPropertiesLayer = (showPopulationCount: boolean, mapObj: maplibregl.Map, currentTheme: MapTheme, shouldRemoveFirst: boolean, propertiesCount?: PopulationCountLegend[], provinceCount?: PopulationCountLegend[]) => {
+    if (shouldRemoveFirst) {
+        removePropertiesLayer(mapObj)
+    }
+    if (!showPopulationCount) {
+        addLayerToMap('properties', mapObj, {
+            "id": "properties",
+            "type": "fill",
+            "source": "sanbi-dynamic",
+            "source-layer": "properties",
+            "minzoom": 10,
+            "maxzoom": 24,
+            "layout": {"visibility": "visible"},
+            "paint": {
+                "fill-color": "rgba(255, 82, 82, 1)",
+                "fill-opacity": 0.8
+            }
+        }, 'erf-highlighted')
+        addLayerToMap('properties-points', mapObj, {
+            "id": "properties-points",
+            "type": "circle",
+            "source": "sanbi-dynamic",
+            "source-layer": "properties-points",
+            "layout": {"visibility": "visible"},
+            "paint": {
+                "circle-color": "rgba(255, 82, 82, 0.8)"
+            },
+            "minzoom": 5,
+            "maxzoom": 10
+        }, 'NGI aerial imagery')
+    } else {
+        // add province layer
+        let _provinceLayer = {
+            "id": "province-count",
+            "type": "fill",
+            "source": "sanbi-dynamic",
+            "minzoom": 5,
+            "maxzoom": 8,
+            "layout": {"visibility": "visible"},
+            "paint": {
+              "fill-opacity": 1,
+              "fill-color": {
+                "property": "count",
+                "type": "interval",
+                "stops": getMapPopulationStops(provinceCount),
+                "base": 1,
+                "default": "rgba(255, 255, 255, 1)"
+              },
+              "fill-outline-color": "rgba(0, 0, 0, 1)"
+            },
+            "Z": 0,
+            "filter": ["all"],
+            "source-layer": "province_population"
+        }
+        let _propertiesLayer = {
+            "id": "properties",
+            "type": "fill",
+            "source": "sanbi-dynamic",
+            "minzoom": 10,
+            "maxzoom": 24,
+            "layout": {"visibility": "visible"},
+            "paint": {
+              "fill-opacity": 1,
+              "fill-color": {
+                "property": "count",
+                "type": "interval",
+                "stops": getMapPopulationStops(propertiesCount),
+                "base": 1,
+                "default": "rgba(255, 0, 255, 1)"
+              },
+              "fill-outline-color": "rgba(0, 0, 0, 1)"
+            },
+            "Z": 0,
+            "filter": ["all"],
+            "source-layer": "properties"
+        }
+        let _propertiesPointsLayer = {
+            "id": "properties-points",
+            "type": "circle",
+            "source": "sanbi-dynamic",
+            "source-layer": "properties-points",
+            "layout": {"visibility": "visible"},
+            "paint": {
+                "circle-color": {
+                    "property": "count",
+                    "type": "exponential",
+                    "stops": getMapPopulationStops(propertiesCount),
+                    "base": 1,
+                    "default": "rgba(248, 0, 255, 1)"
+                }
+            },
+            "minzoom": 5,
+            "maxzoom": 10
+        }
+        
+        addLayerToMap('province-count', mapObj, _provinceLayer, 'NGI aerial imagery')
+        addLayerToMap('properties', mapObj, _propertiesLayer, 'erf-highlighted')
+        addLayerToMap('properties-points', mapObj, _propertiesPointsLayer, 'NGI aerial imagery')
+    }
+    // add label based on maptheme
+    let _propertiesLabel = {}
+    if (currentTheme === MapTheme.Dark) {
+        _propertiesLabel = {
+            "id": "properties-label",
+            "type": "symbol",
+            "source": "sanbi-dynamic",
+            "source-layer": "properties-points",
+            "minzoom": 7,
+            "maxzoom": 24,
+            "layout": {
+              "text-field": "{name}",
+              "text-font": ["Open Sans Bold"],
+              "text-size": 12,
+              "text-letter-spacing": 0.05,
+              "text-offset": [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                7, ["literal", [0, -1.25]],
+                10, ["literal", [0, -1]],
+                12, ["literal", [0, 0]]
+              ]
+            },
+            "paint": {
+              "text-halo-color": "rgba(0, 0, 0, 1)",
+              "text-color": "rgba(240, 240, 240, 1)",
+              "text-halo-width": 1
+            }
+        }
+    } else {
+        _propertiesLabel = {
+            "id": "properties-label",
+            "type": "symbol",
+            "source": "sanbi-dynamic",
+            "source-layer": "properties-points",
+            "minzoom": 7,
+            "maxzoom": 24,
+            "layout": {
+              "text-field": "{name}",
+              "text-font": ["Open Sans Bold"],
+              "text-size": 12,
+              "text-letter-spacing": 0.05,
+              "text-offset": [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                7, ["literal", [0, -1.25]],
+                10, ["literal", [0, -1]],
+                12, ["literal", [0, 0]]
+              ]
+            },
+            "paint": {
+              "text-halo-color": "rgba(191, 191, 191, 1)",
+              "text-color": "rgba(35, 35, 35, 1)",
+              "text-halo-width": 0.5
+            }
+          }
+    }
+    addLayerToMap('properties-label', mapObj, _propertiesLabel, 'erf-highlighted')
+}
+
+/**
+ * Remove layers related to properties
+ * @param mapObj 
+ */
+export const removePropertiesLayer = (mapObj: maplibregl.Map) => {
+    // remove existing layer if any
+    removeLayerFromMap('properties', mapObj)
+    removeLayerFromMap('province-count', mapObj)
+    removeLayerFromMap('properties-points', mapObj)
+    removeLayerFromMap('properties-label', mapObj)
+    removeLayerFromMap('province-extrude', mapObj)
+    removeLayerFromMap('properties-extrude', mapObj)
+}
+
+const addProvinceExtrudeLayer = (mapObj: maplibregl.Map, provinceCount?: PopulationCountLegend[]) => {
+    if (!provinceCount || provinceCount.length === 0) return;
+    // TODO: Determine max height of province extrude 3d layer
+    const PROVINCE_MAX_HEIGHT = 75000
+    let _maxValue = Math.max(...provinceCount.map(o => o.value))
+    let _provinceExtrudeLayer = {
+        "id": "province-extrude",
+        "type": "fill-extrusion",
+        "source": "sanbi-dynamic",
+        "source-layer": "province_population",
+        "paint": {
+            "fill-extrusion-color": {
+                "property": "count",
+                "type": "interval",
+                "stops": getMapPopulationStops(provinceCount),
+                "base": 1,
+                "default": "rgba(0, 0, 0, 0)"
+            },
+            "fill-extrusion-opacity": 1,
+            "fill-extrusion-height": ["*", ["/", ['get', 'count'], _maxValue], PROVINCE_MAX_HEIGHT],
+            "fill-extrusion-base": 0
+        },
+        "minzoom": 5,
+        "maxzoom": 8
+    }
+    addLayerToMap('province-extrude', mapObj, _provinceExtrudeLayer, 'provinces_small_scale')
+}
+
+const addPropertiesExtrudeLayer = (mapObj: maplibregl.Map, propertiesCount?: PopulationCountLegend[]) => {
+    if (!propertiesCount || propertiesCount.length === 0) return;
+    // TODO: Determine max height of properties extrude 3d layer
+    const PROPERTIES_MAX_HEIGHT = 2000
+    let _maxValue = Math.max(...propertiesCount.map(o => o.value))
+    let _propertiesExtrudeLayer = {
+        "id": "properties-extrude",
+        "type": "fill-extrusion",
+        "source": "sanbi-dynamic",
+        "source-layer": "properties",
+        "paint": {
+            "fill-extrusion-color": {
+                "property": "count",
+                "type": "interval",
+                "stops": getMapPopulationStops(propertiesCount),
+                "base": 1,
+                "default": "rgba(0, 0, 0, 0)"
+            },
+            "fill-extrusion-opacity": 1,
+            "fill-extrusion-height": ["*", ["/", ['get', 'count'], _maxValue], PROPERTIES_MAX_HEIGHT],
+            "fill-extrusion-base": 0
+        },
+        "minzoom": 10,
+        "maxzoom": 24
+    }
+    addLayerToMap('properties-extrude', mapObj, _propertiesExtrudeLayer, 'properties-label')
+}
+
+
+export const showExtrudeLayer = (mapObj: maplibregl.Map, provinceCount?: PopulationCountLegend[], propertiesCount?: PopulationCountLegend[]) => {
+    removeExtrudeLayer(mapObj)
+    addProvinceExtrudeLayer(mapObj, provinceCount)
+    addPropertiesExtrudeLayer(mapObj, propertiesCount)
+}
+
+export const removeExtrudeLayer = (mapObj: maplibregl.Map) => {
+    removeLayerFromMap('province-extrude', mapObj)
+    removeLayerFromMap('properties-extrude', mapObj)
 }

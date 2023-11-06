@@ -280,6 +280,11 @@ const DataList = () => {
                                     selectedColumns.length > 0 ?
                                         selectedColumns.includes(column.headerName) : []
                                 );
+                                for (const value of generatedColumns) {
+                                    if (!columns.includes(value)) {
+                                        columns.push(value)
+                                    }
+                                }
                                 const cellRows = cellData.map((row: any, rowIndex: any) => ({
                                     id: rowIndex,
                                     ...row,

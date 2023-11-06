@@ -91,11 +91,35 @@
         font-weight: 400;
         height: 48px;
         line-height: 48px;
+        font-size: 14px;
     }
 
     .legend-item {
         color: var(--black-darker);
         font-weight: 400;
-        height: 24px;
+        height: 56px;
+        line-height: 56px;
+        font-size: 14px;
+
+        .legend-color {
+            padding: 7px 5px;
+            height: 56px;
+            width: 42px;
+        }
+
+        .color {
+            width: 32px;
+            height: 42px;
+        }
+    }
+}
+
+.legend-root-dark {
+    background: #282829;
+    .legend-header {
+        color: white;
+    }
+    .legend-item {
+        color: white;
     }
 }

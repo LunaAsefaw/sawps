@@ -202,7 +202,8 @@ class CreateNewProperty(CheckPropertyNameIsAvailable):
             'geometry': geom,
             'property_size_ha': self.get_geom_size_in_ha(geom) if geom else 0,
             'created_by_id': self.request.user.id,
-            'created_at': datetime.now()
+            'created_at': datetime.now(),
+            'centroid': geom.point_on_surface
         }
         property = Property.objects.create(**data)
         self.add_parcels(property, parcels)
@@ -339,6 +340,7 @@ class UpdatePropertyBoundaries(CreateNewProperty):
         property.property_size_ha = (
             self.get_geom_size_in_ha(geom) if geom else 0
         )
+        property.centroid = geom.point_on_surface
         property.province = province
         property.save()
         # delete existing parcel

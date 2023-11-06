@@ -46,3 +46,6 @@ class SpatialDataValueModel(models.Model):
     class Meta:
         verbose_name = "Spatial data value"
         verbose_name_plural = 'Spatial data values'
+        indexes = [
+            models.Index(fields=['spatial_data_id', 'context_layer_value']),
+        ]

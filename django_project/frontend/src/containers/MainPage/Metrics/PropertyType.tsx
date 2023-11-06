@@ -4,6 +4,7 @@ import { Bar } from 'react-chartjs-2';
 import "./index.scss";
 import Loading from '../../../components/Loading';
 import axios from 'axios';
+import ChartContainer from "../../../components/ChartContainer";
 
 interface PropertyTypeData {
   backgroundColor: any;
@@ -177,15 +178,7 @@ const PropertyTypeBarChart = (props: any) => {
           weight: "bold" as "bold"
         }
       },
-    },
-    title: {
-      display: true,
-      text: 'Total area per property type',
-      font: {
-        size: 16,
-        weight: 'bold' as 'bold',
-      },
-    },
+    }
   },
 } as const;
 
@@ -193,10 +186,13 @@ const PropertyTypeBarChart = (props: any) => {
   return (
     <Grid>
       {!loading ? (
-        <Bar
-          data={data}
-          options={options}
-        />
+        <ChartContainer title={'Total area per property type'} chart={
+          <Bar
+            data={data}
+            options={options}
+            className={'bar-chart'}
+          />
+        }/>
       ) : (
         <Loading containerStyle={{ minHeight: 160 }} />
       )}

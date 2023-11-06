@@ -1,7 +1,10 @@
-.direnv/
 node_modules/
 /test-results/
 /playwright-report/
+/blob-report/
 /playwright/.cache/
-*auth.json
+tests/.auth/*
+.env
+.direnv/
+/test-results/
 __pycache__
