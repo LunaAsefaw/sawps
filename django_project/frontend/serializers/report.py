@@ -342,21 +342,43 @@ class NationalLevelActivityReport(serializers.Serializer):
 class NationalLevelProvinceReport(serializers.Serializer):
 
     def to_representation(self, instance):
-        data = {
-            "common_name": instance.common_name_varbatim,
-            "scientific_name": instance.scientific_name,
-        }
+        all_data = {}
 
-        province_data = AnnualPopulation.objects.values(
-            "property__province__name",
-        ).filter(**self.context['filters'], taxon=instance).annotate(
-            population=Sum("total"),
-        )
+        province_data = AnnualPopulation.objects.select_related(
+            'property__province'
+        ).filter(
+            **self.context['filters'], taxon=instance
+        ).order_by('-year')
+
+        province_fields = set()
 
         for province_entry in province_data:
-            province_name = province_entry["property__province__name"]
-            data[
-                f"total_population_{province_name}"
-            ] = province_entry["population"]
+            data = {
+                "year": province_entry.year,
+                "common_name": instance.common_name_varbatim,
+                "scientific_name": instance.scientific_name,
+            }
+            year = province_entry.year
+            province_name = province_entry.property.province.name
+            province_field = f"total_population_{province_name}"
+            data[province_field] = province_entry.total
+            province_fields.add(province_field)
+            if year in all_data:
+                if province_field in all_data[year]:
+                    all_data[year][province_field] += province_entry.total
+                else:
+                    all_data[year][province_field] = province_entry.total
+            else:
+                all_data[year] = data
 
-        return data
+        all_data = [dt for dt in all_data.values()]
+        for data in all_data:
+            dt_prov_fields = {
+                key for key in data.keys() if
+                key.startswith('total_population')
+            }
+            data.update(
+                {key: 0 for key in province_fields.difference(dt_prov_fields)}
+            )
+
+        return all_data

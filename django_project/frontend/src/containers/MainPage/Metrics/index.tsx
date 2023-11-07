@@ -54,18 +54,6 @@ const Metrics = () => {
     // Declare errorMessage as a state variable
     const [showCharts, setShowCharts] = useState(false);
 
-    const [hasEmptyPopulationTrend, setHasEmptyPopulationTrend] = useState(true);
-    const [hasEmptyPopulationCategory, setHasEmptyPopulationCategory] = useState(true);
-    const [hasEmptyPropertyType, setHasEmptyPropertyType] = useState(true);
-    const [hasEmptyDensity, setHasEmptyDensity] = useState(true);
-    const [hasEmptyProvinceCount, setHasEmptyProvinceCount] = useState(true);
-    const [hasEmptyProvinceCountPercentage, setHasEmptyProvinceCountPercentage] = useState(true);
-    const [hasEmptyTotalCountPerActivity, setHasEmptyTotalCountPerActivity] = useState(true);
-    const [hasEmptyPopulationEstimateCategoryCount, setHasEmptyPopulationEstimateCategoryCount] = useState(true);
-    const [hasEmptyPopulationEstimateCategoryCountPercentage, setHasEmptyhasEmptyPopulationEstimateCategoryCountPercentage] = useState(true);
-    const [hasEmptyPropertyAvailable, setHasEmptyPropertyAvailable] = useState(true);
-    const [hasEmptyAreaAvailable, setHasEmptyAreaAvailable] = useState(true);
-
     const { data: userInfoData, isLoading, isSuccess } = useGetUserInfoQuery();
     const [userPermissions, setUserPermissions] = useState([]);
 
@@ -86,41 +74,6 @@ const Metrics = () => {
             setUserPermissions(userInfoData?.user_permissions.map((permission) => permission.toLowerCase().replace(/\s/g, '')) || []);
         }
     }, [isSuccess, userInfoData]);
-
-    // Pass callback functions to each child component for the specific type
-    const handleEmptyPopulationTrend = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyPopulationTrend(isEmpty);
-    };
-    const handleEmptyPopulationCategory = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyPopulationCategory(isEmpty);
-    };
-    const handleEmptyPropertyType = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyPropertyType(isEmpty);
-    };
-    const handleEmptyDensity = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyDensity(isEmpty);
-    };
-    const handleEmptyPropertyAvailable = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyPropertyAvailable(isEmpty);
-    };
-    const handleEmptyProvinceCount = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyProvinceCount(isEmpty);
-    };
-    const handleEmptyProvinceCountPercentage = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyProvinceCountPercentage(isEmpty);
-    };
-    const handleEmptyTotalCountPerActivity = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyTotalCountPerActivity(isEmpty);
-    };
-    const handleEmptyTopulationEstimateCategoryCount = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyPopulationEstimateCategoryCount(isEmpty);
-    };
-    const handleEmptyPopulationEstimateCategoryCountPercentage = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyhasEmptyPopulationEstimateCategoryCountPercentage(isEmpty);
-    };
-    const handleHasEmptyAreaAvailable = (isEmpty: boolean | ((prevState: boolean) => boolean)) => {
-        setHasEmptyAreaAvailable(isEmpty);
-    };
 
     const fetchActivityPercentageData = () => {
         setLoading(true)
@@ -187,19 +140,6 @@ const Metrics = () => {
         }else {
             setShowCharts(false);
         }
-        // allow rerender
-        setHasEmptyPopulationTrend(true)
-        setHasEmptyPopulationCategory(true)
-        setHasEmptyPropertyType(true)
-        setHasEmptyDensity(true)
-        setHasEmptyPropertyAvailable(true)
-        setHasEmptyProvinceCountPercentage(true)
-        setHasEmptyTotalCountPerActivity(true)
-        setHasEmptyPopulationEstimateCategoryCount(true)
-        setHasEmptyhasEmptyPopulationEstimateCategoryCountPercentage(true)
-        handleHasEmptyAreaAvailable(true)
-
-
     }, [propertyId, startYear, endYear, selectedSpecies])
 
     // downloads all charts rendered on page
@@ -291,42 +231,22 @@ const Metrics = () => {
                         <>
                         <Topper></Topper>
                         <Grid container spacing={1} ref={contentRef}>
-                            {
-                            constants.canViewPopulationTrend &&
-                            selectedSpecies &&
-                            hasEmptyPopulationTrend && (
-                                <Grid item xs={12} md={12} lg={6}>
-                                    <PopulationTrend
-                                        selectedSpecies={selectedSpecies}
-                                        propertyId={propertyId}
-                                        startYear={startYear}
-                                        endYear={endYear}
-                                        loading={loading}
-                                        setLoading={setLoading}
-                                        onEmptyDatasets={handleEmptyPopulationTrend}
-                                    />
-                                </Grid>
-                            )}
-
 
                             {
                             constants.canViewPopulationCategory &&
-                            selectedSpecies &&
-                            hasEmptyPopulationCategory && (
+                            selectedSpecies && (
                                 <Grid item xs={12} md={12} lg={6}>
                                     <PopulationCategoryChart
                                         selectedSpecies={selectedSpecies}
                                         propertyId={propertyId}
                                         startYear={startYear}
                                         endYear={endYear}
-                                        onEmptyDatasets={handleEmptyPopulationCategory}
                                     />
                                 </Grid>
                             )}
 
                              {
-                             constants.canViewPropertyType &&
-                             hasEmptyPropertyType && (
+                             constants.canViewPropertyType && (
                                 <Grid item xs={12} md={12} lg={6}>
                                     <PropertyTypeBarChart
                                         selectedSpecies={selectedSpecies}
@@ -335,7 +255,6 @@ const Metrics = () => {
                                         endYear={endYear}
                                         loading={loading}
                                         setLoading={setLoading}
-                                        onEmptyDatasets={handleEmptyPropertyType}
                                     />
                                 </Grid>
                             )}
@@ -343,8 +262,7 @@ const Metrics = () => {
 
                             {
                             constants.canViewDensityBar &&
-                            selectedSpecies &&
-                            hasEmptyDensity && (
+                            selectedSpecies && (
                                 <Grid item xs={12} md={12} lg={6}>
                                     <DensityBarChart
                                         selectedSpecies={selectedSpecies}
@@ -355,7 +273,6 @@ const Metrics = () => {
                                         setLoading={setLoading}
                                         densityData={densityData}
                                         setDensityData={setDensityData}
-                                        onEmptyDatasets={handleEmptyDensity}
                                     />
                                 </Grid>
                             )}
@@ -363,8 +280,7 @@ const Metrics = () => {
 
                             {
                             constants.canViewPropertyAvailable &&
-                            selectedSpecies &&
-                            hasEmptyPropertyAvailable && (
+                            selectedSpecies && (
                                 <Grid item xs={12} md={12} lg={6}>
                                     <PropertyAvailableBarChart
                                         selectedSpecies={selectedSpecies}
@@ -374,7 +290,6 @@ const Metrics = () => {
                                         loading={loading}
                                         activity={activityParams}
                                         setLoading={setLoading}
-                                        onEmptyDatasets={handleEmptyPropertyAvailable}
                                     />
                                 </Grid>
                             )}
@@ -396,8 +311,7 @@ const Metrics = () => {
 
 
                             {
-                            constants.canViewAreaAvailable &&
-                            hasEmptyAreaAvailable && areaData.map((data, index) => (
+                            constants.canViewAreaAvailable && areaData.map((data, index) => (
                                 <Grid item key={index} xs={12} md={12} lg={6}>
                                     {data?.area?.owned_species ? (
                                         <AreaAvailableLineChart
@@ -408,7 +322,6 @@ const Metrics = () => {
                                             loading={loading}
                                             areaData={data?.area?.owned_species}
                                             species_name={data?.common_name_varbatim}
-                                            onEmptyDatasets={handleHasEmptyAreaAvailable}
                                         />
                                     ) : null}
                                 </Grid>
@@ -417,8 +330,7 @@ const Metrics = () => {
 
                             {
                             constants.canViewProvinceSpeciesCount &&
-                            selectedSpecies &&
-                            hasEmptyProvinceCount && (
+                            selectedSpecies && (
                                 <Grid item xs={12} md={12} lg={6}>
                                     <SpeciesCountPerProvinceChart
                                         selectedSpecies={selectedSpecies}
@@ -427,14 +339,13 @@ const Metrics = () => {
                                         endYear={endYear}
                                         loading={loading}
                                         setLoading={setLoading}
-                                        onEmptyDatasets={handleEmptyProvinceCount}
                                     />
                                 </Grid>
                             )}
 
 
                             {
-                            constants.canViewProvinceSpeciesCountAsPercentage &&
+                            userInfoData?.user_permissions.includes('Can view province species count as percentage') &&
                             selectedSpecies &&
                             (
                                 <Grid item xs={12} md={12} lg={6}>
@@ -446,7 +357,6 @@ const Metrics = () => {
                                         loading={loading}
                                         setLoading={setLoading}
                                         activityData={activityData}
-                                        onEmptyDatasets={handleEmptyProvinceCountPercentage}
                                     />
                                 </Grid>
                             )}
@@ -463,7 +373,6 @@ const Metrics = () => {
                                         endYear={endYear}
                                         loading={loading}
                                         activityData={totalCoutData}
-                                        onEmptyDatasets={handleEmptyTotalCountPerActivity}
                                     />
                                 </Grid>
                             )}
@@ -488,8 +397,7 @@ const Metrics = () => {
 
                             {
                             constants.canViewPopulationEstimate &&
-                            selectedSpecies &&
-                            hasEmptyPopulationEstimateCategoryCount && (
+                            selectedSpecies && (
                                 <Grid item xs={12} md={12} lg={6}>
                                     <PopulationEstimateCategoryCount
                                         selectedSpecies={selectedSpecies}
@@ -497,7 +405,6 @@ const Metrics = () => {
                                         startYear={startYear}
                                         endYear={endYear}
                                         activityData={activityData}
-                                        onEmptyDatasets={handleEmptyTopulationEstimateCategoryCount}
                                     />
                                 </Grid>
                                 )}
@@ -505,8 +412,7 @@ const Metrics = () => {
 
                             {
                             constants.canViewPopulationEstimateAsPercentage &&
-                            selectedSpecies &&
-                            hasEmptyPopulationEstimateCategoryCountPercentage && (
+                            selectedSpecies && (
                                 <Grid item xs={12} md={12} lg={6}>
                                     <PopulationEstimateAsPercentage
                                         selectedSpecies={selectedSpecies}
@@ -516,7 +422,6 @@ const Metrics = () => {
                                         loading={loading}
                                         setLoading={setLoading}
                                         activityData={activityData}
-                                        onEmptyDatasets={handleEmptyPopulationEstimateCategoryCountPercentage}
                                     />
                                 </Grid>
                             )}

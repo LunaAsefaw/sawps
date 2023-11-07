@@ -78,6 +78,7 @@ class TrendPageTaxonSerializer(FrontPageTaxonSerializer):
             'id',
             'species_name',
             'graph_icon',
+            'topper_icon',
             'total_population',
             'total_area',
             'colour'

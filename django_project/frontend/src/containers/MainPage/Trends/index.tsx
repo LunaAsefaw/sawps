@@ -6,8 +6,6 @@ import PopulationTrend, {NationalTrendInterface} from "../Metrics/PopulationTren
 import {useGetTaxonDetailQuery} from "../../../services/api";
 import './index.scss';
 
-const FETCH_GRAPH_SPECIES_LIST = '/api/species/trend-page/'
-
 const Trends = () => {
   const selectedSpecies = useAppSelector((state: RootState) => state.SpeciesFilter.selectedSpecies)
   const propertyId = useAppSelector((state: RootState) => state.SpeciesFilter.propertyId)

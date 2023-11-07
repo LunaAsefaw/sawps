@@ -82,12 +82,6 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
       }
     });
 
-    // TODO: confirm rule
-    // Rule 3: If the year doesn't match startYear or endYear, use the most recent year
-    // if (year !== null && (year < startYear || year > endYear)) {
-    //   year = year;
-    // }
-
     // Rule 2: Only save the activities with the most recent year
     const recentActivities = speciesActivities.filter(
       (activity: ActivityItem) => activity.year === year
@@ -148,13 +142,13 @@ const ActivityCountAsPercentage: React.FC<Props> = ({
   return (
     <>
       {!loading ? (
-        <ChartContainer title={chartTitle} chart={
+        <ChartContainer title={chartTitle}>
               <DoughnutChart
                   chartData={chartData}
                   chartId={'activity-count-as-percentage'}
                   icon={backgroundImageUrl}
               />
-            } icon={backgroundImageUrl}/>
+        </ChartContainer>
       ) : (
         <Loading containerStyle={{ minHeight: 160 }} />
       )}

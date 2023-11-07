@@ -4,6 +4,7 @@ import Loading from "../../../components/Loading";
 import { Bar } from 'react-chartjs-2';
 import { Grid } from "@mui/material";
 import ChartContainer from "../../../components/ChartContainer";
+import BarChart from "../../../components/BarChart";
 
 const FETCH_ACTVITY_COUNT = "/api/species-count-per-province/";
 
@@ -14,10 +15,10 @@ type ProvinceData = {
 };
 
 const availableColors = [
-  'rgba(112, 178, 118, 1)', 
-  'rgba(250, 167, 85, 1)', 
-  'rgba(157, 133, 190, 1)', 
-  '#FF5252', 
+  'rgba(112, 178, 118, 1)',
+  'rgba(250, 167, 85, 1)',
+  'rgba(157, 133, 190, 1)',
+  '#FF5252',
   '#616161',
   'rgba(112, 178, 118, 0.5)',
   'rgba(250, 167, 85, 0.5)',
@@ -26,23 +27,12 @@ const availableColors = [
   'rgba(97, 97, 97, 0.5)'
 ];
 
-
-type SpeciesData = {
-  [speciesName: string]: {
-    [provinceName: string]: ProvinceData;
-  };
-};
-
-
-
 interface SpeciesDataItem {
   province: string;
   species: string;
   year: number | null;
   count: number | null;
 }
-
-
 
 const SpeciesCountPerProvinceChart = (props: any) => {
   const {
@@ -51,8 +41,7 @@ const SpeciesCountPerProvinceChart = (props: any) => {
     startYear,
     endYear,
     loading,
-    setLoading,
-    onEmptyDatasets
+    setLoading
   } = props;
   const [speciesData, setSpeciesData] = useState<SpeciesDataItem[]>([]);
 
@@ -73,12 +62,12 @@ const SpeciesCountPerProvinceChart = (props: any) => {
                 break;
               }
             }
-          }else onEmptyDatasets(false)
-          if(!render_chart) onEmptyDatasets(false)
-          else onEmptyDatasets(true)
+          }
           setSpeciesData(response.data);
           setLoading(false);
-        }else onEmptyDatasets(false)
+        } else {
+          setSpeciesData([])
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -94,7 +83,7 @@ const SpeciesCountPerProvinceChart = (props: any) => {
   const legendLabels: number[] = Array.from(new Set(speciesData.map((item) => item.year)))
     .filter((year) => year !== null) as number[];
 
-  // sort the years from highest 
+  // sort the years from highest
   legendLabels.sort((a: number, b: number) => b - a);
 
     // Create datasets for each year using available colors
@@ -144,73 +133,17 @@ const SpeciesCountPerProvinceChart = (props: any) => {
   };
 
   const chartTitle = `Total count of ${selectedSpecies} per province`;
-  
-  const options = {
-    plugins: {
-        responsive: true,
-        maintainAspectRatio: false,
-        datalabels: {
-            display: false,
-        },
-        legend: {
-            display: true,
-            position: 'right' as 'right',
-            labels: {
-                boxWidth: 20,
-                boxHeight: 13,
-                padding: 12,
-                font: {
-                    size: 10,
-                },
-            },
-        },
-    },
-    layout: {
-        padding: {
-            top: 0, // Remove top padding
-        },
-    },
-    scales: {
-        x: {
-            beginAtZero: true,
-            stacked: true,
-            title: {
-                display: true,
-                text: 'Provinces',
-                font: {
-                    size: 14,
-                },
-            },
-        },
-        y: {
-            beginAtZero: true,
-            stacked: true,
-            type: 'linear' as 'linear',
-            title: {
-                display: true,
-                text: 'Count',
-                font: {
-                    size: 14,
-                },
-            },
-            ticks: {
-              stepSize: 50,  // Set the step size to 50
-              max: Math.ceil(200),
-          },
-        },
-    },
-};
 
   return (
     <Grid>
       {!loading ? (
-          <ChartContainer title={chartTitle} chart={
-            <Bar
-              data={data}
-              options={options}
-              className={'bar-chart'}
-            />
-          }/>
+          <BarChart
+              indexAxis={'x'}
+              yLabel={'Count'}
+              xLabel={'Provinces'}
+              chartData={data}
+              chartId={'species-count-per-province-chart'}
+              chartTitle={chartTitle}/>
       ) : (
         <Loading containerStyle={{ minHeight: 160 }} />
       )}

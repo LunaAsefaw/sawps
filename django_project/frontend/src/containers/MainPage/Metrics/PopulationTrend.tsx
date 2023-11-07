@@ -21,8 +21,8 @@ import { Typography } from '@mui/material';
 import ChartContainer from "../../../components/ChartContainer";
 
 /*
-a new dataset labeled "Counts" is added to the chartData object. 
-This dataset uses the same years as the x-axis and the fit values as the y-axis. 
+a new dataset labeled "Counts" is added to the chartData object.
+This dataset uses the same years as the x-axis and the fit values as the y-axis.
 It's configured to display as points (dots) with a specified size and color.
 With this the chart has dots representing the actual counts per year on the chart,
 in addition to the existing trend line and confidence intervals.
@@ -50,7 +50,7 @@ export interface NationalTrendInterface {
 const SPECIES_POPULATION_TREND_URL = '/api/species/population_trend/'
 
 const PopulationTrend= (props: any) => {
-    const { selectedSpecies, propertyId, startYear, endYear, loading, setLoading, onEmptyDatasets } = props;
+    const { selectedSpecies, propertyId, startYear, endYear, loading, setLoading } = props;
     const [chartData, setChartData] = useState(null)
 
     const fetchChartData = () => {
@@ -60,10 +60,6 @@ const PopulationTrend= (props: any) => {
             if (response.data) {
                 setLoading(false)
                 let _data = response.data as NationalTrendInterface[]
-                if(_data.length > 0){
-                  onEmptyDatasets(true)
-                }else onEmptyDatasets(false)
-
                 if (props.setResult) props.setResult(response.data)
                 setChartData({
                     labels: _data.map((a) => {
@@ -116,22 +112,16 @@ const PopulationTrend= (props: any) => {
                       },
                     ],
                   });
-            }else onEmptyDatasets(false)
+            }
         }).catch((error) => {
             console.log(error)
-            setLoading(false)              
+            setLoading(false)
         })
     }
 
     useEffect(() => {
         fetchChartData();
     }, [propertyId, startYear, endYear, selectedSpecies]);
-
-
-    if(chartData === null){
-        onEmptyDatasets(false);
-    }else onEmptyDatasets(true);
-    
 
     const options:object={
         responsive: true,
@@ -192,7 +182,7 @@ const PopulationTrend= (props: any) => {
           },
         }
     }
-    
+
     return (
         <Grid>
           {!loading ? (
@@ -211,7 +201,7 @@ const PopulationTrend= (props: any) => {
             <Loading containerStyle={{ minHeight: 160 }} />
           )}
         </Grid>
-      );      
+      );
 }
 
 export default PopulationTrend

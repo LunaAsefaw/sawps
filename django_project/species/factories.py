@@ -37,7 +37,7 @@ class TaxonFactory(factory.django.DjangoModelFactory):
     parent = None
     show_on_front_page = factory.Faker('boolean')
     is_selected = factory.Faker('boolean')
-    icon = factory.django.ImageField(filename='icon.jpg', color='blue')
+    # icon = factory.django.ImageField(filename='icon.jpg', color='blue')
 
 
 class TaxonSurveyMethodF(factory.django.DjangoModelFactory):

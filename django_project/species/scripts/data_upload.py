@@ -261,7 +261,6 @@ class SpeciesCSVUpload(object):
             self.row_error = []
             if UploadSpeciesCSV.objects.get(
                     id=self.upload_session.id).canceled:
-                print('Canceled')
                 return
             logger.debug(row)
             self.upload_session.progress = '{index}/{total}'.format(
@@ -312,9 +311,15 @@ class SpeciesCSVUpload(object):
     def open_close_system(self, row):
         open_close_sys = self.row_value(row, OPEN_SYS)
         if open_close_sys:
-            open_sys, open_created = OpenCloseSystem.objects.get_or_create(
-                name=open_close_sys
-            )
+            try:
+                open_sys = OpenCloseSystem.objects.get(
+                    name=open_close_sys
+                )
+            except OpenCloseSystem.DoesNotExist:
+                self.error_row(
+                    f"Open/Close system '{open_close_sys}' does not exist"
+                )
+                return None
             return open_sys
         return None
 

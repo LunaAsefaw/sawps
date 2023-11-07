@@ -4,6 +4,7 @@ import axios from "axios";
 import { Grid } from "@mui/material";
 import Loading from "../../../components/Loading";
 import ChartContainer from "../../../components/ChartContainer";
+import BarChart from "../../../components/BarChart";
 
 const FETCH_SPECIES_DENSITY = "/api/properties-per-population-category/";
 
@@ -60,8 +61,7 @@ const PopulationCategoryChart = (props: any) => {
       selectedSpecies,
       propertyId,
       startYear,
-      endYear,
-      onEmptyDatasets
+      endYear
     } = props;
 
     const [loading, setLoading] = useState<boolean>(false);
@@ -75,12 +75,6 @@ const PopulationCategoryChart = (props: any) => {
         .then((response) => {
           setLoading(false);
           if (response.data) {
-              console.log(response.data);
-            if (Object.keys(response.data).length === 0) {
-                onEmptyDatasets(false)
-            } else {
-                onEmptyDatasets(true)
-            }
             setPopulationData(response.data);
           }
         })
@@ -96,84 +90,22 @@ const PopulationCategoryChart = (props: any) => {
 
     const data = processChartData(populationData);
 
-    const options = {
-        indexAxis: "y",
-        plugins: {
-            skipNull: true,
-            responsive: true,
-            maintainAspectRatio: false,
-            datalabels: {
-                display: false,
-            },
-            legend: {
-                display: true,
-                position: 'right' as 'right',
-                labels: {
-                    boxWidth: 20,
-                    boxHeight: 13,
-                    padding: 12,
-                    font: {
-                        size: 10,
-                    },
-                },
-            }
-        },
-        layout: {
-            padding: {
-                top: 0, // Remove top padding
-            },
-        },
-        scales: {
-            y: {
-                skipNull: true,
-                beginAtZero: true,
-                stacked: false,
-                title: {
-                    display: true,
-                    text: 'Population category',
-                    font: {
-                        size: 14,
-                    },
-                },
-            },
-            x: {
-                beginAtZero: true,
-                stacked: false,
-                type: 'linear' as 'linear',
-                title: {
-                    display: true,
-                    text: 'Number of properties (count)',
-                    font: {
-                        size: 14,
-                    },
-                },
-                ticks: {
-                    stepSize: 1, // Ensure whole number ticks
-                    max: Math.ceil(200), // Round up to the nearest whole number
-                },
-            },
-        },
-    };
-
-
-return (
-    <Grid>
-        {!loading ? (
-        <ChartContainer
-          title={`Number of properties per population category for ${selectedSpecies}`}
-          chart={
-            <Bar
-                data={data}
-                // @ts-ignore
-                options={options}
-                className={'bar-chart'}
-            />
-        }/>
-        ) : (
-            <Loading containerStyle={{ minHeight: 160 }} />
-        )}
-    </Grid>
-);
+    return (
+        <Grid>
+            {!loading ? (
+                <BarChart
+                    yStacked={false}
+                    xStacked={false}
+                    chartData={data}
+                    chartId={'population-category-chart'}
+                    yLabel={'Population category'}
+                    xLabel={'Number of properties (count)'}
+                    chartTitle={`Number of properties per population category for ${selectedSpecies}`}/>
+            ) : (
+                <Loading containerStyle={{ minHeight: 160 }} />
+            )}
+        </Grid>
+    );
 };
 
 export default PopulationCategoryChart;

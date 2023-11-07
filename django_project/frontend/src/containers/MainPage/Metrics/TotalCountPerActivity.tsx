@@ -61,8 +61,7 @@ const TotalCountPerActivity = (props: any) => {
     startYear,
     endYear,
     loading,
-    activityData,
-    onEmptyDatasets
+    activityData
   } = props;
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | undefined>(undefined);
 
@@ -132,13 +131,13 @@ const TotalCountPerActivity = (props: any) => {
   return (
       <>
         {!loading ? (
-            <ChartContainer title={chartTitle} chart={
+            <ChartContainer title={chartTitle}>
               <DoughnutChart
                   chartData={chartData}
                   chartId={'total-count-per-activity'}
                   icon={backgroundImageUrl}
               />
-            } icon={backgroundImageUrl}/>
+            </ChartContainer>
         ) : (
             <Loading containerStyle={{ minHeight: 160 }} />
         )}

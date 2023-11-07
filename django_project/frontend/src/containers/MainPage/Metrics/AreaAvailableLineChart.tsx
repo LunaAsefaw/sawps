@@ -12,15 +12,14 @@ import DoughnutChart from "../../../components/DoughnutChart";
 Chart.register(CategoryScale);
 
 const AreaAvailableLineChart = (props: any) => {
-    const { 
+    const {
         selectedSpecies,
         propertyId,
         startYear,
         endYear,
         loading,
         areaData,
-        species_name,
-        onEmptyDatasets 
+        species_name
     } = props
 
     // Extract the species name
@@ -57,7 +56,7 @@ const AreaAvailableLineChart = (props: any) => {
       }
 
     const areaDataB: AreaDataValueB = AreaDataValue
-      
+
       if (areaDataB.labels.length === 1) {
         const year = areaDataB.labels[0];
         if (!isNaN(year)) {
@@ -74,11 +73,9 @@ const AreaAvailableLineChart = (props: any) => {
             render_chart = false
             }else {
                 render_chart = true
-                override_render_chart = true 
+                override_render_chart = true
             }
         });
-        if (!render_chart && !override_render_chart) onEmptyDatasets(false)
-        else onEmptyDatasets(true)
       }, [propertyId, startYear, endYear, selectedSpecies,areaData]);
 
       areaDataB.datasets.forEach(dataset => {
@@ -89,6 +86,8 @@ const AreaAvailableLineChart = (props: any) => {
 
     const AreaOptions = {
         tension: 0.5,
+        maintainAspectRatio: false,
+        responsive: true,
         elements: {
             point: {
                 radius: 0,
@@ -151,12 +150,14 @@ const AreaAvailableLineChart = (props: any) => {
     return (
         <>
             {!loading ? (
-            <ChartContainer title={`Total area vs area available to ${speciesName}`} chart={
-                <Line
-                    data={AreaDataValue}
-                    options={AreaOptions}
-                />
-            }/>
+            <ChartContainer title={`Total area vs area available to ${speciesName}`}>
+                <div style={{ width: '100%', height: 260}}>
+                    <Line
+                        data={AreaDataValue}
+                        options={AreaOptions}
+                    />
+                </div>
+            </ChartContainer>
             ) : (
                 <Loading containerStyle={{ minHeight: 160 }} />
             )}

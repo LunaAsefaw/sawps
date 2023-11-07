@@ -34,8 +34,7 @@ const PopulationEstimateCategoryCount = (props: any) => {
     propertyId,
     startYear,
     endYear,
-    activityData,
-    onEmptyDatasets
+    activityData
   } = props;
   let year: number | null = null;
   const [speciesData, setSpeciesData] = useState([]);
@@ -63,14 +62,11 @@ const PopulationEstimateCategoryCount = (props: any) => {
         `${FETCH_POPULATION_ESTIMATE_CATEGORY_COUNT}?start_year=${startYear}&end_year=${endYear}&species=${selectedSpecies}&property=${propertyId}`
       )
       .then((response) => {
+        setLoading(false);
         if (response.data) {
-          if (Object.keys(response.data).length === 0) {
-              onEmptyDatasets(false)
-          } else {
-              onEmptyDatasets(true)
-          }
           setSpeciesData(response.data);
-          setLoading(false);
+        } else {
+          setSpeciesData([])
         }
       })
       .catch((error) => {
@@ -136,13 +132,13 @@ const PopulationEstimateCategoryCount = (props: any) => {
   return (
     <>
       {!loading ? (
-          <ChartContainer title={chartTitle} chart={
+          <ChartContainer title={chartTitle}>
             <DoughnutChart
                 chartId={'population-estimate-category'}
                 chartData={chartData}
                 icon={backgroundImageUrl}
             />
-          }/>
+          </ChartContainer>
       ) : (
         <Loading containerStyle={{ minHeight: 160 }} />
       )}

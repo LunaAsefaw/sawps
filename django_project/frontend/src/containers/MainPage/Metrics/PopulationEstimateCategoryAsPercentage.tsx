@@ -36,8 +36,7 @@ const PopulationEstimateAsPercentage = (props: any) => {
     endYear,
     loading,
     setLoading,
-    activityData,
-    onEmptyDatasets
+    activityData
   } = props;
 
   const [speciesData, setSpeciesData] = useState<any>({});
@@ -60,14 +59,11 @@ const PopulationEstimateAsPercentage = (props: any) => {
         `${FETCH_POPULATION_ESTIMATE_CATEGORY_COUNT}?start_year=${startYear}&end_year=${endYear}&species=${selectedSpecies}&property=${propertyId}`
       )
       .then((response) => {
+        setLoading(false);
         if (response.data) {
-          if (Object.keys(response.data).length === 0) {
-              onEmptyDatasets(false)
-          } else {
-              onEmptyDatasets(true)
-          }
           setSpeciesData(response.data);
-          setLoading(false);
+        } else {
+          setSpeciesData([])
         }
       })
       .catch((error) => {
@@ -79,7 +75,7 @@ const PopulationEstimateAsPercentage = (props: any) => {
   useEffect(() => {
     fetchPopulationEstimateCategoryCount();
   }, [propertyId, startYear, endYear, selectedSpecies]);
- 
+
   // Initialize variables
   const labels: string[] = [];
   const data: number[] = [];
@@ -98,7 +94,7 @@ const PopulationEstimateAsPercentage = (props: any) => {
       if (category.length > 25){
         paddedLabel = category.substring(0, 22) + '...';
       }
-          
+
       labels.push(paddedLabel.padEnd(50, ' ')); // Use the padded label
 
       data.push(percentage);
@@ -129,13 +125,13 @@ const PopulationEstimateAsPercentage = (props: any) => {
     return (
       <>
         {!loading ? (
-          <ChartContainer title={chartTitle} chart={
+          <ChartContainer title={chartTitle}>
               <DoughnutChart
                   chartData={chartData}
                   chartId={'population-estimate-category-as-percentage'}
                   icon={backgroundImageUrl}
               />
-            } icon={backgroundImageUrl}/>
+          </ChartContainer>
         ) : (
           <Loading containerStyle={{ minHeight: 160 }} />
         )}

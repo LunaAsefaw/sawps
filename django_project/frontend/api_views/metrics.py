@@ -1,10 +1,14 @@
-"""API Views related to metrics.
+﻿"""API Views related to metrics.
 """
 import datetime
 from typing import List
 
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from frontend.filters.metrics import (
     ActivityBaseMetricsFilter,
     BaseMetricsFilter,
@@ -19,26 +23,24 @@ from frontend.serializers.metrics import (
     TotalAreaVSAvailableAreaSerializer,
     TotalCountPerPopulationEstimateSerializer
 )
+from frontend.serializers.metrics import AreaAvailablePerSpeciesSerializer
+from frontend.utils.data_table import (
+    get_queryset, get_report_filter, SPECIES_REPORT
+)
+from frontend.utils.data_table import get_taxon_queryset, common_filters
 from frontend.utils.metrics import (
     calculate_population_categories,
     calculate_total_area_per_property_type,
     calculate_base_population_of_species,
     calculate_species_count_per_province
 )
-from property.models import Property
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from species.models import Taxon
 from frontend.utils.organisation import (
     get_current_organisation_id
 )
-from frontend.utils.data_table import (
-    get_queryset, get_report_filter, SPECIES_REPORT
-)
 from frontend.utils.user_roles import get_user_roles
-from frontend.serializers.metrics import AreaAvailablePerSpeciesSerializer
 from population_data.models import AnnualPopulation
+from property.models import Property
+from species.models import Taxon
 
 
 class SpeciesPopuationCountPerYearAPIView(APIView):
@@ -170,25 +172,19 @@ class SpeciesPopulationCountPerProvinceAPIView(APIView):
         Returns a filtered queryset of property objects
         within the specified organization.
         """
-        organisation_id = get_current_organisation_id(self.request.user)
-        queryset = Property.objects.filter(organisation_id=organisation_id)
-        filtered_queryset = PropertyFilter(
-            self.request.GET, queryset=queryset
-        ).qs
-        return filtered_queryset.distinct('name')
 
     def get(self, request, *args, **kwargs) -> Response:
         """
         Handle GET request to retrieve species count per province.
         """
-        species_name = request.GET.get("species")
-        queryset = self.get_queryset()
-        start_year = request.GET.get("start_year", 0)
-        end_year = request.GET.get("end_year", datetime.datetime.now().year)
-        year_range = (int(start_year), int(end_year))
+        user_roles = get_user_roles(request.user)
+        queryset = get_taxon_queryset(request)
+        filters = common_filters(request, user_roles)
+
         return Response(
             calculate_species_count_per_province(
-                queryset, species_name, year_range
+                queryset.first(),
+                filters
             )
         )
 

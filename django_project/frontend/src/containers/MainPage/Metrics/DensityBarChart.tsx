@@ -5,6 +5,7 @@ import "./index.scss";
 import Loading from '../../../components/Loading';
 import axios from 'axios';
 import ChartContainer from "../../../components/ChartContainer";
+import BarChart from "../../../components/BarChart";
 
 const FETCH_SPECIES_DENSITY = "/api/species-population-total-density/";
 
@@ -17,8 +18,7 @@ const DensityBarChart = (props: any) => {
         loading,
         setLoading,
         densityData,
-        setDensityData,
-        onEmptyDatasets
+        setDensityData
     } = props;
 
 
@@ -37,12 +37,9 @@ const DensityBarChart = (props: any) => {
                             const hasNonNullDensity = item.density.some((densityItem) => densityItem.density !== null);
                             return hasNonNullDensity;
                         });
-                        
-                        if(filteredData.length > 0){
-                            onEmptyDatasets(true)
-                            setDensityData(filteredData);
-                        }else onEmptyDatasets(false)
-                        
+                        setDensityData(filteredData);
+                    } else {
+                        setDensityData([]);
                     }
                 })
                 .catch((error) => {
@@ -60,13 +57,13 @@ const DensityBarChart = (props: any) => {
         if (item.density === null) {
             return false; // Filter out items with null density
         }
-    
+
         if (Array.isArray(item.density)) {
             // Check if all elements in the density array are null or 0
             const isAllNullOrZero = item.density.every((value) => value.density === null || value === 0);
             return !isAllNullOrZero; // Filter out items where all elements are null or 0
         }
-    
+
         return true; // Keep other items
     });
 
@@ -75,12 +72,12 @@ const DensityBarChart = (props: any) => {
     const labels = filteredArray.map((each: any, index: number) => {
         const provinceName = each.province_name;
         const organizationName = each.organisation_name;
-        
+
         // Check if the density array exists and has at least one item
         if (each.density && Array.isArray(each.density) && each.density.length > 0) {
             // Access the property_name field from the first item in the density array
             const propertyName = each.density[0].property_name;
-        
+
             // Helper function to format a name based on the specified rules
             const formatName = (name: string) => {
                 const words = name.split(' ');
@@ -90,18 +87,18 @@ const DensityBarChart = (props: any) => {
                     return words.map(word => word.substring(0, 1).toUpperCase()).join('');
                 }
             };
-        
+
             const provinceCode = formatName(provinceName);
             const organizationCode = formatName(organizationName);
             const propertyCode = formatName(propertyName);
             const uniqueNumericValue = 1000 + index + 1; // Generate unique numeric value starting from 1001
-        
+
             // Create the label by combining province, organization, property, and the unique numeric value
             const label = `${provinceCode}${organizationCode}${propertyCode}${uniqueNumericValue}`;
-        
+
             return label;
         }
-        
+
         return ''; // Return an empty string if density data is missing or invalid
     });
 
@@ -116,7 +113,7 @@ const DensityBarChart = (props: any) => {
                 }
             });
         }
-        
+
         return years;
     }, []);
 
@@ -141,7 +138,7 @@ const DensityBarChart = (props: any) => {
         }
         return null; // Return null if density data is missing or invalid for the given year
         });
-    
+
         if (data.some((value: any) => value !== null)) {
         // Create the dataset
         return {
@@ -151,96 +148,33 @@ const DensityBarChart = (props: any) => {
         };
         }
     }).filter(dataset => dataset); // Remove any null datasets
-    
+
     // Reverse the order of datasets
     datasets.reverse();
-
-
-
-    const options = {
-        indexAxis: 'y' as const,
-        scales: {
-            x: {
-                beginAtZero: true,
-                display: true,
-                stacked: true,
-                title: {
-                    display: true,
-                    text: "Population density", // X-axis label
-                    font: {
-                        size: 14,
-                    },
-                },
-            },
-            y: {
-                display: true,
-                stacked: true,
-                grid: {
-                    display: false,
-                },
-                title: {
-                    display: true,
-                    text: "Property", // Y-axis label
-                    font: {
-                        size: 14,
-                    },
-                },
-                // Replace the tick values with the labels
-                callback: (value: string, index: number) => {
-                    return labels[index];
-                },
-            },
-        },
-        plugins: {
-            responsive: true,
-            maintainAspectRatio: false,
-            tooltip: {
-                enabled: true,
-            },
-            datalabels: {
-                display: false,
-            },
-            legend: {
-                display: true,
-                position: 'right' as 'right',
-                labels: {
-                    boxWidth: 20,
-                    boxHeight: 13,
-                    padding: 12,
-                    font: {
-                        size: 10,
-                    },
-                },
-            }
-        },
-    } as const;
 
     return (
         <Grid>
             {!loading ? (
-                <ChartContainer
-                  title={`${selectedSpecies} population density per property`}
-                  chart={
-                    <Bar
-                        data={{ labels: labels, datasets: datasets }}
-                        options={options}
-                        className={'bar-chart'}
-                    />
-                  }/>
+                <BarChart
+                    chartData={{ labels: labels, datasets: datasets }}
+                    chartId={'density-bar-chart'}
+                    xLabel={'Population density'}
+                    yLabel={'Property'}
+                    chartTitle={`${selectedSpecies} population density per property`}/>
             ) : (
                 <Loading containerStyle={{ minHeight: 160 }} />
             )}
         </Grid>
     );
-    
+
 };
 
 // Define colors for each year
 const colors = [
   'rgba(112, 178, 118, 1)',
-  'rgba(250, 167, 85, 1)', 
-  'rgba(157, 133, 190, 1)', 
-  '#FF5252', 
+  'rgba(250, 167, 85, 1)',
+  'rgba(157, 133, 190, 1)',
+  '#FF5252',
   '#616161',
   'rgba(112, 178, 118, 0.5)',
   'rgba(250, 167, 85, 0.5)',

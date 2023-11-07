@@ -31,6 +31,8 @@ The filter side panel enhances the user experience by allowing them to focus on 
 
 * **Filter Description:** This filter allows users to filter data according to the organisation.
 * **Usage:** Select an organisation from the dropdown menu to filter data specific to that organisation.
+* **Permission:** `Can view organisation filter` permission must be added to the Group on the admin page, 
+to make user group e.g. `National data scientist` able to see the organisation filter.
 
 ![Organisation filter](./img/filters-4.png)
 
@@ -51,8 +53,11 @@ The filter side panel enhances the user experience by allowing them to focus on 
 
 #### 4. Property Filter
 
-* **Filter Description:** The property filter helps users filter data based on properties.
+* **Filter Description:** The property filter helps users filter data based on properties. This filter is dependent on Organisation Filter. 
+It means, the options will be based on the selected Organisations.
 * **Usage:** Select a property from the available options to view data related to that property.
+* **Permission:** `Can view property filter` permission must be added to the Group on the admin page, 
+to make user group e.g. `National data scientist` able to see the property filter.
 
 ![Property filter](./img/filters-6.png)
 
@@ -61,7 +66,8 @@ The filter side panel enhances the user experience by allowing them to focus on 
 
 #### 5. Species Filter
 
-* **Filter Description:** The species filter allows users to filter data by species.
+* **Filter Description:** The species filter allows users to filter data by species. This filter is dependent on Organisation Filter. 
+It means, the options will be based on the selected Organisations.
 * **Usage:** Choose a species from the list to view data specific to that species.
 
 ![Species filter](./img/filters-7.png)

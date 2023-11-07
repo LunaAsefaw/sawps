@@ -1,15 +1,20 @@
 import base64
+import os
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 from django.db.utils import IntegrityError
 from django.test import Client, TestCase
 from django.urls import reverse
 from django_otp.plugins.otp_totp.models import TOTPDevice
+from rest_framework import status
+
+from core.settings.utils import absolute_path
 from occurrence.models import SurveyMethod
 from population_data.factories import AnnualPopulationF
 from property.factories import PropertyFactory
-from rest_framework import status
 from species.factories import (
     TaxonFactory,
     TaxonRankFactory,
@@ -297,28 +302,85 @@ class TaxonTestCase(TestCase):
         self.assertEqual(response.json()['total_area'], 3)
         self.assertIsNone(response.json()['graph_icon'])
 
-    def test_create_taxon(self):
-        """Test create taxon."""
-        self.assertTrue(isinstance(self.taxon, Taxon))
-        self.assertEqual(Taxon.objects.count(), 1)
-        self.assertEqual(
-            self.taxon.scientific_name,
-            Taxon.objects.get(id=self.taxon.id).scientific_name
+    def test_create_taxon_no_graph_icon(self):
+        """Test create taxon without graph icon."""
+        taxon = TaxonFactory.create(
+            scientific_name='taxon_1',
+            common_name_varbatim='taxon_11',
+            colour_variant=False,
+            taxon_rank=self.taxonRank,
+            show_on_front_page=False,
+            icon=None
         )
+        self.assertTrue(isinstance(taxon, Taxon))
+        self.assertEqual(Taxon.objects.count(), 2)
+        self.assertEqual(
+            taxon.scientific_name,
+            'taxon_1'
+        )
+        self.assertEqual(taxon.graph_icon, None)
+        self.assertEqual(taxon.topper_icon, None)
+        self.assertEqual(taxon.icon, None)
 
     def test_update_taxon(self):
         """Test update taxon objects."""
-        self.taxon.scientific_name = 'taxon_1'
-        self.taxon.infraspecific_epithet = 'infra_1'
-        self.taxon.save()
-        self.assertEqual(
-            Taxon.objects.get(id=self.taxon.id).scientific_name,
-            'taxon_1'
+        graph_icon_path = absolute_path(
+            'frontend', 'static', 'images', 'Loxodonta_africana-graph.svg'
         )
-        self.assertEqual(
-            Taxon.objects.get(id=self.taxon.id).infraspecific_epithet,
-            'infra_1'
-        )
+
+        with open(graph_icon_path, 'rb') as f:
+            self.taxon.scientific_name = 'taxon_1'
+            self.taxon.infraspecific_epithet = 'infra_1'
+            self.taxon.graph_icon = ContentFile(f.read(), name=f"file.svg")
+            self.taxon.save()
+            self.taxon.refresh_from_db()
+            self.assertEqual(
+                self.taxon.scientific_name,
+                'taxon_1'
+            )
+            self.assertEqual(
+                self.taxon.infraspecific_epithet,
+                'infra_1'
+            )
+
+            # Check graph_icon, icon, and topper_icon are updated.
+            # Icon and topper_icon are generated automatically from graph_icon
+            self.assertTrue(
+                os.path.exists(
+                    absolute_path(
+                        settings.MEDIA_ROOT,
+                        str(self.taxon.graph_icon)
+                    )
+                )
+            )
+            self.assertTrue(
+                os.path.exists(
+                    absolute_path(
+                        settings.MEDIA_ROOT,
+                        str(self.taxon.icon)
+                    )
+                )
+            )
+            self.assertTrue(
+                os.path.exists(
+                    absolute_path(
+                        settings.MEDIA_ROOT,
+                        str(self.taxon.topper_icon)
+                    )
+                )
+            )
+
+            # Check fill color for each icon.
+            # Icon and topper_icon color are generated automatically from graph_icon
+            self.assertTrue(
+                self.taxon.graph_icon.readlines()[2].endswith(b'10.052 2.6849z" fill="#000000"/>\n')
+            )
+            self.assertTrue(
+                self.taxon.topper_icon.readlines()[2].endswith(b'10.052 2.6849z" fill="#75B37A"/>\n')
+            )
+            self.assertTrue(
+                self.taxon.icon.readlines()[2].endswith(b'10.052 2.6849z" fill="#FFFFFF"/>\n')
+            )
 
     def test_taxon_unique_scientific_name_constraint(self):
         """Test taxon unique scientific name constraint."""

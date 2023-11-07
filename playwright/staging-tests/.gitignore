@@ -3,7 +3,7 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-tests/.auth/*
+*auth.json
 .env
 .direnv/
 /test-results/

@@ -62,6 +62,13 @@ class TestUploadSpeciesApiView(TestCase):
             common_name_varbatim='Lion'
         )
 
+        OpenCloseSystem.objects.create(
+            name='Open'
+        )
+        OpenCloseSystem.objects.create(
+            name='Closed'
+        )
+
     def test_upload_species_without_login(self):
         """Test upload species api"""
 
@@ -250,7 +257,7 @@ class TestUploadSpeciesApiView(TestCase):
             offtake_permit="DEF100X10"
         ).count(), 1)
 
-        self.assertTrue(OpenCloseSystem.objects.all().count() == 1)
+        self.assertTrue(OpenCloseSystem.objects.all().count() == 2)
 
     def test_upload_species_status(self):
         """Test upload species status."""
@@ -308,6 +315,59 @@ class TestUploadSpeciesApiView(TestCase):
         view = UploadSpeciesStatus.as_view()
         response = view(request, **kwargs)
         self.assertEqual(response.status_code, 404)
+
+    def test_upload_species_open_close_not_exist(self):
+        csv_path = absolute_path(
+            'frontend', 'tests',
+            'csv', 'test_open_close_not_exist.csv')
+        data = open(csv_path, 'rb')
+        data = SimpleUploadedFile(
+            content=data.read(),
+            name=data.name,
+            content_type='multipart/form-data'
+        )
+
+        request = self.factory.post(
+            reverse('upload-species'), {
+                'file': data,
+                'token': self.token,
+                'property': self.property.id
+            }
+        )
+        request.user = self.user
+        view = SpeciesUploader.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 204)
+        upload_session = UploadSpeciesCSV.objects.get(token=self.token)
+        upload_session.progress = 'Processing'
+        upload_session.save()
+        file_upload = SpeciesCSVUpload()
+        file_upload.upload_session = upload_session
+        file_upload.start('utf-8-sig')
+
+        kwargs = {
+            'token': self.token
+        }
+        request = self.factory.get(
+            reverse('upload-species-status', kwargs=kwargs)
+        )
+        request.user = self.user
+        view = UploadSpeciesStatus.as_view()
+        response = view(request, **kwargs)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('media' in response.data['error_file'])
+
+        self.assertTrue('error' in upload_session.error_file.path)
+        with open(upload_session.error_file.path, encoding='utf-8-sig') as csv_file:
+            error_file = csv.DictReader(csv_file)
+            headers = error_file.fieldnames
+            self.assertTrue('error_message' in headers)
+            errors = []
+            for row in error_file:
+                errors.append(row['error_message'])
+            self.assertTrue(
+                "Open/Close system 'Close' does not exist" in errors
+            )
 
     def test_upload_species_status_not_processed(self):
         csv_path = absolute_path(

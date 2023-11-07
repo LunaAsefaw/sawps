@@ -93,6 +93,19 @@ def get_queryset(user_roles: List[str], request):
     return filtered_queryset
 
 
+def get_taxon_queryset(request):
+    organisation_id = get_current_organisation_id(request.user)
+    query_filter = BaseMetricsFilter
+    queryset = Taxon.objects.filter(
+        annualpopulation__property__organisation_id=organisation_id,
+        taxon_rank__name="Species"
+    ).distinct().order_by("scientific_name")
+
+    filtered_queryset = query_filter(
+        request.GET, queryset=queryset
+    ).qs
+    return filtered_queryset
+
 
 def data_table_reports(queryset: QuerySet, request, user_roles) -> List[Dict]:
     """
@@ -352,11 +365,7 @@ def common_filters(request: HttpRequest, user_roles: List[str]) -> Dict:
 
     activity = request.GET.get("activity", "")
     activity = urllib.parse.unquote(activity)
-    if activity == 'all':
-        filters[
-            "annualpopulationperactivity__activity_type_id__in"
-        ] = ActivityType.objects.values_list('id', flat=True)
-    else:
+    if activity not in ['all', '']:
         filters['annualpopulationperactivity__activity_type_id__in'] = [
             int(act) for act in activity.split(',')
         ] if activity else []
@@ -516,7 +525,7 @@ def national_level_province_report(
         }
     )
 
-    return serializer.data
+    return serializer.data[0] if serializer.data else []
 
 
 def write_report_to_rows(queryset, request):

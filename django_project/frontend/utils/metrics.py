@@ -12,61 +12,33 @@ CATEGORY_DATA = 'data'
 
 
 def calculate_species_count_per_province(
-        queryset,
-        species_name: str,
-        year_range: Tuple[int] = None
+        taxon,
+        filters
 ) -> Dict[str, int]:
-    property_ids = [query.id for query in queryset]
-    if not year_range:
-        year_range = (1960, datetime.datetime.now().year)
 
-    # Filter properties by the provided property ids
-    if property_ids:
-        queryset = queryset.filter(id__in=property_ids)
+    annual_populations = AnnualPopulation.objects.select_related(
+        'property__province'
+    ).filter(
+        **filters, taxon=taxon
+    ).order_by('-year').distinct('year', 'property__province')
 
-        # Retrieve species data per property and province
-        species_data = (
-            AnnualPopulation.objects.filter(
-                property__in=queryset,
-                taxon__scientific_name=species_name,
-                year__range=year_range
-            )
-            .values(
-                "property__province__name",
-                "taxon__scientific_name",
-                "year"
-            )
-            .annotate(total=Sum("total"))
-        )
+    result_data = dict()
 
-        # Group the data by province, species, and year
-        grouped_data = {}
-        for item in species_data:
-            province_name = item["property__province__name"]
-            species_name = item["taxon__scientific_name"]
-            year = item["year"]
-            total = item["total"]
+    for pop_data in annual_populations:
+        print(pop_data.property.province, pop_data.total)
+        data = {
+            "year": pop_data.year,
+            "count": pop_data.total,
+            "province": pop_data.property.province.name,
+            "species": pop_data.taxon.scientific_name,
+        }
+        key = f'{pop_data.year}-{pop_data.property.province.name}'
+        if key in result_data:
+            result_data[key]['count'] += pop_data.total
+        else:
+            result_data[key] = data
 
-            key = (province_name, species_name, year)
-            if key in grouped_data:
-                grouped_data[key] += total
-            else:
-                grouped_data[key] = total
-
-        # Format the result data
-        result_data = []
-        for (
-            province_name,
-            species_name, year
-        ), total in grouped_data.items():
-            result_data.append({
-                "province": province_name,
-                "species": species_name,
-                "year": year,
-                "count": total,
-            })
-
-    return result_data
+    return result_data.values()
 
 
 def calculate_population_categories(

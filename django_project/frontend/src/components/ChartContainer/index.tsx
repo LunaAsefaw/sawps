@@ -6,8 +6,8 @@ import './style.scss';
 
 interface ChartContainerInterface {
     title: string;
-    chart: any;
     icon?: string;
+    children?: any;
 }
 
 const INFO_CHART_ICON = '/static/images/information-chart-icon.svg'
@@ -35,7 +35,7 @@ export default function ChartContainer(props: ChartContainerInterface) {
                     <Typography className={'ChartTitle'}>{props.title}</Typography>
                 </Box>
                 <Box className={'ChartBox'}>
-                    {props.chart}
+                    {props.children}
                 </Box>
             </Box>
             <Box className={'DownloadChartContainer'}>

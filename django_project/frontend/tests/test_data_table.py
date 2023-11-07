@@ -144,15 +144,33 @@ class AnnualPopulationTestCase(AnnualPopulationTestMixins, TestCase):
         self.annual_populations[1].annualpopulationperactivity_set.all().delete()
 
         taxon = TaxonFactory.create()
+        # This will not be included since the Species is not
+        # the one specified in request parameter
         AnnualPopulation.objects.create(
             taxon=taxon,
             user=self.annual_populations[0].user,
             property=self.property,
-            total=10,
-            adult_male=4,
-            adult_female=6,
+            total=20,
+            adult_male=8,
+            adult_female=12,
             year=self.annual_populations[0].year,
             area_available_to_species=5
+        )
+
+        property_obj = PropertyFactory.create(
+            organisation=self.property.organisation
+        )
+
+        # This will be included
+        AnnualPopulation.objects.create(
+            taxon=self.annual_populations[0].taxon,
+            user=self.annual_populations[0].user,
+            property=property_obj,
+            total=20,
+            adult_male=8,
+            adult_female=12,
+            year=self.annual_populations[0].year,
+            area_available_to_species=10
         )
 
         data = {
@@ -168,7 +186,7 @@ class AnnualPopulationTestCase(AnnualPopulationTestMixins, TestCase):
 
         # Show all property report (1)
         # We only have 1 property with 5 years of data
-        self.assertEqual(len(response.data[1]["Property_report"]), 5)
+        self.assertEqual(len(response.data[1]["Property_report"]), 6)
         for row in response.data[1]["Property_report"]:
             if row['year'] == int(self.annual_populations[0].year):
                 self.assertEqual(row['area_available_to_species'], 10.0)
@@ -176,20 +194,48 @@ class AnnualPopulationTestCase(AnnualPopulationTestMixins, TestCase):
                 self.assertEqual(row['area_available_to_species'], 10)
 
         # Show all sampling report (5)
-        self.assertEqual(len(response.data[2]["Sampling_report"]), 5)
+        self.assertEqual(len(response.data[2]["Sampling_report"]), 6)
         # Show all species report (5)
-        self.assertEqual(len(response.data[3]["Species_report"]), 5)
+        self.assertEqual(len(response.data[3]["Species_report"]), 6)
         # Show province report
-        taxon = self.annual_populations[0].taxon
-        province_name = self.annual_populations[0].property.province.name
         self.assertEqual(
             response.data[4]["Province_report"],
             [
                 {
-                    "common_name": taxon.common_name_varbatim,
-                    "scientific_name": taxon.scientific_name,
-                    f"total_population_{province_name}": 30,
-                }
+                    "year": int(self.annual_populations[4].year),
+                    "common_name": self.annual_populations[-1].taxon.common_name_varbatim,
+                    "scientific_name": self.annual_populations[-1].taxon.scientific_name,
+                    "total_population_Western Cape": 10,
+                    f"total_population_{property_obj.province.name}": 0,
+                },
+                {
+                    "year": int(self.annual_populations[3].year),
+                    "common_name": self.annual_populations[-1].taxon.common_name_varbatim,
+                    "scientific_name": self.annual_populations[-1].taxon.scientific_name,
+                    "total_population_Western Cape": 10,
+                    f"total_population_{property_obj.province.name}": 0,
+                },
+                {
+                    "year": int(self.annual_populations[2].year),
+                    "common_name": self.annual_populations[-1].taxon.common_name_varbatim,
+                    "scientific_name": self.annual_populations[-1].taxon.scientific_name,
+                    "total_population_Western Cape": 10,
+                    f"total_population_{property_obj.province.name}": 0,
+                },
+                {
+                    "year": int(self.annual_populations[1].year),
+                    "common_name": self.annual_populations[-1].taxon.common_name_varbatim,
+                    "scientific_name": self.annual_populations[-1].taxon.scientific_name,
+                    "total_population_Western Cape": 10,
+                    f"total_population_{property_obj.province.name}": 0,
+                },
+                {
+                    "year": int(self.annual_populations[0].year),
+                    "common_name": self.annual_populations[-1].taxon.common_name_varbatim,
+                    "scientific_name": self.annual_populations[-1].taxon.scientific_name,
+                    "total_population_Western Cape": 10,
+                    f"total_population_{property_obj.province.name}": 20,
+                },
             ]
         )
 

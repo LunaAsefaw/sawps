@@ -31,6 +31,7 @@ class TaxonAdmin(admin.ModelAdmin):
                      'taxon_rank__name']
     form = TaxonForm
     actions = [clean_output_caches]
+    readonly_fields = ['topper_icon', 'icon']
 
     def display_color(self, obj):
         return format_html(

@@ -136,9 +136,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
 
             img {
                 margin: auto;
+            }
+
+            .species-image {
+                width: 113px;
             }
         }
     }

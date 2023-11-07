@@ -3,6 +3,7 @@ import {Bar} from 'react-chartjs-2';
 import "./index.scss";
 import Loading from '../../../components/Loading';
 import ChartContainer from "../../../components/ChartContainer";
+import BarChart from "../../../components/BarChart";
 
 type AvailableColors = {
   [key: string]: string;
@@ -110,74 +111,16 @@ const AgeGroupBarChart = (props: any) => {
     };
   } else return null;
 
-  const options = {
-    indexAxis: 'y' as const,
-    scales: {
-      x: {
-        beginAtZero: true,
-        display: true,
-        stacked: true,
-        title: {
-          display: true,
-          text: 'Count', // X-axis label
-          font: {
-            size: 14,
-          },
-        },
-      },
-      y: {
-        display: true,
-        stacked: true,
-        title: {
-          display: true,
-          text: 'Year', // Y-axis label
-          font: {
-            size: 14,
-          },
-        },
-        grid: {
-          display: false,
-        },
-        ticks: {
-          color: "black",
-        },
-      },
-    },
-    plugins: {
-      responsive: true,
-      maintainAspectRatio: false,
-      tooltip: {
-        enabled: true
-      },
-      datalabels: {
-        display: false,
-      },
-      legend: {
-        display: true,
-        position: 'right' as 'right',
-        labels: {
-          boxWidth: 20,
-          boxHeight: 13,
-          padding: 12,
-          font: {
-            size: 10,
-          }
-        },
-      },
-    },
-  } as const;
-
-
   return (
     <>
       {!loading ? (
-        <ChartContainer title={`Population per age group for ${species}`} chart={
-          <Bar
-            data={data}
-            options={options}
-            className={'bar-chart'}
-          />
-        }/>
+        <BarChart
+            chartData={data}
+            chartId={'age-group-bar-chart'}
+            chartTitle={`Population per age group for ${species}`}
+            yLabel={'Year'}
+            xLabel={'Count'}
+        />
       ) : (
         <Loading containerStyle={{minHeight: 160}}/>
       )}

@@ -1,7 +1,10 @@
 """Species models.
 """
+import re
 from django.contrib.auth.models import User
 from django.db import models
+from django.core.files.base import ContentFile
+from django.core.validators import FileExtensionValidator
 
 
 class TaxonRank(models.Model):
@@ -43,10 +46,34 @@ class Taxon(models.Model):
         verbose_name="Front page order", null=False, blank=True, default=0
     )
     colour = models.CharField(max_length=20, null=True, blank=True)
-    icon = models.ImageField(upload_to="taxon_icons", null=True, blank=True)
-    graph_icon = models.ImageField(
+    icon = models.FileField(
+        upload_to="taxon_icons",
+        null=True, blank=True,
+        help_text=(
+            'Will be generated automatically from graph_icon to be used in '
+            'population overview. Please re-upload graph_icon to '
+            'regenerate icon.'
+        )
+    )
+    graph_icon = models.FileField(
         upload_to="taxon_graph_icons",
-        null=True, blank=True
+        null=True, blank=True,
+        validators=[FileExtensionValidator(['svg'])],
+        help_text=(
+            'Use SVG file with black (#000000) '
+            'fill and transparent background. '
+            'It will be used as species icon in graph/charts.'
+        )
+    )
+    topper_icon = models.FileField(
+        upload_to="taxon_topper_icons",
+        null=True, blank=True,
+        validators=[FileExtensionValidator(['svg'])],
+        help_text=(
+            'Will be generated automatically from graph_icon to be used in '
+            'Report and Charts topper. Please re-upload graph_icon to '
+            'regenerate topper_icon.'
+        )
     )
 
     def __str__(self):
@@ -56,6 +83,39 @@ class Taxon(models.Model):
         verbose_name = "Taxon"
         verbose_name_plural = "Taxa"
         db_table = "taxon"
+
+    def replace_fill_color(self, data, new_color):
+        fill_pattern = re.compile(br'fill="[^"]*"', re.IGNORECASE)
+        return fill_pattern.sub(br'fill="' + new_color.encode() + br'"', data)
+
+    def save(self, *args, **kwargs):
+        if self.graph_icon:
+            graph_icon_original = self.graph_icon.read()
+
+            # Edit graph icon fill to be black
+            graph_icon = self.replace_fill_color(
+                graph_icon_original, '#000000'
+            )
+            graph_icon = ContentFile(
+                graph_icon, name=f"{self.scientific_name}-graph.svg"
+            )
+            self.graph_icon = graph_icon
+
+            topper_icon = self.replace_fill_color(
+                graph_icon_original, '#75B37A'
+            )
+            topper_icon = ContentFile(
+                topper_icon, name=f"{self.scientific_name}-topper.svg"
+            )
+            self.topper_icon = topper_icon
+
+            icon = self.replace_fill_color(graph_icon_original, '#FFFFFF')
+            icon = ContentFile(
+                icon, name=f"{self.scientific_name}-icon.svg"
+            )
+            self.icon = icon
+
+        return super().save(*args, **kwargs)
 
 
 class OwnedSpecies(models.Model):

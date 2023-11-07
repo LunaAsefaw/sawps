@@ -1,7 +1,11 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Box, Button, Checkbox, ListItemText, Typography, Grid } from "@mui/material";
 import { useAppSelector } from "../../../app/hooks";
 import { RootState } from "../../../app/store";
+import {
+    useGetTaxonDetailQuery,
+    TaxonDetail
+} from "../../../services/api";
 
 
 interface TopperProps {
@@ -32,6 +36,19 @@ const Topper = () => {
     const todayMonth = String(today.getMonth() + 1).padStart(2, '0')
     const todayYear = today.getFullYear()
     const todayStr = [todayDate, todayMonth, todayYear].join('/')
+    const {data: taxonDetail, isLoading: isTaxonDetailLoading, isSuccess} = useGetTaxonDetailQuery(selectedSpecies)
+    const [speciesIcon, setSpeciesIcon] = useState("/static/images/default-species-topper.svg")
+
+
+    useEffect(() => {
+        if (taxonDetail) {
+            if (taxonDetail.topper_icon) {
+                setSpeciesIcon(taxonDetail.topper_icon)
+            } else {
+                setSpeciesIcon("/static/images/default-species-topper.svg")
+            }
+        }
+    }, [isSuccess, taxonDetail])
 
     return (
       <Box className={'topper-container'}>
@@ -49,7 +66,7 @@ const Topper = () => {
                       <Box className={'topper-detail'}>
                           <Grid container flexDirection={'row'} flexGrow={1}>
                               <Grid item xs>
-                                  <Box><img src="/static/images/lion.svg" alt='Species image'/></Box>
+                                  <Box><img className={'species-image'} src={speciesIcon} alt='Species image'/></Box>
                                   <Box className={'text-content'}><b>{selectedSpecies}</b></Box>
                               </Grid>
                               <Grid item xs>

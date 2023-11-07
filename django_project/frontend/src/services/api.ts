@@ -48,6 +48,7 @@ export interface TaxonDetail {
   id: number
   species_name: string
   graph_icon: any
+  topper_icon: any
   total_population: number
   total_area: number
   colour: string
